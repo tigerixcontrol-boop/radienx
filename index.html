@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RADIEN • Welcome</title>
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI FONT SESUAI BRAND ANDA (opsional)
+     Kalau mau pakai font lain, ganti link Google Fonts ini
+     ═══════════════════════════════════════════════════════════ -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   GANTI WARNA BRAND ANDA DI SINI
+   Cari semua #000, #fff, #050505 dan sesuaikan
+   ═══════════════════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{
+  width:100%;height:100vh;
+  background:#000;color:#fff;
+  font-family:'Orbitron',Arial,sans-serif;
+  overflow:hidden;
+  position:relative;
+}
+#introVideo{
+  position:fixed;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  background:#000;
+  z-index:1;
+}
+/* Overlay gradient */
+.video-overlay{
+  position:fixed;inset:0;
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.4) 0%,transparent 30%,transparent 70%,rgba(0,0,0,.6) 100%);
+  z-index:2;
+  pointer-events:none;
+}
+/* SKIP Button top-right */
+.skip-btn{
+  position:fixed;
+  top:22px;right:22px;
+  z-index:10;
+  padding:12px 22px;
+  border:1.5px solid rgba(255,255,255,.5);
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  color:#fff;
+  font-family:'Orbitron',sans-serif;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:2px;
+  border-radius:14px;
+  cursor:pointer;
+  transition:transform .15s,background .2s;
+  display:flex;align-items:center;gap:8px;
+}
+.skip-btn:active{
+  transform:scale(.94);
+  background:rgba(255,255,255,.25);
+}
+.skip-btn svg{width:14px;height:14px;color:#fff;}
+/* Unmute button bottom-right */
+.unmute-btn{
+  position:fixed;
+  bottom:24px;right:22px;
+  z-index:10;
+  width:48px;height:48px;
+  border:1.5px solid rgba(255,255,255,.4);
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  color:#fff;
+  border-radius:50%;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s,background .2s;
+}
+.unmute-btn:active{transform:scale(.9);}
+.unmute-btn svg{width:20px;height:20px;color:#fff;}
+.unmute-btn.unmuted{
+  background:#fff;
+}
+.unmute-btn.unmuted svg{color:#080808;}
+/* Tap to play overlay (jika autoplay diblok) */
+.tap-overlay{
+  position:fixed;inset:0;
+  z-index:5;
+  background:rgba(0,0,0,.85);
+  display:none;
+  align-items:center;justify-content:center;
+  flex-direction:column;gap:22px;
+  cursor:pointer;
+  text-align:center;
+  padding:40px 24px;
+}
+.tap-overlay.show{display:flex;}
+.tap-overlay-icon{
+  width:90px;height:90px;
+  border-radius:50%;
+  border:2px solid #fff;
+  display:flex;align-items:center;justify-content:center;
+  animation:tapPulse 1.8s ease-in-out infinite;
+}
+@keyframes tapPulse{
+  0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,255,255,.4);}
+  50%{transform:scale(1.05);box-shadow:0 0 0 20px rgba(255,255,255,0);}
+}
+.tap-overlay-icon svg{width:38px;height:38px;margin-left:5px;fill:#fff;}
+.tap-overlay-text{
+  font-family:'Orbitron',sans-serif;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:2.5px;
+}
+.tap-overlay-sub{
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  color:#aaa;
+  letter-spacing:.5px;
+  max-width:280px;
+  line-height:1.5;
+}
+/* Brand overlay kiri bawah */
+.brand-overlay{
+  position:fixed;
+  left:24px;bottom:24px;
+  z-index:8;
+  pointer-events:none;
+  opacity:0;
+  animation:fadeInBrand .8s ease .5s forwards;
+}
+@keyframes fadeInBrand{
+  to{opacity:.85;}
+}
+.brand-overlay h1{
+  font-family:'Orbitron',sans-serif;
+  font-size:18px;
+  font-weight:900;
+  letter-spacing:3px;
+  margin-bottom:6px;
+  text-shadow:0 0 12px rgba(255,255,255,.4);
+}
+.brand-overlay p{
+  font-family:'Orbitron',sans-serif;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:3px;
+  color:rgba(255,255,255,.65);
+}
+/* Loading spinner saat redirect */
+.loading-redirect{
+  position:fixed;inset:0;
+  z-index:20;
+  background:#050505;
+  display:none;
+  flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:22px;
+}
+.loading-redirect.show{display:flex;}
+.loading-redirect-spinner{
+  width:52px;height:52px;
+  border-radius:50%;
+  border:3px solid rgba(255,255,255,.15);
+  border-top-color:#fff;
+  animation:spinRing 1s linear infinite;
+}
+@keyframes spinRing{to{transform:rotate(360deg);}}
+.loading-redirect-text{
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:2.5px;
+  color:#fff;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI VIDEO INTRO ANDA DI SINI
+     Taruh file video intro.mp4 di folder yang sama dengan file HTML ini
+     Atau ganti src dengan URL video Anda
+     ═══════════════════════════════════════════════════════════ -->
+<video id="introVideo" autoplay muted playsinline preload="auto">
+  <source src="intro.mp4" type="video/mp4">
+  Your browser doesn't support video.
+</video>
+
+<div class="video-overlay"></div>
+
+<!-- SKIP Button -->
+<button class="skip-btn" id="skipBtn" onclick="goNext()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <polygon points="5 4 15 12 5 20 5 4"/>
+    <line x1="19" y1="5" x2="19" y2="19"/>
+  </svg>
+  SKIP
+</button>
+
+<!-- Unmute Button -->
+<button class="unmute-btn" id="unmuteBtn" onclick="toggleMute(event)">
+  <svg id="unmuteIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M11 5L6 9H2v6h4l5 4V5Z"/>
+    <line x1="23" y1="9" x2="17" y2="15"/>
+    <line x1="17" y1="9" x2="23" y2="15"/>
+  </svg>
+</button>
+
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI BRAND / NAMA APLIKASI ANDA DI SINI
+     ═══════════════════════════════════════════════════════════ -->
+<div class="brand-overlay">
+  <h1>RADIEN</h1>
+  <p>CONTROL SYSTEM</p>
+</div>
+
+<!-- Tap to play overlay (fallback kalau autoplay diblok) -->
+<div class="tap-overlay" id="tapOverlay" onclick="playVideo()">
+  <div class="tap-overlay-icon">
+    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+  </div>
+  <div class="tap-overlay-text">TAP TO PLAY</div>
+  <div class="tap-overlay-sub">Ketuk layar untuk memutar intro</div>
+</div>
+
+<!-- Loading redirect -->
+<div class="loading-redirect" id="loadingRedirect">
+  <div class="loading-redirect-spinner"></div>
+  <div class="loading-redirect-text">MEMUAT...</div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   SPLASH SCREEN • INTRO VIDEO
+   ═══════════════════════════════════════════════════════════════════════════
+   HAL YANG PERLU DIKUSTOMISASI:
+   1. Nama brand di <div class="brand-overlay">
+   2. Video intro (file intro.mp4)
+   3. Path redirect: 
+      - ganti "home.html" dan "login.html" sesuai nama file Anda
+   4. LocalStorage key: "astra_session" (sesuaikan dengan sistem Anda)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const video = document.getElementById("introVideo");
+const skipBtn = document.getElementById("skipBtn");
+const unmuteBtn = document.getElementById("unmuteBtn");
+const unmuteIcon = document.getElementById("unmuteIcon");
+const tapOverlay = document.getElementById("tapOverlay");
+const loadingRedirect = document.getElementById("loadingRedirect");
+
+let redirected = false;
+let isMuted = true;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ GANTI KEY INI SESUAI SISTEM ANDA
+   Key untuk cek apakah user sudah login sebelumnya
+   ═══════════════════════════════════════════════════════════════════════════ */
+const SESSION_KEY = "astra_session";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ GANTI PATH REDIRECT SESUAI FILE ANDA
+   ═══════════════════════════════════════════════════════════════════════════ */
+const REDIRECT_LOGGED_IN = "home.html";   // ← ganti ke halaman utama Anda
+const REDIRECT_NOT_LOGGED_IN = "login.html"; // ← ganti ke halaman login Anda
+
+/* Coba autoplay muted */
+function tryAutoplay(){
+  video.muted = true;
+  const playPromise = video.play();
+  if(playPromise !== undefined){
+    playPromise.then(function(){
+      console.log("[SPLASH] Autoplay OK");
+    }).catch(function(err){
+      console.log("[SPLASH] Autoplay blocked:", err);
+      tapOverlay.classList.add("show");
+    });
+  }
+}
+
+/* Manual play (dipanggil dari tap overlay) */
+function playVideo(){
+  tapOverlay.classList.remove("show");
+  video.muted = true;
+  video.play().catch(function(err){
+    console.log("[SPLASH] Play failed:", err);
+  });
+}
+
+/* Toggle mute */
+function toggleMute(e){
+  if(e) e.stopPropagation();
+  isMuted = !isMuted;
+  video.muted = isMuted;
+  if(isMuted){
+    unmuteBtn.classList.remove("unmuted");
+    unmuteIcon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5Z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
+  } else {
+    unmuteBtn.classList.add("unmuted");
+    unmuteIcon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5Z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   REDIRECT KE HALAMAN BERIKUTNYA
+   ═══════════════════════════════════════════════════════════════════════════ */
+function goNext(){
+  if(redirected) return;
+  redirected = true;
+
+  // Stop video
+  try{ video.pause(); }catch(e){}
+
+  // Tampilkan loading
+  loadingRedirect.classList.add("show");
+
+  // Cek session login
+  let hasSession = false;
+  try{
+    const raw = localStorage.getItem(SESSION_KEY);
+    if(raw){
+      const session = JSON.parse(raw);
+      if(session && session.username && session.username.length > 0){
+        hasSession = true;
+      }
+    }
+  }catch(e){ hasSession = false; }
+
+  console.log("[SPLASH] Redirecting to:", hasSession ? REDIRECT_LOGGED_IN : REDIRECT_NOT_LOGGED_IN);
+
+  // Redirect setelah animasi singkat
+  setTimeout(function(){
+    if(hasSession){
+      window.location.replace(REDIRECT_LOGGED_IN);
+    } else {
+      window.location.replace(REDIRECT_NOT_LOGGED_IN);
+    }
+  }, 400);
+}
+
+/* ─── Event Listeners ─── */
+video.addEventListener("ended", goNext);
+video.addEventListener("error", function(){
+  console.warn("[SPLASH] Video error, skip ke redirect");
+  setTimeout(goNext, 800);
+});
+video.addEventListener("loadeddata", function(){
+  console.log("[SPLASH] Video loaded");
+});
+video.addEventListener("play", function(){
+  console.log("[SPLASH] Video playing");
+});
+
+/* Safety timeout — kalau video gak load, redirect setelah 15 detik */
+setTimeout(function(){
+  if(!redirected && video.paused){
+    console.warn("[SPLASH] Video tidak diputar, force redirect");
+    goNext();
+  }
+}, 15000);
+
+/* Absolute safety — redirect max 60 detik */
+setTimeout(function(){
+  if(!redirected){
+    console.warn("[SPLASH] Force redirect timeout");
+    goNext();
+  }
+}, 60000);
+
+/* Keyboard: Enter/Space = skip */
+document.addEventListener("keydown", function(e){
+  if(e.key === "Enter" || e.key === " " || e.key === "Escape"){
+    e.preventDefault();
+    goNext();
+  }
+});
+
+/* Swipe up = skip */
+let touchStartY = 0;
+document.addEventListener("touchstart", function(e){
+  if(e.touches && e.touches[0]) touchStartY = e.touches[0].clientY;
+}, {passive:true});
+document.addEventListener("touchend", function(e){
+  if(e.changedTouches && e.changedTouches[0]){
+    const deltaY = touchStartY - e.changedTouches[0].clientY;
+    if(deltaY > 80){
+      // Swipe up
+      goNext();
+    }
+  }
+}, {passive:true});
+
+/* Init */
+tryAutoplay();
+</script>
+</body>
+</html>

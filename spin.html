@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI JUDUL HALAMAN SESUAI BRAND ANDA
+     ═══════════════════════════════════════════════════════════ -->
+<title>SPIN & MENANG • APPNAME</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI FONT SESUAI BRAND ANDA (opsional)
+     ═══════════════════════════════════════════════════════════ -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE SDK — biarkan seperti ini (versi 10.12.2)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+
+:root{
+  --bg:#050505;
+  --card1:#151515;
+  --card2:#0a0a0a;
+  --line:rgba(255,255,255,.15);
+  --line2:rgba(255,255,255,.25);
+  --white:#ffffff;
+  --gray:#999999;
+  --gray2:#666666;
+  --ok:#4ade80;
+  --err:#f87171;
+  --gold:#ffffff;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+
+html{
+  width:100%;min-height:100%;
+  background:#000;
+  scroll-behavior:smooth;
+}
+
+body{
+  width:100%;min-height:100vh;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(255,255,255,.08), transparent 40%),
+    radial-gradient(circle at 100% 50%, rgba(255,255,255,.03), transparent 40%),
+    radial-gradient(circle at 0% 70%, rgba(255,255,255,.03), transparent 40%),
+    #050505;
+  color:#fff;
+  font-family:'Rajdhani',Arial,Helvetica,sans-serif;
+  overflow-x:hidden;
+  padding:24px 16px 40px;
+  position:relative;
+}
+
+body::before{
+  content:"";position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+  background-size:34px 34px;
+  pointer-events:none;
+  z-index:0;
+}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:#444;border-radius:20px;}
+
+.spin-wrapper{
+  width:100%;max-width:480px;
+  margin:0 auto;
+  position:relative;
+  z-index:1;
+}
+
+/* ===================== HEADER ===================== */
+
+.spin-header{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.spin-logo{
+  width:150px;height:50px;
+  margin:0 auto 14px;
+  display:flex;align-items:center;justify-content:center;
+}
+
+.spin-logo img{
+  width:100%;max-width:150px;max-height:46px;
+  object-fit:contain;display:block;
+  filter:drop-shadow(0 0 10px rgba(255,255,255,.2));
+}
+
+.spin-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:26px;font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;
+  text-shadow:0 0 18px rgba(255,255,255,.25);
+  margin-bottom:6px;
+}
+
+.spin-subtitle{
+  font-family:'Orbitron',sans-serif;
+  font-size:9px;font-weight:800;
+  letter-spacing:3px;color:#777;
+}
+
+/* ===================== INFO CARD ===================== */
+
+.info-card{
+  display:grid;
+  grid-template-columns:1fr 1px 1fr;
+  gap:0;
+  border-radius:22px;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#161616,#080808) padding-box,
+             linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.1)) border-box;
+  padding:16px 12px;
+  margin-bottom:22px;
+  align-items:center;
+}
+
+.info-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  padding:0 6px;
+  text-align:center;
+}
+
+.info-label{
+  font-family:'Orbitron',sans-serif;
+  font-size:8px;font-weight:800;
+  letter-spacing:1.5px;
+  color:#777;
+}
+
+.info-value{
+  font-family:'Orbitron',sans-serif;
+  font-size:15px;font-weight:900;
+  letter-spacing:.5px;
+  color:#fff;
+  text-shadow:0 0 8px rgba(255,255,255,.3);
+}
+
+.info-divider{
+  width:1px;
+  height:36px;
+  background:linear-gradient(180deg,transparent,rgba(255,255,255,.3),transparent);
+}
+
+/* ===================== WHEEL ===================== */
+
+.wheel-container{
+  position:relative;
+  width:min(340px,86vw);
+  aspect-ratio:1/1;
+  margin:0 auto 26px;
+}
+
+.wheel-pointer{
+  position:absolute;
+  top:-22px;
+  left:50%;
+  transform:translateX(-50%);
+  width:0;height:0;
+  border-left:16px solid transparent;
+  border-right:16px solid transparent;
+  border-top:38px solid #ffffff;
+  z-index:6;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.8))
+         drop-shadow(0 0 14px rgba(255,255,255,.5));
+  pointer-events:none;
+}
+
+.wheel-pointer::after{
+  content:"";
+  position:absolute;
+  top:-10px;left:50%;
+  transform:translateX(-50%);
+  width:6px;height:6px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 8px #fff;
+}
+
+#wheelCanvas{
+  width:100%;height:100%;
+  display:block;
+  border-radius:50%;
+  box-shadow:
+    0 0 30px rgba(255,255,255,.12),
+    inset 0 0 30px rgba(0,0,0,.6);
+  transition:transform 4.8s cubic-bezier(.15,.65,.15,1);
+  transform-origin:50% 50%;
+  will-change:transform;
+  background:#0a0a0a;
+}
+
+.wheel-center{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:74px;height:74px;
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, #1a1a1a, #050505);
+  border:3px solid #ffffff;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:
+    0 0 24px rgba(255,255,255,.4),
+    0 0 0 6px rgba(0,0,0,.6);
+  z-index:5;
+  pointer-events:none;
+}
+
+.wheel-center-inner{
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;font-weight:900;
+  letter-spacing:1.5px;
+  color:#fff;
+  text-shadow:0 0 6px rgba(255,255,255,.7);
+  text-align:center;
+  line-height:1.1;
+}
+
+.wheel-center-inner small{
+  display:block;
+  font-size:6px;
+  color:#999;
+  letter-spacing:2px;
+  margin-top:2px;
+}
+
+/* ===================== SPIN BUTTON ===================== */
+
+.spin-btn{
+  width:100%;
+  height:64px;
+  border:0;
+  outline:none;
+  border-radius:22px;
+  background:#ffffff;
+  color:#080808;
+  font-family:'Orbitron',sans-serif;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:1.8px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  position:relative;
+  transition:transform .15s, opacity .2s;
+  box-shadow:
+    0 10px 30px rgba(255,255,255,.2),
+    0 0 0 0 rgba(255,255,255,.5);
+  margin-bottom:22px;
+}
+
+.spin-btn:active{transform:scale(.97);}
+.spin-btn:disabled{
+  opacity:.35;
+  cursor:not-allowed;
+  background:#2a2a2a;
+  color:#888;
+  box-shadow:none;
+}
+
+.spin-btn.spinning{
+  background:#1a1a1a;
+  color:#fff;
+  box-shadow:0 0 30px rgba(255,255,255,.3);
+  pointer-events:none;
+}
+
+.spin-btn svg{
+  width:20px;height:20px;
+  color:#080808;
+  transition:color .2s;
+}
+
+.spin-btn.spinning svg{
+  color:#fff;
+  animation:spinIcon 1s linear infinite;
+}
+
+@keyframes spinIcon{
+  from{transform:rotate(0);}
+  to{transform:rotate(360deg);}
+}
+
+/* ===================== HISTORY ===================== */
+
+.history-card{
+  border-radius:22px;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#121212,#080808) padding-box,
+             linear-gradient(135deg,rgba(255,255,255,.25),rgba(255,255,255,.06)) border-box;
+  padding:18px 16px;
+  margin-bottom:20px;
+}
+
+.history-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:2px;
+  color:#999;
+  margin-bottom:14px;
+  padding-bottom:12px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.history-title::before{
+  content:"";
+  width:6px;height:6px;border-radius:50%;
+  background:radial-gradient(circle,#fff,#888);
+  box-shadow:0 0 6px rgba(255,255,255,.9);
+}
+
+.history-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  max-height:280px;
+  overflow-y:auto;
+}
+
+.history-list::-webkit-scrollbar{width:3px;}
+.history-list::-webkit-scrollbar-thumb{background:#444;border-radius:20px;}
+
+.history-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:11px 14px;
+  border-radius:14px;
+  background:linear-gradient(145deg,#1a1a1a,#0d0d0d);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.history-item-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.history-item-icon{
+  width:30px;height:30px;
+  border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.2);
+  background:#0a0a0a;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.history-item-icon svg{
+  width:14px;height:14px;
+  color:#fff;
+}
+
+.history-item-info{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.history-item-label{
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;
+  font-weight:900;
+  color:#fff;
+  letter-spacing:.5px;
+}
+
+.history-item-time{
+  font-size:10px;
+  color:#777;
+  font-weight:600;
+}
+
+.history-item-value{
+  font-family:'Orbitron',sans-serif;
+  font-size:11px;
+  font-weight:900;
+  color:#4ade80;
+  letter-spacing:.5px;
+  text-shadow:0 0 8px rgba(74,222,128,.4);
+}
+
+.history-empty{
+  text-align:center;
+  padding:24px 12px;
+  color:#666;
+  font-size:11.5px;
+  font-weight:600;
+  letter-spacing:.5px;
+}
+
+/* ===================== BACK BUTTON ===================== */
+
+.back-btn{
+  width:100%;
+  height:54px;
+  border-radius:18px;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#161616,#0a0a0a) padding-box,
+             linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.1)) border-box;
+  color:#fff;
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:1.5px;
+  cursor:pointer;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  transition:.15s;
+}
+
+.back-btn:active{transform:scale(.97);}
+
+.back-btn svg{
+  width:16px;height:16px;
+  color:#fff;
+}
+
+.spin-footer{
+  text-align:center;
+  margin-top:22px;
+  color:#555;
+  font-family:'Orbitron',sans-serif;
+  font-size:8px;
+  letter-spacing:2px;
+  font-weight:800;
+}
+
+/* ===================== RESULT MODAL ===================== */
+
+.result-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.88);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  z-index:10000;
+  opacity:0;
+  visibility:hidden;
+  transition:.3s;
+}
+
+.result-overlay.active{
+  opacity:1;
+  visibility:visible;
+}
+
+.result-box{
+  width:100%;
+  max-width:360px;
+  border-radius:30px;
+  border:2px solid transparent;
+  background:linear-gradient(160deg,#1a1a1a,#080808) padding-box,
+             linear-gradient(135deg,#fff,#888,#fff) border-box;
+  padding:36px 26px;
+  text-align:center;
+  transform:translateY(30px) scale(.9);
+  transition:.4s cubic-bezier(.2,.8,.2,1);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.9),
+    0 0 60px rgba(255,255,255,.15);
+}
+
+.result-overlay.active .result-box{
+  transform:translateY(0) scale(1);
+}
+
+.result-icon{
+  width:88px;
+  height:88px;
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#1a1a1a,#050505);
+  border:3px solid #ffffff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 20px;
+  box-shadow:
+    0 0 30px rgba(255,255,255,.5),
+    0 0 60px rgba(255,255,255,.2);
+  animation:popIn .5s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes popIn{
+  0%{transform:scale(.3) rotate(-20deg);opacity:0;}
+  60%{transform:scale(1.15) rotate(5deg);}
+  100%{transform:scale(1) rotate(0);opacity:1;}
+}
+
+.result-icon svg{
+  width:42px;
+  height:42px;
+  color:#ffffff;
+  filter:drop-shadow(0 0 10px rgba(255,255,255,.6));
+}
+
+.result-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:16px;
+  font-weight:900;
+  letter-spacing:2px;
+  color:#fff;
+  margin-bottom:10px;
+  text-shadow:0 0 12px rgba(255,255,255,.4);
+}
+
+.result-text{
+  font-size:12px;
+  color:#999;
+  font-weight:600;
+  letter-spacing:.5px;
+  margin-bottom:8px;
+}
+
+.result-amount{
+  font-family:'Orbitron',sans-serif;
+  font-size:30px;
+  font-weight:900;
+  letter-spacing:1.5px;
+  color:#ffffff;
+  margin-bottom:24px;
+  text-shadow:
+    0 0 16px rgba(255,255,255,.6),
+    0 0 32px rgba(255,255,255,.3);
+  animation:glowPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glowPulse{
+  0%{text-shadow:0 0 16px rgba(255,255,255,.6),0 0 32px rgba(255,255,255,.3);}
+  100%{text-shadow:0 0 24px rgba(255,255,255,.9),0 0 48px rgba(255,255,255,.5);}
+}
+
+.result-claim-btn{
+  width:100%;
+  height:58px;
+  border:0;
+  outline:none;
+  border-radius:19px;
+  background:#ffffff;
+  color:#080808;
+  font-family:'Orbitron',sans-serif;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:1.5px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  transition:.2s;
+  box-shadow:0 8px 24px rgba(255,255,255,.3);
+}
+
+.result-claim-btn:active{transform:scale(.97);}
+.result-claim-btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.result-claim-btn svg{
+  width:18px;height:18px;
+  color:#080808;
+}
+
+/* ===================== TOAST ===================== */
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:30px;
+  transform:translate(-50%,20px);
+  background:#151515;
+  border:1.5px solid transparent;
+  background-image:linear-gradient(#151515,#151515),
+                   linear-gradient(135deg,rgba(255,255,255,.4),rgba(255,255,255,.15));
+  background-origin:border-box;
+  background-clip:padding-box,border-box;
+  color:#fff;
+  padding:13px 20px;
+  border-radius:15px;
+  font-size:11.5px;
+  font-weight:700;
+  opacity:0;
+  visibility:hidden;
+  transition:.3s cubic-bezier(.2,.8,.2,1);
+  z-index:9999;
+  box-shadow:0 15px 45px rgba(0,0,0,.8);
+  max-width:90vw;
+  text-align:center;
+  letter-spacing:.3px;
+}
+
+.toast.show{
+  opacity:1;
+  visibility:visible;
+  transform:translate(-50%,0);
+}
+
+/* ===================== LOADING SCREEN ===================== */
+
+.loading-screen{
+  position:fixed;
+  inset:0;
+  background:#050505;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:20px;
+  z-index:99999;
+  transition:.4s;
+}
+
+.loading-screen.hidden{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+
+.loading-ring{
+  width:54px;height:54px;
+  border-radius:50%;
+  border:3px solid rgba(255,255,255,.15);
+  border-top-color:#fff;
+  animation:spinIcon 1s linear infinite;
+}
+
+.loading-text{
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:2px;
+  color:#888;
+}
+
+/* ===================== RESPONSIVE ===================== */
+
+@media(max-width:390px){
+  body{padding:20px 12px 30px;}
+  .spin-title{font-size:22px;}
+  .spin-logo{width:130px;height:44px;}
+  .info-value{font-size:13px;}
+  .wheel-container{width:min(300px,84vw);}
+  .wheel-center{width:64px;height:64px;}
+  .wheel-center-inner{font-size:9px;}
+  .spin-btn{height:58px;font-size:11px;letter-spacing:1.5px;}
+  .result-box{padding:30px 22px;}
+  .result-amount{font-size:26px;}
+  .result-icon{width:76px;height:76px;}
+  .result-icon svg{width:36px;height:36px;}
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ================= LOADING SCREEN ================= -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-ring"></div>
+  <div class="loading-text">MEMUAT SPIN...</div>
+</div>
+
+<div class="spin-wrapper">
+
+  <!-- ================= HEADER ================= -->
+  <div class="spin-header">
+    <!-- ═══════════════════════════════════════════════════════════
+         GANTI LOGO ANDA DI SINI (header.png)
+         ═══════════════════════════════════════════════════════════ -->
+    <div class="spin-logo">
+      <img src="header.png" alt="LOGO" onerror="this.style.display='none';">
+    </div>
+    <h1 class="spin-title">SPIN & MENANG</h1>
+    <p class="spin-subtitle">COBA KEBERUNTUNGANMU HARI INI</p>
+  </div>
+
+  <!-- ================= INFO CARD ================= -->
+  <div class="info-card">
+    <div class="info-item">
+      <div class="info-label">WALLET</div>
+      <div class="info-value" id="walletDisplay">Rp 0</div>
+    </div>
+    <div class="info-divider"></div>
+    <div class="info-item">
+      <div class="info-label">SISA SPIN</div>
+      <div class="info-value" id="spinsLeft">5 / 5</div>
+    </div>
+  </div>
+
+  <!-- ================= WHEEL ================= -->
+  <div class="wheel-container">
+    <div class="wheel-pointer"></div>
+    <canvas id="wheelCanvas" width="720" height="720"></canvas>
+    <div class="wheel-center">
+      <div class="wheel-center-inner">
+        <!-- ═══════════════════════════════════════════════════════════
+             GANTI "APPNAME" DI BAWAH INI DENGAN BRAND ANDA
+             ═══════════════════════════════════════════════════════════ -->
+        APPNAME
+        <small>SPIN</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SPIN BUTTON ================= -->
+  <button class="spin-btn" id="spinBtn" onclick="doSpin()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <path d="M21 12a9 9 0 1 1-3-6.7"/>
+      <path d="M21 4v5h-5"/>
+    </svg>
+    SPIN SEKARANG
+  </button>
+
+  <!-- ================= HISTORY ================= -->
+  <div class="history-card">
+    <div class="history-title">RIWAYAT SPIN HARI INI</div>
+    <div class="history-list" id="historyList">
+      <div class="history-empty">Belum ada spin hari ini</div>
+    </div>
+  </div>
+
+  <!-- ================= BACK ================= -->
+  <!-- ═══════════════════════════════════════════════════════════
+       GANTI PATH "home.html" SESUAI FILE HOME ANDA
+       ═══════════════════════════════════════════════════════════ -->
+  <a href="home.html" class="back-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <path d="M19 12H5"/>
+      <path d="M12 19l-7-7 7-7"/>
+    </svg>
+    KEMBALI KE BERANDA
+  </a>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       GANTI "APPNAME" DI BAWAH INI DENGAN BRAND ANDA
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="spin-footer">APPNAME • SPIN & WIN • 2026</div>
+
+</div>
+
+<!-- ================= RESULT MODAL ================= -->
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-box">
+    <div class="result-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/>
+      </svg>
+    </div>
+    <div class="result-title" id="resultTitle">SELAMAT!</div>
+    <div class="result-text">Kamu mendapatkan</div>
+    <div class="result-amount" id="resultAmount">Rp 100</div>
+    <button class="result-claim-btn" id="resultClaimBtn" onclick="claimReward()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+      KLAIM SEKARANG
+    </button>
+  </div>
+</div>
+
+<!-- ================= TOAST ================= -->
+<div class="toast" id="toast"></div>
+
+<script>
+
+/* =========================================================
+   SPIN & WIN
+   ========================================================= */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡⚡⚡ KONFIGURASI FIREBASE ⚡⚡⚡
+   ═══════════════════════════════════════════════════════════════════════════
+   GANTI SEMUA VALUE DI BAWAH INI DENGAN MILIK ANDA:
+
+   1. Buka Firebase Console → Project Settings → General
+   2. Scroll ke "Your apps" → pilih Web App
+   3. Copy config dan paste ke sini
+   4. Pastikan Realtime Database sudah dibuat (bukan Firestore)
+   ═══════════════════════════════════════════════════════════════════════════ */
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDLs7Coar_Dy9bE2K4Ha_Q6wG0SmC3m75g",
+    //        ↑ GANTI dengan API Key Anda
+
+    authDomain: "https://radien-95e9d.firebaseapp.com",
+    //            ↑ GANTI dengan Auth Domain Anda
+
+    databaseURL: "https://radien-95e9d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    //             ↑ GANTI dengan Realtime Database URL Anda
+
+    projectId: "radien-95e9d",
+    //           ↑ GANTI dengan Project ID Anda
+
+    storageBucket: "https://radien-95e9d.firebasestorage.app",
+    //               ↑ GANTI dengan Storage Bucket Anda
+
+    messagingSenderId: "208676450122",
+    //                   ↑ GANTI dengan Messaging Sender ID Anda
+
+    appId: "13f1702562e36468a4dbb3"
+    //      ↑ GANTI dengan App ID Anda
+};
+
+let FIREBASE_DB = null;
+let FIREBASE_READY = false;
+let CURRENT_USER = null;
+let CURRENT_USERNAME = null;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ KONFIGURASI SPIN
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const MAX_SPINS_PER_DAY = 5;
+//                          ↑ Batas spin per hari
+//                          GANTI kalau mau batas berbeda
+
+/* =========================================================
+   WHEEL CONFIG
+   8 slices. Weights out of 1000.
+   Weight lebih besar = lebih sering muncul.
+   Value = hadiah dalam Rupiah.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const SLICES = [
+    { value: 100,   label: "100",  weight: 550 },
+    { value: 200,   label: "200",  weight: 250 },
+    { value: 300,   label: "300",  weight: 100 },
+    { value: 500,   label: "500",  weight:  50 },
+    { value: 1000,  label: "1K",   weight:  30 },
+    { value: 5000,  label: "5K",   weight:  10 },
+    { value: 10000, label: "10K",  weight:   5 },
+    { value: 50000, label: "50K",  weight:   5 }
+    // ↑ GANTI value/label/weight sesuai keinginan Anda
+    // Total weight = 1000 (mudah untuk hitung persentase)
+];
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ SESSION STORAGE KEY
+   ⚠️ WAJIB SAMA dengan file login.html
+   ═══════════════════════════════════════════════════════════════════════════ */
+const STORAGE_KEY_SESSION = "astra_session";
+//                            ↑ GANTI kalau perlu (harus SAMA semua file)
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ FIREBASE DATABASE PATHS
+   ⚠️ Sesuaikan dengan struktur database Anda
+   ═══════════════════════════════════════════════════════════════════════════ */
+const DB_PATH_WALLETS = "wallets";
+//                       ↑ Path utama wallet data
+
+/* State */
+let wheelRotation = 0;
+let isSpinning = false;
+let currentSpinData = { dateKey:"", used:0, won:0, history:[] };
+let pendingPrize = null;
+let pendingPrizeIndex = -1;
+
+/* =========================================================
+   FIREBASE
+   ========================================================= */
+function initFirebase(){
+    try{
+        if(typeof firebase === "undefined") return false;
+        if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        FIREBASE_DB = firebase.database();
+        FIREBASE_READY = true;
+        return true;
+    }catch(e){
+        console.error("[FIREBASE] init:", e);
+        return false;
+    }
+}
+
+/* =========================================================
+   AUTH (from localStorage session)
+   ========================================================= */
+function loadSession(){
+    try{
+        const raw = localStorage.getItem(STORAGE_KEY_SESSION);
+        if(!raw) return null;
+        const s = JSON.parse(raw);
+        if(!s || !s.username) return null;
+        return s;
+    }catch(e){ return null; }
+}
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+function getJakartaDateKey(){
+    const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone:"Asia/Jakarta",
+        year:"numeric", month:"2-digit", day:"2-digit"
+    }).formatToParts(new Date());
+    const r = {};
+    parts.forEach(p => { if(p.type !== "literal") r[p.type] = p.value; });
+    return r.year + "-" + r.month + "-" + r.day;
+}
+
+function formatRupiah(n){
+    return new Intl.NumberFormat("id-ID", {
+        style:"currency", currency:"IDR",
+        minimumFractionDigits:0, maximumFractionDigits:0
+    }).format(n);
+}
+
+function getWalletKey(){
+    return "astra_wallet_balance_" + CURRENT_USERNAME.toLowerCase();
+}
+
+let toastTimer = null;
+function showToast(msg, type){
+    const t = document.getElementById("toast");
+    if(!t) return;
+    t.textContent = msg;
+    t.className = "toast show" + (type ? " " + type : "");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.className = "toast"; }, 2800);
+}
+
+/* =========================================================
+   WHEEL DRAWING
+   ========================================================= */
+function drawWheel(){
+    const canvas = document.getElementById("wheelCanvas");
+    if(!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width;
+    const H = canvas.height;
+    const cx = W / 2;
+    const cy = H / 2;
+    const R = W / 2 - 8;
+    const n = SLICES.length;
+    const sliceAngle = (2 * Math.PI) / n;
+
+    ctx.clearRect(0, 0, W, H);
+
+    for (let i = 0; i < n; i++){
+        const start = -Math.PI / 2 + i * sliceAngle;
+        const end = start + sliceAngle;
+
+        const isDark = (i % 2 === 0);
+
+        // slice
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, R, start, end);
+        ctx.closePath();
+        ctx.fillStyle = isDark ? "#0d0d0d" : "#e8e8e8";
+        ctx.fill();
+
+        // slice border
+        ctx.strokeStyle = "#050505";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // text
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(start + sliceAngle / 2);
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = isDark ? "#ffffff" : "#050505";
+        ctx.font = "900 " + Math.floor(W / 20) + "px Orbitron, Arial, sans-serif";
+        ctx.fillText(SLICES[i].label, R * 0.68, 0);
+
+        // "Rp" kecil di bawah label (opsional)
+        ctx.font = "700 " + Math.floor(W / 40) + "px Orbitron, Arial, sans-serif";
+        ctx.globalAlpha = 0.55;
+        ctx.fillText("Rp", R * 0.68, Math.floor(W / 22));
+        ctx.globalAlpha = 1;
+        ctx.restore();
+    }
+
+    // ring luarnya
+    ctx.beginPath();
+    ctx.arc(cx, cy, R + 4, 0, Math.PI * 2);
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 6;
+    ctx.stroke();
+
+    // inner ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 0.32, 0, Math.PI * 2);
+    ctx.strokeStyle = "#050505";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+}
+
+/* =========================================================
+   WEIGHTED RANDOM
+   ========================================================= */
+function rollSliceIndex(){
+    const total = SLICES.reduce((s, x) => s + x.weight, 0);
+    let r = Math.random() * total;
+    for (let i = 0; i < SLICES.length; i++){
+        r -= SLICES[i].weight;
+        if (r < 0) return i;
+    }
+    return 0;
+}
+
+/* =========================================================
+   SPIN ANIMATION
+   ========================================================= */
+function spinWheelTo(index){
+    const sliceAngleDeg = 360 / SLICES.length;
+    // Slice i center ada di (initial) -90 + i*45 + 22.5 = -67.5 + i*45 (derajat)
+    // Pointer ada di -90 (atas)
+    // Target rotation: baseTarget = -22.5 - i*45
+    const jitter = (Math.random() - 0.5) * sliceAngleDeg * 0.55;
+    const baseTarget = -22.5 - index * 45 + jitter;
+
+    const currentMod = ((wheelRotation % 360) + 360) % 360;
+    const targetMod  = ((baseTarget % 360) + 360) % 360;
+
+    let diff = targetMod - currentMod;
+    if (diff <= 0) diff += 360;
+
+    const spins = 6 + Math.floor(Math.random() * 3); // 6-8 putaran
+    const finalRotation = wheelRotation + spins * 360 + diff;
+
+    wheelRotation = finalRotation;
+
+    const canvas = document.getElementById("wheelCanvas");
+    canvas.style.transform = "rotate(" + finalRotation + "deg)";
+}
+
+/* =========================================================
+   UI - HISTORY
+   ========================================================= */
+function renderHistory(){
+    const el = document.getElementById("historyList");
+    if (!el) return;
+    const hist = (currentSpinData.history || []).slice(0, 20);
+    if (hist.length === 0){
+        el.innerHTML = '<div class="history-empty">Belum ada spin hari ini</div>';
+        return;
+    }
+    let html = "";
+    hist.forEach(item => {
+        const time = new Date(item.at).toLocaleTimeString("id-ID", {
+            hour:"2-digit", minute:"2-digit", hour12:false
+        });
+        html +=
+            '<div class="history-item">' +
+                '<div class="history-item-left">' +
+                    '<div class="history-item-icon">' +
+                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                            '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/>' +
+                        '</svg>' +
+                    '</div>' +
+                    '<div class="history-item-info">' +
+                        '<div class="history-item-label">SPIN</div>' +
+                        '<div class="history-item-time">' + time + '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="history-item-value">+ ' + formatRupiah(item.value) + '</div>' +
+            '</div>';
+    });
+    el.innerHTML = html;
+}
+
+/* =========================================================
+   UI - REFRESH
+   ========================================================= */
+function refreshUI(){
+    const used = currentSpinData.used || 0;
+    const left = Math.max(0, MAX_SPINS_PER_DAY - used);
+
+    const spinsEl = document.getElementById("spinsLeft");
+    if (spinsEl) spinsEl.textContent = left + " / " + MAX_SPINS_PER_DAY;
+
+    const btn = document.getElementById("spinBtn");
+    if (btn){
+        if (left <= 0){
+            btn.disabled = true;
+            btn.innerHTML =
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+                    '<circle cx="12" cy="12" r="9"/>' +
+                    '<path d="M12 7v5l3 2"/>' +
+                '</svg>' +
+                'BATAS SPIN HARI INI';
+        } else if (isSpinning){
+            btn.disabled = true;
+            btn.classList.add("spinning");
+            btn.innerHTML =
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+                    '<path d="M21 12a9 9 0 1 1-3-6.7"/>' +
+                    '<path d="M21 4v5h-5"/>' +
+                '</svg>' +
+                'SEDANG MUTER...';
+        } else {
+            btn.disabled = false;
+            btn.classList.remove("spinning");
+            btn.innerHTML =
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+                    '<path d="M21 12a9 9 0 1 1-3-6.7"/>' +
+                    '<path d="M21 4v5h-5"/>' +
+                '</svg>' +
+                'SPIN SEKARANG';
+        }
+    }
+
+    renderHistory();
+}
+
+/* =========================================================
+   WALLET DISPLAY
+   ========================================================= */
+function loadWalletDisplay(){
+    // Prioritas: Firebase
+    if (FIREBASE_READY && CURRENT_USERNAME){
+        FIREBASE_DB.ref(DB_PATH_WALLETS + "/" + CURRENT_USERNAME + "/balance").once("value")
+            .then(snap => {
+                const v = snap.val() || 0;
+                localStorage.setItem(getWalletKey(), String(v));
+                const el = document.getElementById("walletDisplay");
+                if (el) el.textContent = formatRupiah(v);
+            })
+            .catch(() => {
+                const cached = parseInt(localStorage.getItem(getWalletKey()), 10) || 0;
+                const el = document.getElementById("walletDisplay");
+                if (el) el.textContent = formatRupiah(cached);
+            });
+    } else {
+        const cached = parseInt(localStorage.getItem(getWalletKey()), 10) || 0;
+        const el = document.getElementById("walletDisplay");
+        if (el) el.textContent = formatRupiah(cached);
+    }
+}
+
+/* =========================================================
+   SPIN DATA (daily usage)
+   ========================================================= */
+function loadSpinData(){
+    if (!FIREBASE_READY || !CURRENT_USERNAME){
+        // fallback localStorage
+        const todayKey = getJakartaDateKey();
+        const key = "astra_spin_data_" + CURRENT_USERNAME.toLowerCase();
+        try{
+            const raw = localStorage.getItem(key);
+            const d = raw ? JSON.parse(raw) : null;
+            if (d && d.dateKey === todayKey) return Promise.resolve(d);
+        }catch(e){}
+        return Promise.resolve({ dateKey: todayKey, used:0, won:0, history:[] });
+    }
+
+    const todayKey = getJakartaDateKey();
+    return FIREBASE_DB.ref(DB_PATH_WALLETS + "/" + CURRENT_USERNAME + "/spinData")
+        .once("value")
+        .then(snap => {
+            const d = snap.val() || {};
+            let hist = d.history;
+            if (hist && !Array.isArray(hist)){
+                // Firebase kadang simpan array sebagai object
+                const keys = Object.keys(hist).sort((a,b) => Number(a) - Number(b));
+                hist = keys.map(k => hist[k]);
+            }
+            if (!hist) hist = [];
+
+            if (d.dateKey !== todayKey){
+                // Reset untuk hari baru
+                return { dateKey: todayKey, used:0, won:0, history:[] };
+            }
+            return {
+                dateKey: d.dateKey,
+                used: d.used || 0,
+                won: d.won || 0,
+                history: hist
+            };
+        })
+        .catch(() => {
+            return { dateKey: todayKey, used:0, won:0, history:[] };
+        });
+}
+
+function saveSpinData(){
+    const todayKey = getJakartaDateKey();
+    currentSpinData.dateKey = todayKey;
+
+    const localKey = "astra_spin_data_" + CURRENT_USERNAME.toLowerCase();
+    try{
+        localStorage.setItem(localKey, JSON.stringify(currentSpinData));
+    }catch(e){}
+
+    if (FIREBASE_READY && CURRENT_USERNAME){
+        FIREBASE_DB.ref(DB_PATH_WALLETS + "/" + CURRENT_USERNAME + "/spinData")
+            .set(currentSpinData)
+            .catch(err => console.warn("[SPIN] save error:", err));
+    }
+}
+
+/* =========================================================
+   SPIN ACTION
+   ========================================================= */
+function doSpin(){
+    if (isSpinning) return;
+    if (!CURRENT_USERNAME){
+        showToast("Silakan login dulu", "error");
+        return;
+    }
+
+    const used = currentSpinData.used || 0;
+    if (used >= MAX_SPINS_PER_DAY){
+        showToast("Batas spin hari ini sudah habis", "error");
+        return;
+    }
+
+    isSpinning = true;
+    pendingPrize = null;
+    pendingPrizeIndex = -1;
+    refreshUI();
+
+    if (navigator.vibrate) navigator.vibrate(40);
+
+    // Roll prize (weighted)
+    const sliceIdx = rollSliceIndex();
+    const prize = SLICES[sliceIdx].value;
+    pendingPrize = prize;
+    pendingPrizeIndex = sliceIdx;
+
+    // Animate wheel
+    spinWheelTo(sliceIdx);
+
+    // Tunggu sampai animasi selesai (4.8s)
+    setTimeout(() => {
+        isSpinning = false;
+        showResultPopup(prize);
+    }, 5000);
+}
+
+/* =========================================================
+   RESULT POPUP
+   ========================================================= */
+function showResultPopup(prize){
+    const overlay = document.getElementById("resultOverlay");
+    const amountEl = document.getElementById("resultAmount");
+    const titleEl  = document.getElementById("resultTitle");
+
+    amountEl.textContent = formatRupiah(prize);
+
+    if (prize >= 50000){
+        titleEl.textContent = "🎉 JACKPOT! 🎉";
+    } else if (prize >= 1000){
+        titleEl.textContent = "LUAR BIASA!";
+    } else {
+        titleEl.textContent = "SELAMAT!";
+    }
+
+    overlay.classList.add("active");
+    if (navigator.vibrate){
+        if (prize >= 50000) navigator.vibrate([100, 50, 100, 50, 200, 80, 300]);
+        else if (prize >= 1000) navigator.vibrate([80, 40, 120]);
+        else navigator.vibrate(60);
+    }
+}
+
+/* =========================================================
+   CLAIM REWARD
+   ========================================================= */
+function claimReward(){
+    if (pendingPrize == null) return;
+
+    const prize = pendingPrize;
+    const btn = document.getElementById("resultClaimBtn");
+    btn.disabled = true;
+    btn.textContent = "MEMPROSES...";
+
+    const finish = (finalBalance) => {
+        // Update history
+        const now = Date.now();
+        const newHistory = [{ value: prize, at: now }]
+            .concat(currentSpinData.history || [])
+            .slice(0, 30);
+
+        currentSpinData.used = (currentSpinData.used || 0) + 1;
+        currentSpinData.won  = (currentSpinData.won  || 0) + prize;
+        currentSpinData.history = newHistory;
+        saveSpinData();
+
+        // Update UI
+        document.getElementById("walletDisplay").textContent = formatRupiah(finalBalance);
+        refreshUI();
+
+        // Close popup
+        document.getElementById("resultOverlay").classList.remove("active");
+        btn.disabled = false;
+        btn.innerHTML =
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+                '<path d="M20 6L9 17l-5-5"/>' +
+            '</svg>KLAIM SEKARANG';
+
+        pendingPrize = null;
+        pendingPrizeIndex = -1;
+
+        showToast("✓ " + formatRupiah(prize) + " masuk ke wallet!", "success");
+    };
+
+    // Atomic-ish: read then write
+    const walletRef = FIREBASE_DB
+        ? FIREBASE_DB.ref(DB_PATH_WALLETS + "/" + CURRENT_USERNAME + "/balance")
+        : null;
+
+    if (walletRef){
+        walletRef.transaction(current => {
+            const cur = (typeof current === "number") ? current : 0;
+            return cur + prize;
+        }).then(res => {
+            if (!res.committed){
+                // fallback: read then write
+                return walletRef.once("value").then(snap => {
+                    const cur = snap.val() || 0;
+                    const nb = cur + prize;
+                    return walletRef.set(nb).then(() => nb);
+                });
+            }
+            const nb = res.snapshot.val() || 0;
+            return nb;
+        }).then(nb => {
+            localStorage.setItem(getWalletKey(), String(nb));
+            finish(nb);
+        }).catch(err => {
+            console.error("[CLAIM] error:", err);
+            // Fallback: pakai localStorage saja
+            const cur = parseInt(localStorage.getItem(getWalletKey()), 10) || 0;
+            const nb = cur + prize;
+            localStorage.setItem(getWalletKey(), String(nb));
+            finish(nb);
+        });
+    } else {
+        // No Firebase — fallback localStorage
+        const cur = parseInt(localStorage.getItem(getWalletKey()), 10) || 0;
+        const nb = cur + prize;
+        localStorage.setItem(getWalletKey(), String(nb));
+        finish(nb);
+    }
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+function initPage(){
+    initFirebase();
+
+    // Cek session
+    const sess = loadSession();
+    if (!sess){
+        /* ═══════════════════════════════════════════════════════════
+           GANTI PATH "login.html" SESUAI FILE LOGIN ANDA
+           ═══════════════════════════════════════════════════════════ */
+        window.location.replace("login.html");
+        return;
+    }
+
+    CURRENT_USER = sess;
+    CURRENT_USERNAME = (sess.username || "").toLowerCase();
+
+    // Draw wheel
+    drawWheel();
+
+    // Load data
+    loadWalletDisplay();
+
+    loadSpinData().then(d => {
+        currentSpinData = d;
+        refreshUI();
+        document.getElementById("loadingScreen").classList.add("hidden");
+    }).catch(() => {
+        currentSpinData = { dateKey: getJakartaDateKey(), used:0, won:0, history:[] };
+        refreshUI();
+        document.getElementById("loadingScreen").classList.add("hidden");
+    });
+}
+
+document.addEventListener("DOMContentLoaded", initPage);
+
+/* Anti double-tap zoom */
+let lastTouchEnd = 0;
+document.addEventListener("touchend", function(e){
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) e.preventDefault();
+    lastTouchEnd = now;
+}, false);
+
+</script>
+
+</body>
+</html>

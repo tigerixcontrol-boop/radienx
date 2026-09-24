@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI JUDUL APLIKASI ANDA DI SINI
+     ═══════════════════════════════════════════════════════════ -->
+<title>RADIEN • BLOCK APPS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI FONT SESUAI BRAND ANDA (opsional)
+     ═══════════════════════════════════════════════════════════ -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE SDK — biarkan seperti ini (versi 10.12.2)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+:root{
+  --white:#ffffff;
+  --rgbBorder:linear-gradient(135deg,#666,#ffffff,#bbbbbb,#ffffff,#666);
+  --bg:#0a0a0a;
+  --bg2:#050505;
+  --ok:#4ade80;
+  --red:#f87171;
+  --warn:#fbbf24;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{width:100%;min-height:100%;background:#000;}
+body{
+  width:100%;min-height:100vh;
+  background:
+    radial-gradient(circle at 20% 10%,rgba(255,255,255,.06),transparent 42%),
+    radial-gradient(circle at 85% 30%,rgba(255,255,255,.05),transparent 46%),
+    radial-gradient(circle at 50% 90%,rgba(255,255,255,.05),transparent 46%),
+    #050505;
+  color:#fff;
+  font-family:'Rajdhani',Arial,Helvetica,sans-serif;
+  overflow-x:hidden;
+  padding-bottom:40px;
+}
+body::before{
+  content:"";position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:34px 34px;pointer-events:none;z-index:-1;
+}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:#050505;}
+::-webkit-scrollbar-thumb{background:#888;border-radius:20px;}
+.app{width:100%;max-width:520px;margin:0 auto;padding:0 16px;}
+
+.topbar{height:92px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:20;}
+.back-btn{
+  width:46px;height:46px;border-radius:15px;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#1a1a1a,#0a0a0a) padding-box,
+             linear-gradient(135deg,#555,#fff,#888) border-box;
+  color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.back-btn svg{width:22px;height:22px;color:#fff;}
+.logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:170px;height:58px;display:flex;align-items:center;justify-content:center;}
+.logo img{display:block;width:100%;max-width:170px;max-height:55px;object-fit:contain;filter:grayscale(100%) brightness(1.2);}
+.status-wrap{width:46px;height:46px;display:flex;align-items:center;justify-content:center;}
+.status-dot{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle,#fff,#888);box-shadow:0 0 8px rgba(255,255,255,.8);}
+
+.page-title{margin-top:7px;margin-bottom:20px;text-align:center;}
+.page-title h1{font-family:'Orbitron',sans-serif;font-size:27px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#fff;}
+.page-title p{margin-top:7px;font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:3px;font-weight:700;color:#fff;}
+
+/* ⚡ DEVICE BAR — sekarang bisa DIKLIK untuk ganti device */
+.device-bar{
+  border-radius:24px;padding:16px 18px;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#161616,#0a0a0a) padding-box,
+             var(--rgbBorder) border-box;
+  display:flex;align-items:center;gap:13px;
+  margin-bottom:12px;position:relative;
+  cursor:pointer;transition:transform .15s;
+}
+.device-bar:active{transform:scale(.98);}
+.device-bar-icon{
+  width:46px;height:46px;border-radius:14px;flex-shrink:0;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#1a1a1a,#0a0a0a) padding-box,
+             linear-gradient(135deg,rgba(255,255,255,.5),rgba(255,255,255,.2)) border-box;
+  display:flex;align-items:center;justify-content:center;
+}
+.device-bar-icon svg{width:22px;height:22px;color:#fff;}
+.device-bar-info{flex:1;min-width:0;}
+.device-bar-info h3{
+  font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;
+  letter-spacing:.5px;margin-bottom:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;
+}
+.device-bar-info p{
+  font-size:11px;color:#bbb;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.device-bar-status{display:flex;align-items:center;gap:6px;margin-top:5px;}
+.device-bar-status .dot{width:7px;height:7px;border-radius:50%;background:radial-gradient(circle,#fff,#aaa);box-shadow:0 0 6px rgba(255,255,255,.8);}
+.device-bar-status .dot.offline{background:#444;box-shadow:none;}
+.device-bar-status span{font-family:'Orbitron',sans-serif;font-size:8px;font-weight:800;letter-spacing:1px;color:#fff;}
+.device-bar-status span.offline{color:#777;}
+
+/* ⚡ SWITCH DEVICE button */
+.device-bar-switch{
+  width:38px;height:38px;flex-shrink:0;border-radius:12px;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#1a1a1a,#0a0a0a) padding-box,
+             linear-gradient(135deg,rgba(255,255,255,.5),rgba(255,255,255,.2)) border-box;
+  display:flex;align-items:center;justify-content:center;
+}
+.device-bar-switch svg{width:17px;height:17px;color:#fff;}
+
+.info-banner{
+  border-radius:20px;padding:14px 16px;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#0d0d0d,#050505) padding-box,
+             linear-gradient(135deg,#fff,#888) border-box;
+  display:flex;gap:12px;align-items:flex-start;
+  margin-bottom:16px;
+}
+.info-banner svg{width:20px;height:20px;color:#fff;flex-shrink:0;margin-top:2px;}
+.info-banner-text{flex:1;font-size:11px;line-height:1.55;font-weight:700;color:#ccc;}
+.info-banner-text b{color:#fff;}
+
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:16px;}
+.stat-box{
+  border-radius:18px;padding:14px 10px;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#161616,#0a0a0a) padding-box,
+             var(--rgbBorder) border-box;
+  text-align:center;
+}
+.stat-box .stat-value{font-family:'Orbitron',sans-serif;font-size:17px;font-weight:900;color:#fff;letter-spacing:.5px;margin-bottom:4px;}
+.stat-box .stat-label{font-family:'Orbitron',sans-serif;font-size:7px;font-weight:800;letter-spacing:1px;color:#999;}
+
+.search-wrap{
+  display:flex;align-items:center;gap:10px;
+  height:52px;border-radius:16px;padding:0 16px;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#0d0d0d,#050505) padding-box,
+             var(--rgbBorder) border-box;
+  margin-bottom:12px;
+}
+.search-wrap svg{width:17px;height:17px;color:#888;flex-shrink:0;}
+.search-wrap input{
+  flex:1;border:0;outline:none;background:transparent;
+  color:#fff;font-family:'Rajdhani',sans-serif;
+  font-size:14px;font-weight:600;-webkit-text-fill-color:#fff;
+}
+.search-wrap input::placeholder{color:#666;-webkit-text-fill-color:#666;}
+
+.app-list{display:flex;flex-direction:column;gap:10px;}
+.app-item{
+  display:flex;align-items:center;gap:14px;
+  padding:14px;border-radius:20px;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#161616,#0a0a0a) padding-box,
+             linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.12)) border-box;
+  transition:transform .15s, opacity .15s;
+  position:relative;overflow:hidden;
+}
+.app-item:active{transform:scale(.99);}
+.app-item.blocked{
+  background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.03)) padding-box,
+             linear-gradient(135deg,#fff,#aaa) border-box;
+}
+.app-item.blocked::after{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:#fff;border-radius:0 4px 4px 0;
+}
+.app-icon{
+  width:48px;height:48px;border-radius:14px;flex-shrink:0;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#1a1a1a,#0a0a0a) padding-box,
+             linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.15)) border-box;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.app-icon img{width:100%;height:100%;object-fit:cover;display:block;border-radius:12px;filter:grayscale(20%);}
+.app-icon .fallback{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;color:#fff;}
+.app-info{flex:1;min-width:0;}
+.app-name{
+  font-family:'Orbitron',sans-serif;font-size:11.5px;font-weight:900;
+  letter-spacing:.3px;color:#fff;margin-bottom:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.app-pkg{
+  font-size:10px;color:#888;font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.2px;
+}
+.app-badge-system{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 7px;border-radius:7px;
+  background:rgba(255,255,255,.1);
+  font-family:'Orbitron',sans-serif;font-size:6.5px;
+  font-weight:900;letter-spacing:.6px;color:#fff;margin-left:6px;
+}
+.app-toggle{
+  display:flex;flex-shrink:0;border-radius:12px;padding:3px;gap:3px;
+  background:linear-gradient(#0d0d0d,#0d0d0d) padding-box,
+             var(--rgbBorder) border-box;
+  border:1.5px solid transparent;
+}
+.app-toggle .sw-btn{
+  width:42px;height:32px;border:0;outline:none;border-radius:9px;
+  background:transparent;color:#fff;-webkit-text-fill-color:#fff;
+  font-family:'Orbitron',sans-serif;font-size:8.5px;font-weight:900;
+  letter-spacing:.5px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:.15s;
+}
+.app-toggle .sw-btn.on.active{background:#fff !important;color:#080808 !important;-webkit-text-fill-color:#080808 !important;}
+.app-toggle .sw-btn.off.active{background:#4a4a4a !important;color:#fff !important;-webkit-text-fill-color:#fff !important;}
+
+.loading-state,.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 20px;text-align:center;gap:16px;
+}
+.loading-ring{width:46px;height:46px;border-radius:50%;border:3px solid rgba(255,255,255,.15);border-top-color:#fff;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text,.empty-title{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;letter-spacing:1.5px;color:#fff;}
+.empty-text{font-size:11.5px;line-height:1.55;font-weight:700;max-width:280px;color:#999;}
+.empty-icon{
+  width:70px;height:70px;border-radius:22px;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#161616,#0a0a0a) padding-box,
+             linear-gradient(135deg,rgba(255,255,255,.4),rgba(255,255,255,.15)) border-box;
+  display:flex;align-items:center;justify-content:center;
+}
+.empty-icon svg{width:34px;height:34px;color:#666;}
+
+.block-preview-overlay{
+  position:fixed;inset:0;background:#000;z-index:2000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:24px;padding:30px;text-align:center;
+  opacity:0;visibility:hidden;transition:opacity .25s, visibility .25s;pointer-events:none;
+}
+.block-preview-overlay.active{opacity:1;visibility:visible;}
+.block-preview-icon{
+  width:110px;height:110px;border-radius:50%;border:3px solid #fff;
+  background:rgba(255,255,255,.05);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 60px rgba(255,255,255,.3),0 0 120px rgba(255,255,255,.15);
+  animation:pulseRing 1.2s ease-in-out infinite;
+}
+@keyframes pulseRing{
+  0%,100%{transform:scale(1);box-shadow:0 0 60px rgba(255,255,255,.3),0 0 120px rgba(255,255,255,.15);}
+  50%{transform:scale(1.06);box-shadow:0 0 80px rgba(255,255,255,.5),0 0 160px rgba(255,255,255,.25);}
+}
+.block-preview-icon svg{width:60px;height:60px;color:#fff;filter:drop-shadow(0 0 12px rgba(255,255,255,.6));}
+.block-preview-text{
+  font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;
+  letter-spacing:3px;color:#fff;line-height:1.35;
+  text-shadow:0 0 20px rgba(255,255,255,.5);
+  animation:fadeInUp .3s ease;
+}
+.block-preview-sub{
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:800;
+  letter-spacing:2px;color:#999;margin-top:-8px;
+  padding:8px 16px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);
+  animation:fadeInUp .4s ease;
+}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ⚡ DEVICE PICKER MODAL ⚡ */
+.device-picker-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.85);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;visibility:hidden;transition:.25s;z-index:2500;
+}
+.device-picker-overlay.active{opacity:1;visibility:visible;}
+.device-picker-box{
+  width:100%;max-width:420px;
+  border:2px solid transparent;border-radius:26px;
+  padding:22px 20px;
+  background:linear-gradient(160deg,#181818,#080808) padding-box,
+             linear-gradient(90deg,#333,#fff,#555,#fff,#333) border-box;
+  max-height:85vh;overflow-y:auto;
+  transform:translateY(20px) scale(.96);opacity:0;
+  transition:transform .25s cubic-bezier(.2,.8,.2,1),opacity .25s;
+  box-shadow:0 0 30px rgba(255,255,255,.1);
+}
+.device-picker-overlay.active .device-picker-box{
+  transform:translateY(0) scale(1);opacity:1;
+}
+.device-picker-head{
+  display:flex;align-items:center;gap:12px;margin-bottom:18px;
+}
+.device-picker-head-icon{
+  width:44px;height:44px;border-radius:14px;flex-shrink:0;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#1a1a1a,#0a0a0a) padding-box,
+             linear-gradient(135deg,rgba(255,255,255,.5),rgba(255,255,255,.2)) border-box;
+  display:flex;align-items:center;justify-content:center;
+}
+.device-picker-head-icon svg{width:21px;height:21px;color:#fff;}
+.device-picker-title{
+  font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;
+  letter-spacing:1px;color:#fff;margin-bottom:3px;
+}
+.device-picker-subtitle{
+  font-size:11px;font-weight:700;color:#999;
+}
+.device-picker-close{
+  margin-left:auto;width:36px;height:36px;border-radius:12px;border:0;
+  background:rgba(255,255,255,.08);color:#fff;
+  font-size:20px;font-family:Arial,sans-serif;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+
+.device-picker-list{display:flex;flex-direction:column;gap:10px;}
+.device-pick-item{
+  display:flex;align-items:center;gap:13px;
+  padding:14px;border-radius:18px;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#161616,#0a0a0a) padding-box,
+             linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.12)) border-box;
+  cursor:pointer;transition:transform .15s;
+  position:relative;
+}
+.device-pick-item:active{transform:scale(.98);}
+.device-pick-item.current{
+  background:linear-gradient(145deg,rgba(255,255,255,.1),rgba(255,255,255,.03)) padding-box,
+             linear-gradient(135deg,#fff,#aaa) border-box;
+}
+.device-pick-item.current::after{
+  content:"✓";position:absolute;top:10px;right:14px;
+  font-size:15px;font-weight:900;color:#fff;
+}
+.device-pick-icon{
+  width:46px;height:46px;border-radius:14px;flex-shrink:0;
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,#1a1a1a,#0a0a0a) padding-box,
+             linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.15)) border-box;
+  display:flex;align-items:center;justify-content:center;
+}
+.device-pick-icon svg{width:22px;height:22px;color:#fff;}
+.device-pick-info{flex:1;min-width:0;}
+.device-pick-info h4{
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;
+  letter-spacing:.5px;color:#fff;margin-bottom:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.device-pick-info p{
+  font-size:10.5px;color:#aaa;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.device-pick-status{
+  display:flex;align-items:center;gap:6px;margin-top:5px;
+}
+.device-pick-status .dot{
+  width:7px;height:7px;border-radius:50%;
+  background:radial-gradient(circle,#fff,#aaa);
+  box-shadow:0 0 6px rgba(255,255,255,.8);
+}
+.device-pick-status .dot.offline{background:#444;box-shadow:none;}
+.device-pick-status span{
+  font-family:'Orbitron',sans-serif;font-size:7.5px;
+  font-weight:800;letter-spacing:.8px;color:#fff;
+}
+.device-pick-status span.offline{color:#777;}
+
+.device-picker-empty{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:40px 20px;text-align:center;gap:14px;
+}
+.device-picker-empty svg{width:50px;height:50px;color:#555;}
+.device-picker-empty-title{
+  font-family:'Orbitron',sans-serif;font-size:11px;
+  font-weight:900;letter-spacing:1px;color:#fff;
+}
+.device-picker-empty-text{
+  font-size:11px;line-height:1.5;font-weight:700;
+  max-width:260px;color:#999;
+}
+.device-picker-loading{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:50px 20px;gap:14px;
+}
+.device-picker-loading-ring{
+  width:40px;height:40px;border-radius:50%;
+  border:3px solid rgba(255,255,255,.15);
+  border-top-color:#fff;animation:spin 1s linear infinite;
+}
+
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);
+  border:2px solid transparent;border-radius:16px;padding:13px 18px;
+  background:linear-gradient(145deg,#151515,#050505) padding-box,
+             linear-gradient(90deg,#444,#fff,#888,#fff,#444) border-box;
+  font-size:11px;font-weight:800;color:#fff;
+  opacity:0;visibility:hidden;transition:.25s;
+  z-index:3000;max-width:90vw;text-align:center;
+  box-shadow:0 0 20px rgba(255,255,255,.15);
+}
+.toast.show{opacity:1;visibility:visible;transform:translate(-50%,0);}
+
+@media(max-width:390px){
+  .app{padding:0 12px;}
+  .page-title h1{font-size:22px;}
+  .app-toggle .sw-btn{width:38px;height:30px;font-size:8px;}
+  .app-icon{width:44px;height:44px;}
+  .stat-box .stat-value{font-size:15px;}
+  .block-preview-text{font-size:18px;letter-spacing:2px;}
+  .block-preview-icon{width:90px;height:90px;}
+  .block-preview-icon svg{width:48px;height:48px;}
+}
+</style>
+</head>
+<body>
+
+<main class="app">
+
+  <header class="topbar">
+    <button class="back-btn" onclick="goBack()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <!-- ═══════════════════════════════════════════════════════════
+         GANTI LOGO ANDA DI SINI (header.png)
+         Taruh file logo di folder yang sama dengan file HTML ini
+         ═══════════════════════════════════════════════════════════ -->
+    <div class="logo"><img src="header.png" alt="LOGO" onerror="this.style.display='none';"></div>
+    <div class="status-wrap"><div class="status-dot"></div></div>
+  </header>
+
+  <div class="page-title">
+    <h1>Block Apps</h1>
+    <p>APP BLOCKER SYSTEM</p>
+  </div>
+
+  <!-- ⚡ DEVICE BAR — klik untuk ganti device -->
+  <div class="device-bar" onclick="openDevicePicker()">
+    <div class="device-bar-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+        <rect x="6" y="2" width="12" height="20" rx="2"/>
+        <path d="M10 18h4"/>
+      </svg>
+    </div>
+    <div class="device-bar-info">
+      <h3 id="devBarName">MEMUAT...</h3>
+      <p id="devBarInfo">-</p>
+      <div class="device-bar-status">
+        <span class="dot" id="devBarDot"></span>
+        <span id="devBarStatus">-</span>
+      </div>
+    </div>
+    <div class="device-bar-switch">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M7 16l-4-4 4-4"/><path d="M17 8l4 4-4 4"/><path d="M3 12h18"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="info-banner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 8v4"/>
+      <path d="M12 16h.01"/>
+    </svg>
+    <div class="info-banner-text">
+      Ketuk <b>device bar</b> di atas untuk ganti device. Aktifkan toggle untuk blokir aplikasi di HP target. Saat target membuka app tersebut, muncul popup <b>"APLIKASI INI DI BLOK"</b> full screen selama 3 detik.
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-value" id="statTotal">0</div><div class="stat-label">TOTAL APP</div></div>
+    <div class="stat-box"><div class="stat-value" id="statBlocked">0</div><div class="stat-label">DIBLOK</div></div>
+    <div class="stat-box"><div class="stat-value" id="statActive">0</div><div class="stat-label">AKTIF</div></div>
+  </div>
+
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+    </svg>
+    <input type="text" id="appSearch" placeholder="Cari nama atau package..." autocomplete="off" oninput="renderAppList()">
+  </div>
+
+  <div class="app-list" id="appList"></div>
+
+  <div class="loading-state" id="loadingState">
+    <div class="loading-ring"></div>
+    <div class="loading-text">MEMUAT DAFTAR APLIKASI...</div>
+  </div>
+
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div class="empty-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+    </div>
+    <div class="empty-title" id="emptyTitle">BELUM ADA APLIKASI</div>
+    <div class="empty-text" id="emptyText">Device target belum mengirim daftar aplikasi. Pastikan device ONLINE dan izin baca aplikasi sudah diberikan.</div>
+  </div>
+
+</main>
+
+<div class="block-preview-overlay" id="blockPreviewOverlay">
+  <div class="block-preview-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M4.93 4.93l14.14 14.14"/>
+    </svg>
+  </div>
+  <div class="block-preview-text">APLIKASI INI<br>DI BLOK</div>
+  <div class="block-preview-sub" id="blockPreviewAppName">APP</div>
+</div>
+
+<!-- ⚡ DEVICE PICKER MODAL ⚡ -->
+<div class="device-picker-overlay" id="devicePickerOverlay" onclick="closeDevicePicker(event)">
+  <div class="device-picker-box" onclick="event.stopPropagation()">
+    <div class="device-picker-head">
+      <div class="device-picker-head-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="6" y="2" width="12" height="20" rx="2"/>
+          <path d="M10 18h4"/>
+        </svg>
+      </div>
+      <div style="min-width:0;flex:1;">
+        <div class="device-picker-title">PILIH DEVICE</div>
+        <div class="device-picker-subtitle">Pilih device untuk atur block apps</div>
+      </div>
+      <button class="device-picker-close" onclick="closeDevicePicker()">×</button>
+    </div>
+    <div class="device-picker-list" id="devicePickerList">
+      <div class="device-picker-loading">
+        <div class="device-picker-loading-ring"></div>
+        <div class="device-picker-empty-title">MEMUAT DEVICE...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡⚡⚡ KONFIGURASI FIREBASE ⚡⚡⚡
+   ═══════════════════════════════════════════════════════════════════════════
+   GANTI SEMUA VALUE DI BAWAH INI DENGAN MILIK ANDA:
+
+   1. Buka Firebase Console → Project Settings → General
+   2. Scroll ke bagian "Your apps" → pilih Web App Anda
+   3. Copy config dan paste ke sini
+   4. Pastikan Realtime Database sudah dibuat (bukan Firestore)
+   ═══════════════════════════════════════════════════════════════════════════ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDLs7Coar_Dy9bE2K4Ha_Q6wG0SmC3m75g",
+  //        ↑ GANTI dengan API Key Anda (contoh: "AIzaSy...")
+
+  authDomain: "https://radien-95e9d.firebaseapp.com",
+  //            ↑ GANTI dengan Auth Domain Anda (contoh: "myapp.firebaseapp.com")
+
+  databaseURL: "https://radien-95e9d-default-rtdb.asia-southeast1.firebasedatabase.app",
+  //             ↑ GANTI dengan Realtime Database URL Anda
+  //             Contoh: "https://radien-95e9d-default-rtdb.asia-southeast1.firebasedatabase.app"
+
+  projectId: "radien-95e9d",
+  //           ↑ GANTI dengan Project ID Anda (contoh: "myapp-12345")
+
+  storageBucket: "https://radien-95e9d.firebasestorage.app",
+  //               ↑ GANTI dengan Storage Bucket Anda
+
+  messagingSenderId: "208676450122",
+  //                   ↑ GANTI dengan Messaging Sender ID Anda (contoh: "123456789")
+
+  appId: "13f1702562e36468a4dbb3"
+  //      ↑ GANTI dengan App ID Anda (contoh: "1:123456789:web:abc123def456")
+};
+
+let FIREBASE_DB = null;
+let FIREBASE_READY = false;
+
+function initFirebase(){
+  try{
+    if(typeof firebase==="undefined") return false;
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    FIREBASE_DB = firebase.database();
+    FIREBASE_READY = true;
+    return true;
+  }catch(e){ console.error("[FIREBASE] Init error:",e); return false; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ HELPER: encode/decode pkg
+   (jangan diubah — dipakai untuk format key Firebase)
+   ═══════════════════════════════════════════════════════════════════════════ */
+function encodePkg(pkg){ return String(pkg || "").replace(/\./g, "|"); }
+function decodePkg(key, data){
+  if(data && data.pkg) return String(data.pkg);
+  return String(key || "").replace(/\|/g, ".");
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ SESSION STORAGE KEYS
+   ⚠️ PENTING: ganti nilai key ini kalau kamu ubah di file login.html juga
+   Key harus SAMA PERSIS di seluruh aplikasi (login, home, splash, dll)
+   ═══════════════════════════════════════════════════════════════════════════ */
+const STORAGE_KEY_SESSION = "astra_session";
+//                            ↑ GANTI kalau perlu (contoh: "myapp_session")
+const STORAGE_KEY_USERS   = "astra_users";
+//                            ↑ GANTI kalau perlu (contoh: "myapp_users")
+const STORAGE_KEY_SELECTED_DEVICE = "astra_selected_device";
+//                                    ↑ GANTI kalau perlu
+
+let ACTIVE_USER = null;
+
+function checkAuth(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY_SESSION);
+    if(!raw) return null;
+    const session = JSON.parse(raw);
+    if(!session || !session.username) return null;
+    const users = (function(){ try{ const r = localStorage.getItem(STORAGE_KEY_USERS); return r?JSON.parse(r):{}; }catch(e){ return {}; } })();
+    const key = session.username.toLowerCase();
+    if(!users[key]) return null;
+    return { session, users, key, username: key, user: users[key] };
+  }catch(e){ return null; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ DEVICE
+   ═══════════════════════════════════════════════════════════════════════════ */
+const DEVICE_OFFLINE_MS = 90 * 1000;
+let CURRENT_DEVICE = null;
+let deviceStatusListener = null;
+let deviceValueListener = null;
+
+let allDevicesListener = null;
+let allDevices = [];
+
+function isDeviceReallyOnline(device){
+  if(!device) return false;
+  if(device.status !== "online") return false;
+  if(!device.lastSeen || device.lastSeen <= 0) return true;
+  return (Date.now() - device.lastSeen) <= DEVICE_OFFLINE_MS;
+}
+
+function loadSelectedDevice(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY_SELECTED_DEVICE);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
+}
+
+function saveSelectedDevice(device){
+  try{
+    localStorage.setItem(STORAGE_KEY_SELECTED_DEVICE, JSON.stringify(device));
+  }catch(e){}
+}
+
+function renderDeviceBar(){
+  const nameEl = document.getElementById("devBarName");
+  const infoEl = document.getElementById("devBarInfo");
+  const dotEl  = document.getElementById("devBarDot");
+  const statEl = document.getElementById("devBarStatus");
+
+  if(!CURRENT_DEVICE){
+    if(nameEl) nameEl.textContent = "PILIH DEVICE";
+    if(infoEl) infoEl.textContent = "Ketuk untuk pilih device";
+    if(dotEl){ dotEl.className = "dot offline"; }
+    if(statEl){ statEl.textContent = "TIDAK ADA"; statEl.className = "offline"; }
+    return;
+  }
+
+  const online = isDeviceReallyOnline(CURRENT_DEVICE);
+  if(nameEl) nameEl.textContent = (CURRENT_DEVICE.name || "Device").toUpperCase();
+  if(infoEl) infoEl.textContent = (CURRENT_DEVICE.model||"-") + " • " + (CURRENT_DEVICE.android||"-");
+  if(dotEl){ dotEl.className = "dot" + (online ? "" : " offline"); }
+  if(statEl){ statEl.textContent = online ? "ONLINE" : "OFFLINE"; statEl.className = online ? "" : "offline"; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ SEND COMMAND KE DEVICE
+   ═══════════════════════════════════════════════════════════════════════════ */
+function fbSendCommand(action, payload){
+  if(!FIREBASE_READY || !FIREBASE_DB){
+    showToast("Firebase belum tersambung");
+    return Promise.resolve(false);
+  }
+  if(!CURRENT_DEVICE || !CURRENT_DEVICE.id){
+    showToast("Pilih device dulu");
+    return Promise.resolve(false);
+  }
+  const command = {
+    action: action,
+    payload: payload || {},
+    from: (ACTIVE_USER && ACTIVE_USER.username) ? ACTIVE_USER.username : "unknown",
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    status: "pending"
+  };
+  return FIREBASE_DB.ref("devices/" + CURRENT_DEVICE.id + "/commands").push().set(command)
+    .then(function(){ return true; })
+    .catch(function(err){
+      console.error("[CMD] Send error:", err);
+      showToast("Gagal kirim: " + err.message);
+      return false;
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ LISTENER: DAFTAR APLIKASI
+   ═══════════════════════════════════════════════════════════════════════════ */
+let appListData = [];
+let blockedAppsData = {};
+let appsListener = null;
+let blockedListener = null;
+let appSearchQuery = "";
+let appsLoaded = false;
+
+function fbListenApps(){
+  if(!FIREBASE_READY || !FIREBASE_DB || !CURRENT_DEVICE) return;
+  if(appsListener){ try{ appsListener.off(); }catch(e){} appsListener = null; }
+
+  appsLoaded = false;
+  toggleLoadingState();
+  appListData = [];
+  renderAppList();
+
+  appsListener = FIREBASE_DB.ref("devices/" + CURRENT_DEVICE.id + "/apps");
+  appsListener.on("value", function(snap){
+    appsLoaded = true;
+    const val = snap.val();
+    const list = [];
+    if(val){
+      Object.keys(val).forEach(function(pkgKey){
+        const d = val[pkgKey];
+        if(!d || typeof d !== "object") return;
+        const realPkg = decodePkg(pkgKey, d);
+        const name = d.name || d.label || d.appName || realPkg.split(".").pop();
+        const icon = d.icon || d.iconBase64 || "";
+        const isSystem = d.system === true || d.isSystem === true;
+        list.push({
+          pkg: realPkg,
+          name: String(name),
+          icon: String(icon || ""),
+          system: isSystem
+        });
+      });
+    }
+    list.sort(function(a,b){
+      const aB = blockedAppsData[a.pkg] ? 0 : 1;
+      const bB = blockedAppsData[b.pkg] ? 0 : 1;
+      if(aB !== bB) return aB - bB;
+      return a.name.localeCompare(b.name);
+    });
+    appListData = list;
+    renderAppList();
+    updateStats();
+    toggleLoadingState();
+  }, function(err){
+    console.error("[APPS] Listener error:", err);
+    toggleLoadingState();
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ LISTENER: BLOCKED APPS
+   ═══════════════════════════════════════════════════════════════════════════ */
+function fbListenBlockedApps(){
+  if(!FIREBASE_READY || !FIREBASE_DB || !CURRENT_DEVICE) return;
+  if(blockedListener){ try{ blockedListener.off(); }catch(e){} blockedListener = null; }
+
+  blockedAppsData = {};
+  blockedListener = FIREBASE_DB.ref("devices/" + CURRENT_DEVICE.id + "/blockedApps");
+  blockedListener.on("value", function(snap){
+    const val = snap.val() || {};
+    const decoded = {};
+    Object.keys(val).forEach(function(k){
+      const d = val[k] || {};
+      const realPkg = decodePkg(k, d);
+      decoded[realPkg] = d;
+    });
+    blockedAppsData = decoded;
+
+    if(appListData.length > 0){
+      appListData.sort(function(a,b){
+        const aB = blockedAppsData[a.pkg] ? 0 : 1;
+        const bB = blockedAppsData[b.pkg] ? 0 : 1;
+        if(aB !== bB) return aB - bB;
+        return a.name.localeCompare(b.name);
+      });
+    }
+    renderAppList();
+    updateStats();
+  }, function(err){
+    console.error("[BLOCKED] Listener error:", err);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ RENDER APP LIST
+   ═══════════════════════════════════════════════════════════════════════════ */
+function renderAppList(){
+  const listEl = document.getElementById("appList");
+  const emptyEl = document.getElementById("emptyState");
+  if(!listEl) return;
+
+  const q = (appSearchQuery || "").toLowerCase().trim();
+  const filtered = appListData.filter(function(a){
+    if(!q) return true;
+    return a.name.toLowerCase().indexOf(q) !== -1 ||
+           a.pkg.toLowerCase().indexOf(q) !== -1;
+  });
+
+  if(appListData.length === 0){
+    listEl.innerHTML = "";
+    if(emptyEl){
+      emptyEl.style.display = "flex";
+      document.getElementById("emptyTitle").textContent = "BELUM ADA APLIKASI";
+      document.getElementById("emptyText").textContent = "Device target belum mengirim daftar aplikasi. Pastikan device ONLINE dan izin baca aplikasi sudah diberikan.";
+    }
+    return;
+  }
+  if(filtered.length === 0){
+    listEl.innerHTML = "";
+    if(emptyEl){
+      emptyEl.style.display = "flex";
+      document.getElementById("emptyTitle").textContent = "TIDAK DITEMUKAN";
+      document.getElementById("emptyText").textContent = "Tidak ada aplikasi yang cocok dengan pencarian \"" + escapeHtml(q) + "\".";
+    }
+    return;
+  }
+  if(emptyEl) emptyEl.style.display = "none";
+
+  let html = "";
+  filtered.forEach(function(app){
+    const isBlocked = !!blockedAppsData[app.pkg];
+    const initial = (app.name || "?").trim().charAt(0).toUpperCase() || "?";
+    const iconHtml = app.icon
+      ? '<img src="' + escapeHtml(app.icon) + '" alt="" onerror="this.outerHTML=\'<div class=\\\'fallback\\\'>' + escapeHtml(initial) + '</div>\';">'
+      : '<div class="fallback">' + escapeHtml(initial) + '</div>';
+    const sysBadge = app.system ? '<span class="app-badge-system">SYSTEM</span>' : '';
+    html +=
+      '<div class="app-item' + (isBlocked ? ' blocked' : '') + '" data-pkg="' + escapeHtml(app.pkg) + '">' +
+        '<div class="app-icon">' + iconHtml + '</div>' +
+        '<div class="app-info">' +
+          '<div class="app-name">' + escapeHtml(app.name) + sysBadge + '</div>' +
+          '<div class="app-pkg">' + escapeHtml(app.pkg) + '</div>' +
+        '</div>' +
+        '<div class="app-toggle">' +
+          '<button class="sw-btn on' + (isBlocked ? ' active' : '') + '" onclick="toggleBlockApp(\'' + escapeJs(app.pkg) + '\', \'' + escapeJs(app.name) + '\', \'on\')">ON</button>' +
+          '<button class="sw-btn off' + (isBlocked ? '' : ' active') + '" onclick="toggleBlockApp(\'' + escapeJs(app.pkg) + '\', \'' + escapeJs(app.name) + '\', \'off\')">OFF</button>' +
+        '</div>' +
+      '</div>';
+  });
+  listEl.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ TOGGLE BLOCK APP
+   ═══════════════════════════════════════════════════════════════════════════ */
+function toggleBlockApp(pkg, appName, state){
+  if(!FIREBASE_READY || !FIREBASE_DB){
+    showToast("Firebase belum tersambung");
+    return;
+  }
+  if(!CURRENT_DEVICE){
+    showToast("Pilih device dulu");
+    return;
+  }
+
+  const isOn = state === "on";
+  const uname = (ACTIVE_USER && ACTIVE_USER.username) ? ACTIVE_USER.username : "unknown";
+
+  const safeKey = encodePkg(pkg);
+  const refBlocked = FIREBASE_DB.ref("devices/" + CURRENT_DEVICE.id + "/blockedApps/" + safeKey);
+
+  if(isOn){
+    blockedAppsData[pkg] = { pkg: pkg, name: appName, blockedAt: Date.now(), blockedBy: uname };
+  } else {
+    delete blockedAppsData[pkg];
+  }
+  if(appListData.length > 0){
+    appListData.sort(function(a,b){
+      const aB = blockedAppsData[a.pkg] ? 0 : 1;
+      const bB = blockedAppsData[b.pkg] ? 0 : 1;
+      if(aB !== bB) return aB - bB;
+      return a.name.localeCompare(b.name);
+    });
+  }
+  renderAppList();
+  updateStats();
+
+  if(isOn){
+    refBlocked.set({
+      pkg: pkg,
+      name: appName,
+      blockedAt: Date.now(),
+      blockedBy: uname
+    }).catch(function(err){ console.error("[BLOCK] set error:", err); });
+
+    fbSendCommand("block_app", { package: pkg, name: appName, blockedAt: Date.now() });
+
+    if(navigator.vibrate) navigator.vibrate([40, 30, 40]);
+    showBlockPreview(appName);
+    showToast("🚫 " + appName + " berhasil diblok");
+  } else {
+    refBlocked.remove().catch(function(err){ console.error("[UNBLOCK] remove error:", err); });
+    fbSendCommand("unblock_app", { package: pkg, name: appName, unblockedAt: Date.now() });
+    if(navigator.vibrate) navigator.vibrate(30);
+    showToast("✅ " + appName + " dibuka blokir");
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ PREVIEW POPUP
+   ═══════════════════════════════════════════════════════════════════════════ */
+let blockPreviewTimer = null;
+function showBlockPreview(appName){
+  const overlay = document.getElementById("blockPreviewOverlay");
+  const nameEl  = document.getElementById("blockPreviewAppName");
+  if(!overlay) return;
+  if(nameEl) nameEl.textContent = (appName || "APP").toUpperCase();
+  overlay.classList.add("active");
+  clearTimeout(blockPreviewTimer);
+  blockPreviewTimer = setTimeout(function(){
+    overlay.classList.remove("active");
+  }, 3000);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ STATS
+   ═══════════════════════════════════════════════════════════════════════════ */
+function updateStats(){
+  const total = appListData.length;
+  const blocked = Object.keys(blockedAppsData).length;
+  const active = total - blocked;
+  const tEl = document.getElementById("statTotal");
+  const bEl = document.getElementById("statBlocked");
+  const aEl = document.getElementById("statActive");
+  if(tEl) tEl.textContent = String(total);
+  if(bEl) bEl.textContent = String(blocked);
+  if(aEl) aEl.textContent = String(Math.max(0, active));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ LOADING
+   ═══════════════════════════════════════════════════════════════════════════ */
+function toggleLoadingState(){
+  const loadingEl = document.getElementById("loadingState");
+  if(loadingEl){
+    loadingEl.style.display = appsLoaded ? "none" : "flex";
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ SEARCH
+   ═══════════════════════════════════════════════════════════════════════════ */
+document.addEventListener("DOMContentLoaded", function(){
+  const searchEl = document.getElementById("appSearch");
+  if(searchEl){
+    searchEl.addEventListener("input", function(){
+      appSearchQuery = this.value || "";
+      renderAppList();
+    });
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ HELPERS
+   ═══════════════════════════════════════════════════════════════════════════ */
+function escapeHtml(str){
+  if(str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+function escapeJs(str){
+  if(str === null || str === undefined) return "";
+  return String(str)
+    .replace(/\\/g,"\\\\")
+    .replace(/'/g,"\\'")
+    .replace(/"/g,'\\"')
+    .replace(/\n/g,"\\n")
+    .replace(/\r/g,"");
+}
+
+let toastTimer = null;
+function showToast(message){
+  const toast = document.getElementById("toast");
+  if(!toast) return;
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){
+    toast.classList.remove("show");
+  }, 2600);
+}
+
+function goBack(){
+  if(window.history.length > 1){
+    window.history.back();
+    return;
+  }
+  /* ═══════════════════════════════════════════════════════════════════════
+     ⚡ GANTI PATH FALLBACK REDIRECT
+     Kalau user buka halaman ini dari link langsung (bukan dari history),
+     akan diarahkan ke halaman ini.
+     ═══════════════════════════════════════════════════════════════════════ */
+  window.location.href = "home.html";
+  //                      ↑ GANTI ke halaman utama Anda
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ DEVICE PICKER — pilih device langsung di halaman ini
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function openDevicePicker(){
+  const overlay = document.getElementById("devicePickerOverlay");
+  if(!overlay) return;
+  overlay.classList.add("active");
+  document.body.style.overflow = "hidden";
+  loadDevicesForPicker();
+}
+
+function closeDevicePicker(event){
+  if(event && event.target !== document.getElementById("devicePickerOverlay")) return;
+  const overlay = document.getElementById("devicePickerOverlay");
+  if(!overlay) return;
+  overlay.classList.remove("active");
+  document.body.style.overflow = "";
+}
+
+function loadDevicesForPicker(){
+  const listEl = document.getElementById("devicePickerList");
+  if(!listEl) return;
+
+  if(!FIREBASE_READY || !FIREBASE_DB){
+    listEl.innerHTML = '<div class="device-picker-empty">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>' +
+      '<div class="device-picker-empty-title">FIREBASE TIDAK TERSAMBUNG</div>' +
+      '<div class="device-picker-empty-text">Cek koneksi internet.</div>' +
+      '</div>';
+    return;
+  }
+
+  listEl.innerHTML = '<div class="device-picker-loading"><div class="device-picker-loading-ring"></div><div class="device-picker-empty-title">MEMUAT DEVICE...</div></div>';
+
+  FIREBASE_DB.ref("devices").once("value").then(function(snap){
+    const val = snap.val() || {};
+
+    const myUsername = ACTIVE_USER ? (ACTIVE_USER.username || "").toLowerCase().trim() : "";
+    const myUid      = ACTIVE_USER && ACTIVE_USER.user ? (ACTIVE_USER.user.uid || "").toLowerCase().trim() : "";
+    const myEmail    = ACTIVE_USER && ACTIVE_USER.user ? (ACTIVE_USER.user.email || "").toLowerCase().trim() : "";
+    const myId       = ACTIVE_USER && ACTIVE_USER.user ? (ACTIVE_USER.user.id || "").toLowerCase().trim() : "";
+    const myName     = ACTIVE_USER && ACTIVE_USER.user ? (ACTIVE_USER.user.name || "").toLowerCase().trim() : "";
+
+    const candidates = [];
+
+    Object.keys(val).forEach(function(id){
+      const d = val[id];
+      if(!d || typeof d !== "object") return;
+
+      const owner = (d.owner || "").toString().toLowerCase().trim();
+      const lastSeen = (d.status && d.status.lastSeen) ? d.status.lastSeen : 0;
+      const pairedAt = d.pairedAt || d.paired_at || d.createdAt || 0;
+
+      let isOwner = false;
+      if(owner !== ""){
+        if(myUsername && owner === myUsername) isOwner = true;
+        else if(myUid && owner === myUid) isOwner = true;
+        else if(myEmail && owner === myEmail) isOwner = true;
+        else if(myId && owner === myId) isOwner = true;
+        else if(myName && owner === myName) isOwner = true;
+      }
+      if(!isOwner) return;
+
+      const hwId = (
+        d.deviceId || d.device_id ||
+        d.androidId || d.android_id ||
+        d.serial || d.serialNumber || d.serial_number ||
+        d.imei || d.fingerprint || d.uuid || ""
+      ).toString().toLowerCase().trim();
+
+      const model = (d.model || "").toString().toLowerCase().trim();
+      const androidVer = (d.android || "").toString().toLowerCase().trim();
+
+      const fingerprint = hwId !== ""
+        ? ("hw:" + hwId)
+        : ("mdl:" + model + "|and:" + androidVer + "|own:" + owner);
+
+      candidates.push({
+        fbId: id, data: d, owner: owner,
+        lastSeen: lastSeen, pairedAt: pairedAt,
+        fingerprint: fingerprint,
+        hwId: hwId
+      });
+    });
+
+    const bestByFingerprint = {};
+    candidates.forEach(function(c){
+      const prev = bestByFingerprint[c.fingerprint];
+      const thisTime = c.lastSeen || c.pairedAt || 0;
+      const prevTime = prev ? (prev.lastSeen || prev.pairedAt || 0) : -1;
+      if(!prev || thisTime > prevTime){
+        bestByFingerprint[c.fingerprint] = c;
+      }
+    });
+
+    const devices = [];
+    Object.keys(bestByFingerprint).forEach(function(fp){
+      const c = bestByFingerprint[fp];
+      const d = c.data;
+      const isOnline = (d.status && d.status.online === true);
+      devices.push({
+        id: c.fbId,
+        name: resolveDeviceName(c.fbId, d),
+        deviceId: c.hwId,
+        model: d.model || "-",
+        android: d.android || "-",
+        status: isOnline ? "online" : "offline",
+        lastSeen: c.lastSeen,
+        pairedAt: c.pairedAt,
+        antiUninstall: d.antiUninstall === true,
+        owner: d.owner || ""
+      });
+    });
+
+    devices.sort(function(a,b){
+      return (b.lastSeen || b.pairedAt || 0) - (a.lastSeen || a.pairedAt || 0);
+    });
+
+    allDevices = devices;
+    renderDevicePickerList(devices);
+  }).catch(function(err){
+    console.error("[PICKER] error:", err);
+    listEl.innerHTML = '<div class="device-picker-empty">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>' +
+      '<div class="device-picker-empty-title">GAGAL MEMUAT</div>' +
+      '<div class="device-picker-empty-text">' + escapeHtml(err.message) + '</div>' +
+      '</div>';
+  });
+}
+
+function resolveDeviceName(id, d){
+  if(d.name && d.name.trim() !== "" && d.name.toLowerCase() !== "unknown device") return d.name;
+  if(d.model && d.model.trim() !== "" && d.model !== "-") return d.model;
+  return "Device " + id.substring(Math.max(0, id.length - 8));
+}
+
+function renderDevicePickerList(devices){
+  const listEl = document.getElementById("devicePickerList");
+  if(!listEl) return;
+
+  if(!devices || devices.length === 0){
+    listEl.innerHTML = '<div class="device-picker-empty">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></svg>' +
+      '<div class="device-picker-empty-title">BELUM ADA DEVICE</div>' +
+      '<div class="device-picker-empty-text">Buka menu PAIRING CODE untuk sambungkan device baru.</div>' +
+      '</div>';
+    return;
+  }
+
+  const currentId = CURRENT_DEVICE ? CURRENT_DEVICE.id : null;
+  let html = "";
+  devices.forEach(function(d){
+    const isCurrent = (d.id === currentId);
+    const isOnline = isDeviceReallyOnline(d);
+    const statusClass = isOnline ? "" : " offline";
+    const statusText = isOnline ? "ONLINE" : "OFFLINE";
+
+    html +=
+      '<div class="device-pick-item' + (isCurrent ? ' current' : '') + '" onclick="pickDevice(\'' + escapeJs(d.id) + '\')">' +
+        '<div class="device-pick-icon">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">' +
+            '<rect x="6" y="2" width="12" height="20" rx="2"/>' +
+            '<path d="M10 18h4"/>' +
+          '</svg>' +
+        '</div>' +
+        '<div class="device-pick-info">' +
+          '<h4>' + escapeHtml(d.name) + '</h4>' +
+          '<p>' + escapeHtml(d.model) + ' • ' + escapeHtml(d.android) + '</p>' +
+          '<div class="device-pick-status">' +
+            '<span class="dot' + statusClass + '"></span>' +
+            '<span class="' + (isOnline ? '' : 'offline') + '">' + statusText + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  });
+  listEl.innerHTML = html;
+}
+
+function pickDevice(deviceId){
+  const device = allDevices.find(function(d){ return d.id === deviceId; });
+  if(!device){
+    showToast("Device tidak ditemukan");
+    return;
+  }
+
+  saveSelectedDevice(device);
+  CURRENT_DEVICE = device;
+
+  renderDeviceBar();
+  closeDevicePicker();
+
+  appListData = [];
+  blockedAppsData = {};
+  appsLoaded = false;
+  renderAppList();
+  updateStats();
+  toggleLoadingState();
+
+  if(appsListener){ try{ appsListener.off(); }catch(e){} appsListener = null; }
+  if(blockedListener){ try{ blockedListener.off(); }catch(e){} blockedListener = null; }
+  if(deviceStatusListener){ try{ deviceStatusListener.off(); }catch(e){} deviceStatusListener = null; }
+  if(deviceValueListener){ try{ deviceValueListener.off(); }catch(e){} deviceValueListener = null; }
+
+  fbListenBlockedApps();
+  fbListenApps();
+
+  deviceStatusListener = FIREBASE_DB.ref("devices/" + CURRENT_DEVICE.id + "/status");
+  deviceStatusListener.on("value", function(snap){
+    const val = snap.val() || {};
+    CURRENT_DEVICE.status = (val.online === true) ? "online" : "offline";
+    CURRENT_DEVICE.lastSeen = val.lastSeen || 0;
+    renderDeviceBar();
+  });
+
+  deviceValueListener = FIREBASE_DB.ref("devices/" + CURRENT_DEVICE.id);
+  deviceValueListener.on("value", function(snap){
+    const val = snap.val();
+    if(!val) return;
+    if(val.name) CURRENT_DEVICE.name = val.name;
+    if(val.model) CURRENT_DEVICE.model = val.model;
+    if(val.android) CURRENT_DEVICE.android = val.android;
+    if(val.status){
+      CURRENT_DEVICE.status = (val.status.online === true) ? "online" : "offline";
+      CURRENT_DEVICE.lastSeen = val.status.lastSeen || 0;
+    }
+    renderDeviceBar();
+  });
+
+  showToast("Terhubung ke: " + device.name);
+  if(navigator.vibrate) navigator.vibrate(40);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ INIT
+   ═══════════════════════════════════════════════════════════════════════════ */
+document.addEventListener("DOMContentLoaded", function(){
+  initFirebase();
+  ACTIVE_USER = checkAuth();
+
+  CURRENT_DEVICE = loadSelectedDevice();
+  renderDeviceBar();
+
+  if(!CURRENT_DEVICE){
+    appsLoaded = true;
+    toggleLoadingState();
+    const emptyEl = document.getElementById("emptyState");
+    if(emptyEl){
+      emptyEl.style.display = "flex";
+      document.getElementById("emptyTitle").textContent = "BELUM PILIH DEVICE";
+      document.getElementById("emptyText").textContent = "Ketuk device bar di atas untuk pilih device.";
+    }
+    return;
+  }
+
+  if(!FIREBASE_READY){
+    appsLoaded = true;
+    toggleLoadingState();
+    const emptyEl = document.getElementById("emptyState");
+    if(emptyEl){
+      emptyEl.style.display = "flex";
+      document.getElementById("emptyTitle").textContent = "FIREBASE TIDAK TERSAMBUNG";
+      document.getElementById("emptyText").textContent = "Cek koneksi internet dan konfigurasi Firebase.";
+    }
+    return;
+  }
+
+  fbListenBlockedApps();
+  fbListenApps();
+
+  deviceStatusListener = FIREBASE_DB.ref("devices/" + CURRENT_DEVICE.id + "/status");
+  deviceStatusListener.on("value", function(snap){
+    const val = snap.val() || {};
+    CURRENT_DEVICE.status = (val.online === true) ? "online" : "offline";
+    CURRENT_DEVICE.lastSeen = val.lastSeen || 0;
+    renderDeviceBar();
+  });
+
+  deviceValueListener = FIREBASE_DB.ref("devices/" + CURRENT_DEVICE.id);
+  deviceValueListener.on("value", function(snap){
+    const val = snap.val();
+    if(!val) return;
+    if(val.name) CURRENT_DEVICE.name = val.name;
+    if(val.model) CURRENT_DEVICE.model = val.model;
+    if(val.android) CURRENT_DEVICE.android = val.android;
+    if(val.status){
+      CURRENT_DEVICE.status = (val.status.online === true) ? "online" : "offline";
+      CURRENT_DEVICE.lastSeen = val.status.lastSeen || 0;
+    }
+    renderDeviceBar();
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ CLEANUP
+   ═══════════════════════════════════════════════════════════════════════════ */
+window.addEventListener("beforeunload", function(){
+  if(appsListener){ try{ appsListener.off(); }catch(e){} }
+  if(blockedListener){ try{ blockedListener.off(); }catch(e){} }
+  if(deviceStatusListener){ try{ deviceStatusListener.off(); }catch(e){} }
+  if(deviceValueListener){ try{ deviceValueListener.off(); }catch(e){} }
+  if(allDevicesListener){ try{ allDevicesListener.off(); }catch(e){} }
+});
+</script>
+
+</body>
+</html>

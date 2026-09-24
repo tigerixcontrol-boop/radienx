@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI JUDUL HALAMAN SESUAI BRAND ANDA
+     ═══════════════════════════════════════════════════════════ -->
+<title>PAIRING CODE • APPNAME</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI FONT SESUAI BRAND ANDA (opsional)
+     ═══════════════════════════════════════════════════════════ -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE SDK — biarkan seperti ini (versi 10.12.2)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<style>
+:root{
+  --black:#050505;
+  --panel:#111111;
+  --white:#ffffff;
+  --gray:#777;
+  --ok:#4ade80;
+  --line:rgba(255,255,255,.15);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{
+  width:100%;min-height:100%;background:#000;scroll-behavior:smooth;
+}
+body{
+  width:100%;min-height:100vh;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(255,255,255,.07), transparent 32%),
+    radial-gradient(circle at 100% 40%, rgba(255,255,255,.025), transparent 35%),
+    #050505;
+  color:#fff;
+  font-family:'Rajdhani',Arial,Helvetica,sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  overflow-x:hidden;
+  position:relative;
+}
+body::before{
+  content:"";position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+  background-size:34px 34px;
+  pointer-events:none;z-index:0;
+}
+.pairing-box{
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:420px;
+  background:linear-gradient(160deg, #151515, #080808);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:30px;
+  padding:34px 24px 28px;
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.85),
+    inset 0 0 60px rgba(255,255,255,.02);
+  overflow:hidden;
+}
+.pairing-box::before{
+  content:"";position:absolute;
+  width:220px;height:220px;border-radius:50%;
+  background:rgba(255,255,255,.05);
+  top:-120px;right:-90px;
+  filter:blur(8px);
+  pointer-events:none;
+}
+.pairing-box::after{
+  content:"";position:absolute;
+  width:180px;height:180px;border-radius:50%;
+  background:rgba(255,255,255,.03);
+  bottom:-110px;left:-80px;
+  filter:blur(8px);
+  pointer-events:none;
+}
+
+.pairing-icon{
+  width:64px;height:64px;
+  margin:0 auto 18px;
+  border-radius:20px;
+  background:#202020;
+  border:1px solid rgba(255,255,255,.2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;z-index:1;
+  box-shadow:0 0 30px rgba(255,255,255,.08);
+}
+.pairing-icon svg{
+  width:32px;height:32px;color:#fff;
+}
+
+.pairing-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:20px;font-weight:900;
+  letter-spacing:2px;
+  text-align:center;
+  margin-bottom:8px;
+  position:relative;z-index:1;
+  text-transform:uppercase;
+  text-shadow:0 0 14px rgba(255,255,255,.18);
+}
+
+.pairing-sub{
+  font-size:12px;
+  color:#777;
+  text-align:center;
+  line-height:1.6;
+  font-weight:600;
+  margin-bottom:24px;
+  position:relative;z-index:1;
+  padding:0 10px;
+}
+
+.code-box{
+  font-family:'Orbitron',sans-serif;
+  font-size:38px;
+  font-weight:900;
+  letter-spacing:10px;
+  text-align:center;
+  color:#fff;
+  padding:26px 18px;
+  border-radius:20px;
+  background:#0a0a0a;
+  border:1px solid rgba(255,255,255,.2);
+  margin-bottom:20px;
+  position:relative;z-index:1;
+  word-break:break-all;
+  text-shadow:0 0 20px rgba(255,255,255,.15);
+  min-height:96px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.25s;
+}
+.code-box.active{
+  border-color:rgba(255,255,255,.45);
+  box-shadow:
+    0 0 30px rgba(255,255,255,.08),
+    inset 0 0 40px rgba(255,255,255,.03);
+  animation:codeFlash 0.5s ease;
+}
+@keyframes codeFlash{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.04);}
+  100%{transform:scale(1);}
+}
+
+.code-box .placeholder{
+  color:#333;
+  letter-spacing:8px;
+}
+
+.btn-group{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  position:relative;z-index:1;
+}
+
+.pair-btn{
+  width:100%;
+  height:56px;
+  border:0;
+  outline:none;
+  border-radius:18px;
+  font-family:'Orbitron',sans-serif;
+  font-size:10.5px;
+  font-weight:900;
+  letter-spacing:1.5px;
+  cursor:pointer;
+  transition:.2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+}
+
+.pair-btn:active{transform:scale(.97);}
+
+.pair-btn.primary{
+  background:#f2f2f2;
+  color:#080808;
+  box-shadow:0 10px 30px rgba(255,255,255,.1);
+}
+.pair-btn.primary:hover{background:#fff;}
+
+.pair-btn.secondary{
+  background:#1a1a1a;
+  color:#aaa;
+  border:1px solid rgba(255,255,255,.14);
+}
+.pair-btn.secondary:hover{background:#222;color:#fff;}
+
+.pair-btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.pair-btn svg{
+  width:16px;height:16px;
+  flex-shrink:0;
+}
+
+.pair-info{
+  margin-top:20px;
+  padding:14px 16px;
+  border-radius:16px;
+  background:#0d0d0d;
+  border:1px solid rgba(255,255,255,.1);
+  position:relative;z-index:1;
+}
+.pair-info-label{
+  font-family:'Orbitron',sans-serif;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:1.5px;
+  color:#777;
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.pair-info-label .dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--ok);
+  box-shadow:0 0 8px rgba(74,222,128,.7);
+  animation:pulseDot 1.5s infinite;
+}
+@keyframes pulseDot{
+  0%,100%{opacity:1;}
+  50%{opacity:.4;}
+}
+.pair-info-text{
+  font-size:11.5px;
+  color:#999;
+  line-height:1.55;
+  font-weight:600;
+}
+.pair-info-text b{color:#fff;}
+
+.back-link{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  margin-top:22px;
+  color:#777;
+  font-family:'Orbitron',sans-serif;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:1.2px;
+  text-decoration:none;
+  transition:.2s;
+  position:relative;z-index:1;
+}
+.back-link:hover{color:#fff;}
+.back-link svg{width:14px;height:14px;}
+
+@media(max-width:390px){
+  .pairing-box{padding:28px 18px 22px;}
+  .pairing-title{font-size:17px;letter-spacing:1.5px;}
+  .code-box{font-size:30px;letter-spacing:7px;padding:22px 14px;}
+  .pair-btn{height:52px;font-size:9.5px;}
+  .pairing-icon{width:56px;height:56px;}
+  .pairing-icon svg{width:28px;height:28px;}
+}
+</style>
+</head>
+<body>
+
+<div class="pairing-box">
+
+  <!-- ICON -->
+  <div class="pairing-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <rect x="3" y="3" width="7" height="7" rx="1"/>
+      <rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/>
+      <path d="M14 14h3v3"/>
+      <path d="M20 14v3"/>
+      <path d="M14 20h3"/>
+      <path d="M20 20h.01"/>
+    </svg>
+  </div>
+
+  <!-- TITLE -->
+  <div class="pairing-title">PAIRING CODE</div>
+
+  <div class="pairing-sub">
+    Masukkan kode ini di aplikasi target<br>
+    untuk menghubungkan device kamu
+  </div>
+
+  <!-- CODE DISPLAY -->
+  <div class="code-box" id="codeBox">
+    <span class="placeholder" id="codePlaceholder">----</span>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="btn-group">
+    <button class="pair-btn primary" id="generateBtn" onclick="generateCode()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M21 12a9 9 0 1 1-3-6.7"/>
+        <path d="M21 3v6h-6"/>
+      </svg>
+      GENERATE KODE
+    </button>
+    <button class="pair-btn secondary" id="copyBtn" onclick="copyCode()" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <rect x="9" y="9" width="12" height="12" rx="2"/>
+        <path d="M5 15V5a2 2 0 0 1 2-2h10"/>
+      </svg>
+      SALIN KODE
+    </button>
+  </div>
+
+  <!-- INFO -->
+  <div class="pair-info">
+    <div class="pair-info-label">
+      <span class="dot"></span>
+      STATUS: MENUNGGU KODE
+    </div>
+    <div class="pair-info-text" id="statusText">
+      Klik <b>GENERATE KODE</b> untuk membuat kode pairing baru.
+    </div>
+  </div>
+
+  <!-- BACK -->
+  <!-- ═══════════════════════════════════════════════════════════
+       GANTI PATH "home.html" SESUAI FILE HOME ANDA
+       ═══════════════════════════════════════════════════════════ -->
+  <a href="home.html" class="back-link">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <path d="M19 12H5"/>
+      <path d="M12 19l-7-7 7-7"/>
+    </svg>
+    KEMBALI KE HOME
+  </a>
+
+</div>
+
+<script>
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡⚡⚡ KONFIGURASI FIREBASE ⚡⚡⚡
+   ═══════════════════════════════════════════════════════════════════════════
+   GANTI SEMUA VALUE DI BAWAH INI DENGAN MILIK ANDA:
+
+   1. Buka Firebase Console → Project Settings → General
+   2. Scroll ke "Your apps" → pilih Web App
+   3. Copy config dan paste ke sini
+   4. Pastikan Realtime Database sudah dibuat (bukan Firestore)
+   ═══════════════════════════════════════════════════════════════════════════ */
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDLs7Coar_Dy9bE2K4Ha_Q6wG0SmC3m75g",
+    //        ↑ GANTI dengan API Key Anda
+
+    authDomain: "https://radien-95e9d.firebaseapp.com",
+    //            ↑ GANTI dengan Auth Domain Anda
+
+    databaseURL: "https://radien-95e9d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    //             ↑ GANTI dengan Realtime Database URL Anda
+
+    projectId: "radien-95e9d",
+    //           ↑ GANTI dengan Project ID Anda
+
+    storageBucket: "https://radien-95e9d.firebasestorage.app",
+    //               ↑ GANTI dengan Storage Bucket Anda
+
+    messagingSenderId: "208676450122",
+    //                   ↑ GANTI dengan Messaging Sender ID Anda
+
+    appId: "13f1702562e36468a4dbb3"
+    //      ↑ GANTI dengan App ID Anda
+};
+
+let FIREBASE_DB = null;
+let FIREBASE_READY = false;
+
+function initFirebase(){
+    try {
+        if (typeof firebase === "undefined") {
+            console.warn("[FIREBASE] SDK belum dimuat");
+            return false;
+        }
+        if (!firebase.apps.length) {
+            firebase.initializeApp(FIREBASE_CONFIG);
+        }
+        FIREBASE_DB = firebase.database();
+        FIREBASE_READY = true;
+        console.log("[FIREBASE] Initialized ✓", FIREBASE_CONFIG.projectId);
+        return true;
+    } catch (e) {
+        console.error("[FIREBASE] Init error:", e);
+        FIREBASE_READY = false;
+        return false;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ KONFIGURASI PAIRING
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const PAIRING_EXPIRY_MS = 5 * 60 * 1000;
+//                          ↑ Durasi kode berlaku (5 menit = 300.000 ms)
+//                          GANTI kalau mau durasi berbeda
+
+const PAIRING_CODE_LENGTH = 6;
+//                             ↑ Panjang kode pairing (default: 6 karakter)
+//                             GANTI kalau mau panjang berbeda
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ SESSION STORAGE KEY
+   ⚠️ WAJIB SAMA dengan file login.html dan file lainnya
+   ═══════════════════════════════════════════════════════════════════════════ */
+const STORAGE_KEY_SESSION = "astra_session";
+//                            ↑ GANTI kalau perlu (harus SAMA semua file)
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ FIREBASE DATABASE PATH
+   ⚠️ Sesuaikan dengan struktur database Anda
+   ═══════════════════════════════════════════════════════════════════════════ */
+const DB_PATH_PAIRING_CODES = "pairing_codes";
+//                               ↑ Path Firebase untuk pairing codes
+
+/* =========================================================
+   PAIRING CODE — JAVASCRIPT
+   ========================================================= */
+
+let currentCode = "";
+let expiryTimer = null;
+
+/* ⚡ AMBIL USERNAME DARI SESSION — buat owner */
+function getSessionUsername(){
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY_SESSION);
+        if(!raw) return "unknown";
+        const s = JSON.parse(raw);
+        return s && s.username ? s.username.toLowerCase() : "unknown";
+    } catch(e){
+        return "unknown";
+    }
+}
+
+/* ===== GENERATE CODE ===== */
+function generateCode(){
+
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // tanpa O,0,I,1
+    let code = "";
+
+    for(let i = 0; i < PAIRING_CODE_LENGTH; i++){
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    currentCode = code;
+
+    const box = document.getElementById("codeBox");
+    box.innerHTML = code;
+    box.classList.add("active");
+
+    document.getElementById("copyBtn").disabled = false;
+
+    const status = document.getElementById("statusText");
+    if(status){
+        status.innerHTML = "Menyimpan kode ke server...";
+    }
+
+    const label = document.querySelector(".pair-info-label");
+    if(label){
+        label.innerHTML = '<span class="dot"></span>STATUS: KODE AKTIF';
+    }
+
+    setTimeout(function(){
+        box.classList.remove("active");
+    }, 600);
+
+    console.log("[PAIRING] Code generated:", code);
+
+    savePairingCodeToFirebase(code);
+}
+
+/* =========================================================
+   ⚡ SIMPAN KODE KE FIREBASE + OWNER
+   ========================================================= */
+function savePairingCodeToFirebase(code){
+
+    if(!FIREBASE_READY || !FIREBASE_DB){
+        console.warn("[FIREBASE] Not ready");
+        const status = document.getElementById("statusText");
+        if(status){
+            status.innerHTML = "<b style='color:#f87171;'>Firebase belum tersambung.</b><br>Cek koneksi internet.";
+        }
+        return;
+    }
+
+    const username = getSessionUsername();
+    const now = Date.now();
+    const expiresAt = now + PAIRING_EXPIRY_MS;
+
+    // ⚡ OWNER disimpan di sini — dipakai Android untuk filter device
+    const payload = {
+        code: code,
+        owner: username,
+        createdAt: now,
+        expiresAt: expiresAt,
+        used: false,
+        pairedDeviceId: null
+    };
+
+    const ref = FIREBASE_DB.ref(DB_PATH_PAIRING_CODES + "/" + code);
+
+    ref.set(payload)
+        .then(function(){
+            console.log("[FIREBASE] Pairing code saved:", code, "owner:", username);
+
+            const status = document.getElementById("statusText");
+            if(status){
+                status.innerHTML =
+                    "Kode <b>" + code + "</b> tersimpan di server.<br>" +
+                    "Berlaku <b>5 menit</b> sejak dibuat.";
+            }
+
+            startExpiryCountdown(expiresAt);
+            listenCodeUsed(code);
+        })
+        .catch(function(err){
+            console.error("[FIREBASE] Save error:", err);
+
+            const status = document.getElementById("statusText");
+            if(status){
+                status.innerHTML = "<b style='color:#f87171;'>Gagal simpan kode.</b><br>" + err.message;
+            }
+        });
+
+}
+
+/* =========================================================
+   EXPIRY COUNTDOWN
+   ========================================================= */
+function startExpiryCountdown(expiresAt){
+
+    if(expiryTimer) clearInterval(expiryTimer);
+
+    function tick(){
+        const now = Date.now();
+        const remaining = Math.max(0, expiresAt - now);
+
+        if(remaining <= 0){
+            clearInterval(expiryTimer);
+            expiryTimer = null;
+
+            const status = document.getElementById("statusText");
+            if(status){
+                status.innerHTML =
+                    "<b style='color:#f87171;'>Kode sudah kedaluwarsa.</b><br>" +
+                    "Generate ulang untuk kode baru.";
+            }
+
+            const label = document.querySelector(".pair-info-label");
+            if(label){
+                label.innerHTML = '<span class="dot" style="background:#f87171;box-shadow:0 0 8px rgba(248,113,113,.7);"></span>STATUS: KEDALUWARSA';
+            }
+
+            if(FIREBASE_READY && FIREBASE_DB && currentCode){
+                FIREBASE_DB.ref(DB_PATH_PAIRING_CODES + "/" + currentCode).remove()
+                    .then(function(){
+                        console.log("[FIREBASE] Expired code removed");
+                    })
+                    .catch(function(){});
+            }
+            return;
+        }
+
+        const totalSec = Math.floor(remaining / 1000);
+        const m = Math.floor(totalSec / 60);
+        const s = totalSec % 60;
+        const pad = (n) => (n < 10 ? "0" + n : "" + n);
+
+        const status = document.getElementById("statusText");
+        if(status && currentCode){
+            status.innerHTML =
+                "Kode <b>" + currentCode + "</b> aktif.<br>" +
+                "Berlaku <b>" + m + ":" + pad(s) + "</b> lagi.";
+        }
+    }
+
+    tick();
+    expiryTimer = setInterval(tick, 1000);
+}
+
+/* =========================================================
+   LISTEN KALAU KODE DIPAKAI HP TARGET
+   ========================================================= */
+let codeUsedUnsub = null;
+
+function listenCodeUsed(code){
+
+    if(!FIREBASE_READY || !FIREBASE_DB) return;
+
+    if(codeUsedUnsub){
+        codeUsedUnsub.off();
+        codeUsedUnsub = null;
+    }
+
+    const ref = FIREBASE_DB.ref(DB_PATH_PAIRING_CODES + "/" + code);
+    codeUsedUnsub = ref;
+
+    ref.on("value", function(snap){
+        const val = snap.val();
+        if(!val) return;
+
+        if(val.used === true){
+            console.log("[FIREBASE] Code sudah dipakai:", code);
+
+            const status = document.getElementById("statusText");
+            if(status){
+                status.innerHTML =
+                    "<b style='color:#4ade80;'>Device berhasil dipasangkan!</b><br>" +
+                    "ID: " + (val.pairedDeviceId || "-");
+            }
+
+            const label = document.querySelector(".pair-info-label");
+            if(label){
+                label.innerHTML = '<span class="dot"></span>STATUS: BERHASIL DIPASANGKAN';
+            }
+
+            if(expiryTimer){
+                clearInterval(expiryTimer);
+                expiryTimer = null;
+            }
+
+            showPairToast("Device berhasil dipasangkan!");
+        }
+    });
+}
+
+/* ===== COPY CODE ===== */
+function copyCode(){
+    if(currentCode === ""){
+        showPairToast("Generate kode dulu");
+        return;
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(currentCode)
+            .then(function(){
+                showPairToast("Kode disalin: " + currentCode);
+            })
+            .catch(function(){
+                fallbackCopy();
+            });
+    }else{
+        fallbackCopy();
+    }
+}
+
+function fallbackCopy(){
+    const temp = document.createElement("textarea");
+    temp.value = currentCode;
+    temp.style.position = "fixed";
+    temp.style.opacity = "0";
+    document.body.appendChild(temp);
+    temp.select();
+    try{
+        document.execCommand("copy");
+        showPairToast("Kode disalin: " + currentCode);
+    }catch(e){
+        showPairToast("Gagal menyalin kode");
+    }
+    document.body.removeChild(temp);
+}
+
+/* ===== TOAST ===== */
+let pairToastTimer = null;
+
+function showPairToast(msg){
+    let toast = document.getElementById("pairToast");
+    if(!toast){
+        toast = document.createElement("div");
+        toast.id = "pairToast";
+        toast.style.cssText =
+          "position:fixed;left:50%;bottom:30px;" +
+          "transform:translate(-50%,20px);" +
+          "background:#151515;" +
+          "border:1px solid rgba(255,255,255,.18);" +
+          "color:#fff;" +
+          "padding:13px 20px;" +
+          "border-radius:16px;" +
+          "font-family:'Orbitron',sans-serif;" +
+          "font-size:10px;" +
+          "font-weight:800;" +
+          "letter-spacing:1px;" +
+          "opacity:0;" +
+          "visibility:hidden;" +
+          "transition:.25s;" +
+          "z-index:9999;" +
+          "box-shadow:0 15px 40px rgba(0,0,0,.65);" +
+          "max-width:90vw;" +
+          "text-align:center;";
+        document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = "1";
+    toast.style.visibility = "visible";
+    toast.style.transform = "translate(-50%,0)";
+    clearTimeout(pairToastTimer);
+    pairToastTimer = setTimeout(function(){
+        toast.style.opacity = "0";
+        toast.style.visibility = "hidden";
+        toast.style.transform = "translate(-50%,20px)";
+    }, 2500);
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+initFirebase();
+
+</script>
+
+</body>
+</html>

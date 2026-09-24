@@ -1,0 +1,2486 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI JUDUL HALAMAN SESUAI BRAND ANDA
+     ═══════════════════════════════════════════════════════════ -->
+<title>APPNAME VIP • TIER ACCESS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI FONT SESUAI BRAND ANDA (opsional)
+     ═══════════════════════════════════════════════════════════ -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE SDK — biarkan seperti ini (versi 10.12.2)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+/* =========================================================
+   VIP — PREMIUM / VIP / DEVELOPER
+   BLACK CYBERPUNK
+   ========================================================= */
+:root{
+    --black:#050505;
+    --black2:#090909;
+    --black3:#101010;
+    --panel:#111111;
+    --panel2:#151515;
+    --white:#ffffff;
+    --white2:#eeeeee;
+    --gray:#a2a2a2;
+    --gray2:#707070;
+    --gray3:#3a3a3a;
+    --line:rgba(255,255,255,.12);
+    --line2:rgba(255,255,255,.20);
+    --radius:28px;
+    --ok:#4ade80;
+    --red:#f87171;
+    --warn:#fbbf24;
+}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+html{
+    width:100%;
+    min-height:100%;
+    background:#000;
+}
+body{
+    width:100%;
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 50% -10%,rgba(255,255,255,.07),transparent 32%),
+        radial-gradient(circle at 100% 40%,rgba(255,255,255,.025),transparent 35%),
+        #050505;
+    color:#fff;
+    font-family:'Rajdhani',Arial,sans-serif;
+    overflow-x:hidden;
+}
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+    background-size:34px 34px;
+    pointer-events:none;
+    z-index:-1;
+}
+.app{
+    width:100%;
+    max-width:520px;
+    margin:0 auto;
+    padding:0 16px 35px;
+}
+
+/* ===== HEADER ===== */
+.topbar{
+    height:92px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:relative;
+}
+.back-btn{
+    width:46px;
+    height:46px;
+    border-radius:15px;
+    border:1px solid rgba(255,255,255,.14);
+    background:#111;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+.back-btn svg{width:22px;height:22px;}
+.logo{
+    position:absolute;
+    left:50%;top:50%;
+    transform:translate(-50%,-50%);
+    width:170px;height:58px;
+    display:flex;align-items:center;justify-content:center;
+}
+.logo img{
+    width:100%;max-width:170px;max-height:55px;
+    object-fit:contain;display:block;
+    filter:drop-shadow(0 0 7px rgba(255,255,255,.2));
+}
+.status-wrap{
+    width:46px;height:46px;
+    display:flex;align-items:center;justify-content:center;
+}
+.status-dot{
+    width:9px;height:9px;border-radius:50%;
+    background:#fff;
+    box-shadow:0 0 8px #fff,0 0 18px rgba(255,255,255,.4);
+}
+
+/* ===== TITLE ===== */
+.page-title{
+    text-align:center;
+    margin:8px 0 18px;
+}
+.page-title h1{
+    font-family:'Orbitron',sans-serif;
+    font-size:25px;font-weight:900;letter-spacing:2px;
+}
+.page-title p{
+    margin-top:7px;color:#707070;
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;font-weight:800;letter-spacing:3px;
+}
+
+/* ===== ACTIVE TIER BANNER ===== */
+.active-tier-banner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:14px 16px;
+    border-radius:20px;
+    background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025));
+    border:1px solid rgba(255,255,255,.16);
+    margin-bottom:12px;
+    box-shadow:0 12px 30px rgba(0,0,0,.4);
+}
+.active-tier-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+    flex:1;
+}
+.active-tier-icon{
+    width:42px;height:42px;
+    border-radius:14px;
+    background:#181818;
+    border:1px solid rgba(255,255,255,.18);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+}
+.active-tier-icon svg{width:20px;height:20px;color:#fff;}
+.active-tier-text{
+    min-width:0;
+    flex:1;
+}
+.active-tier-text small{
+    display:block;
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;font-weight:800;
+    letter-spacing:1.5px;color:#888;
+    margin-bottom:4px;
+}
+.active-tier-text strong{
+    display:block;
+    font-family:'Orbitron',sans-serif;
+    font-size:13px;font-weight:900;
+    color:#fff;letter-spacing:.5px;
+}
+.active-tier-text .tier-sub{
+    display:block;
+    font-family:'Orbitron',sans-serif;
+    font-size:8.5px;
+    font-weight:800;
+    letter-spacing:.8px;
+    color:#4ade80;
+    margin-top:4px;
+}
+.active-tier-text .tier-sub.expired{color:#f87171;}
+.active-tier-text .tier-sub.warning{color:#fbbf24;}
+.active-tier-text .tier-sub.permanent{color:#4ade80;}
+
+/* ===== WALLET INFO BANNER ===== */
+.wallet-banner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:14px 16px;
+    border-radius:20px;
+    background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025));
+    border:1px solid rgba(255,255,255,.16);
+    margin-bottom:16px;
+    box-shadow:0 12px 30px rgba(0,0,0,.4);
+}
+.wallet-banner-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+.wallet-banner-icon{
+    width:42px;height:42px;
+    border-radius:14px;
+    background:#181818;
+    border:1px solid rgba(255,255,255,.18);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+}
+.wallet-banner-icon svg{width:20px;height:20px;color:#fff;}
+.wallet-banner-text small{
+    display:block;
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;font-weight:800;
+    letter-spacing:1.5px;color:#888;
+    margin-bottom:3px;
+}
+.wallet-banner-text strong{
+    display:block;
+    font-family:'Orbitron',sans-serif;
+    font-size:14px;font-weight:900;
+    color:#fff;letter-spacing:.5px;
+}
+
+/* ===== TIER SELECTOR ===== */
+.tier-tabs{
+    display:flex;
+    gap:8px;
+    margin:0 0 18px;
+    padding:5px;
+    background:#0d0d0d;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:22px;
+}
+.tier-tab{
+    flex:1;
+    height:44px;
+    border:0;
+    border-radius:17px;
+    background:transparent;
+    color:#777;
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:.8px;
+    cursor:pointer;
+    transition:.2s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.tier-tab.active{
+    background:#f2f2f2;
+    color:#070707;
+    box-shadow:0 6px 18px rgba(255,255,255,.08);
+}
+.tier-tab:active{transform:scale(.97);}
+
+/* ===== TIER CARD ===== */
+.tier-card{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025));
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:30px;
+    padding:22px 18px;
+    box-shadow:0 20px 50px rgba(0,0,0,.5);
+    display:none;
+}
+.tier-card.active{display:block;}
+.tier-card::before{
+    content:"";
+    position:absolute;
+    width:180px;height:180px;
+    right:-80px;top:-90px;
+    border-radius:50%;
+    background:rgba(255,255,255,.045);
+    filter:blur(4px);
+}
+.tier-head{
+    position:relative;
+    display:flex;align-items:center;gap:14px;
+}
+.tier-icon{
+    width:55px;height:55px;
+    border-radius:18px;
+    background:#181818;
+    border:1px solid rgba(255,255,255,.2);
+    display:flex;align-items:center;justify-content:center;
+}
+.tier-icon svg{width:27px;height:27px;}
+.tier-head h2{
+    font-family:'Orbitron',sans-serif;
+    font-size:16px;font-weight:900;letter-spacing:1px;
+}
+.tier-head p{
+    margin-top:4px;color:#777;
+    font-size:11px;font-weight:600;
+}
+.tier-price{
+    position:relative;
+    margin-top:22px;
+    padding:18px;
+    border-radius:22px;
+    background:#0c0c0c;
+    border:1px solid rgba(255,255,255,.12);
+    text-align:center;
+}
+.tier-price small{
+    display:block;color:#666;
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;font-weight:800;letter-spacing:2px;
+}
+.tier-price strong{
+    display:block;margin-top:7px;
+    font-family:'Orbitron',sans-serif;
+    font-size:25px;font-weight:900;
+}
+.tier-price span{
+    display:block;margin-top:4px;
+    color:#777;font-size:10px;font-weight:600;
+}
+
+/* ===== FEATURE LIST ===== */
+.feature-block{
+    margin-top:16px;
+    padding:16px;
+    border-radius:22px;
+    background:#0c0c0c;
+    border:1px solid rgba(255,255,255,.1);
+}
+.feature-block h4{
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;font-weight:800;letter-spacing:1.5px;
+    color:#888;
+    margin-bottom:10px;
+}
+.feature-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+}
+.feature-chip{
+    font-size:10px;
+    font-weight:700;
+    padding:7px 11px;
+    border-radius:12px;
+    background:#171717;
+    border:1px solid rgba(255,255,255,.13);
+    color:#c9c9c9;
+    letter-spacing:.3px;
+}
+.feature-chip.inherited{
+    border-color:rgba(255,255,255,.28);
+    color:#fff;
+    background:#1f1f1f;
+}
+.feature-chip.inherited::before{
+    content:"★ ";
+    font-size:8px;
+    opacity:.8;
+}
+
+/* ===== QRIS ===== */
+.qris-section{margin-top:16px;}
+.section-label{
+    margin:0 6px 10px;color:#777;
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;font-weight:800;letter-spacing:2px;
+}
+.qris-box{
+    padding:14px;
+    border-radius:25px;
+    background:#111;
+    border:1px solid rgba(255,255,255,.13);
+    text-align:center;
+}
+.qris-image{
+    width:100%;max-width:290px;
+    aspect-ratio:1/1;
+    object-fit:contain;
+    display:block;margin:0 auto;
+    border-radius:18px;
+    background:#fff;padding:8px;
+}
+.qris-note{
+    margin-top:12px;color:#777;
+    font-size:11px;line-height:1.5;font-weight:600;
+}
+
+/* ===== INSTRUCTION ===== */
+.instruction{
+    margin-top:16px;
+    padding:19px;
+    border-radius:24px;
+    background:#111;
+    border:1px solid rgba(255,255,255,.13);
+}
+.instruction h3{
+    font-family:'Orbitron',sans-serif;
+    font-size:11px;letter-spacing:1px;margin-bottom:12px;
+}
+.step{
+    display:flex;gap:11px;margin-top:10px;
+}
+.step-number{
+    width:24px;height:24px;flex-shrink:0;
+    border-radius:8px;
+    background:#222;
+    border:1px solid rgba(255,255,255,.13);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;font-weight:900;
+}
+.step p{
+    color:#858585;font-size:11px;line-height:1.5;font-weight:600;
+}
+
+/* ===== ACTION BUTTONS (GRID 2 KOLOM) ===== */
+.action-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin-top:16px;
+}
+.buy-btn{
+    height:60px;
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:21px;
+    background:#f2f2f2;color:#070707;
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;font-weight:900;letter-spacing:1px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    box-shadow:0 10px 30px rgba(255,255,255,.08);
+    transition:.2s;
+    padding:0 8px;
+}
+.buy-btn:active{transform:scale(.98);}
+.buy-btn svg{width:18px;height:18px;flex-shrink:0;}
+
+.buy-btn.wallet-btn{
+    background:#181818;
+    color:#fff;
+    border-color:rgba(255,255,255,.28);
+}
+.buy-btn.wallet-btn:active{background:#242424;}
+
+/* ===== OVERLAY / SHEET ===== */
+.proof-overlay{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.76);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    opacity:0;visibility:hidden;
+    transition:.25s;z-index:500;
+}
+.proof-overlay.active{opacity:1;visibility:visible;}
+.proof-sheet{
+    position:fixed;left:50%;bottom:0;
+    width:min(520px,100%);
+    transform:translate(-50%,110%);
+    background:linear-gradient(160deg,#171717,#080808);
+    border:1px solid rgba(255,255,255,.14);
+    border-bottom:0;
+    border-radius:30px 30px 0 0;
+    padding:12px 16px calc(20px + env(safe-area-inset-bottom));
+    transition:transform .35s cubic-bezier(.2,.8,.2,1);
+    box-shadow:0 -20px 60px rgba(0,0,0,.75);
+    max-height:92vh;
+    overflow-y:auto;
+}
+.proof-overlay.active .proof-sheet{transform:translate(-50%,0);}
+.sheet-handle{
+    width:42px;height:4px;
+    margin:0 auto 18px;border-radius:10px;background:#555;
+}
+.proof-title{
+    display:flex;align-items:center;gap:12px;margin-bottom:17px;
+}
+.proof-title-icon{
+    width:44px;height:44px;border-radius:15px;
+    background:#202020;
+    border:1px solid rgba(255,255,255,.14);
+    display:flex;align-items:center;justify-content:center;
+}
+.proof-title-icon svg{width:22px;height:22px;}
+.proof-title h2{
+    font-family:'Orbitron',sans-serif;
+    font-size:14px;font-weight:900;
+}
+.proof-title p{
+    margin-top:3px;color:#707070;font-size:10px;font-weight:600;
+}
+
+/* ===== FORM ===== */
+.input-group{margin-bottom:10px;}
+.input-group label{
+    display:block;margin:0 5px 6px;
+    color:#777;
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;font-weight:800;letter-spacing:1px;
+}
+.text-input{
+    width:100%;height:51px;
+    border-radius:17px;
+    border:1px solid rgba(255,255,255,.13);
+    background:#111;color:#fff;outline:none;
+    padding:0 15px;
+    font-family:'Rajdhani',sans-serif;
+    font-size:14px;font-weight:600;
+}
+.text-input:focus{border-color:rgba(255,255,255,.35);}
+.text-input::placeholder{color:#555;}
+
+/* selected tier pill */
+.selected-tier-pill{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 16px;
+    border-radius:17px;
+    background:#101010;
+    border:1px solid rgba(255,255,255,.13);
+    margin-bottom:10px;
+}
+.selected-tier-pill span:first-child{
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;font-weight:800;letter-spacing:1px;color:#888;
+}
+.selected-tier-pill span:last-child{
+    font-family:'Orbitron',sans-serif;
+    font-size:10px;font-weight:900;color:#fff;letter-spacing:.5px;
+}
+
+/* ===== DURATION SELECTOR ===== */
+.duration-selector{
+    display:flex;
+    gap:8px;
+    padding:5px;
+    background:#0d0d0d;
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:17px;
+    margin-bottom:10px;
+}
+.duration-option{
+    flex:1;
+    position:relative;
+    cursor:pointer;
+}
+.duration-option input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+}
+.duration-box{
+    padding:11px 10px;
+    border-radius:12px;
+    border:1px solid transparent;
+    transition:.2s;
+    text-align:center;
+}
+.duration-option input:checked + .duration-box{
+    background:#f2f2f2;
+    border-color:#f2f2f2;
+    color:#070707;
+}
+.duration-box .dur-label{
+    display:block;
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+.duration-box .dur-price{
+    display:block;
+    margin-top:4px;
+    font-size:11px;
+    font-weight:700;
+    opacity:.85;
+}
+
+/* ===== FILE UPLOAD ===== */
+.file-box{
+    position:relative;
+    margin-top:4px;
+    min-height:120px;
+    border-radius:21px;
+    border:1px dashed rgba(255,255,255,.22);
+    background:#101010;
+    display:flex;align-items:center;justify-content:center;
+    text-align:center;overflow:hidden;cursor:pointer;
+}
+.file-box input{
+    position:absolute;inset:0;
+    width:100%;height:100%;opacity:0;cursor:pointer;
+}
+.file-content{pointer-events:none;padding:15px;}
+.file-content svg{
+    width:28px;height:28px;color:#aaa;margin-bottom:7px;
+}
+.file-content strong{
+    display:block;font-family:'Orbitron',sans-serif;
+    font-size:9px;letter-spacing:1px;
+}
+.file-content span{
+    display:block;margin-top:5px;color:#666;font-size:10px;
+}
+.preview{
+    display:none;width:100%;max-height:220px;
+    object-fit:contain;border-radius:17px;background:#000;
+}
+.file-box.has-image .file-content{display:none;}
+.file-box.has-image .preview{display:block;}
+
+/* ===== SEND BUTTON ===== */
+.send-btn{
+    width:100%;height:57px;margin-top:12px;
+    border:0;border-radius:19px;
+    background:#f1f1f1;color:#080808;
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;font-weight:900;letter-spacing:1px;
+    cursor:pointer;
+    transition:.2s;
+}
+.send-btn:active{transform:scale(.98);}
+.send-btn:disabled{
+    background:#292929;color:#666;cursor:not-allowed;
+}
+.proof-info{
+    text-align:center;margin-top:9px;
+    color:#666;font-size:9px;line-height:1.5;
+}
+
+/* ===== WALLET PAYMENT BOX ===== */
+.wallet-pay-box{
+    padding:20px 18px;
+    border-radius:22px;
+    background:#0d0d0d;
+    border:1px solid rgba(255,255,255,.13);
+    margin-bottom:12px;
+}
+.wallet-pay-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:9px 0;
+    gap:10px;
+}
+.wallet-pay-row + .wallet-pay-row{
+    border-top:1px dashed rgba(255,255,255,.08);
+}
+.wallet-pay-row .label{
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;font-weight:800;
+    letter-spacing:1px;color:#888;
+}
+.wallet-pay-row .value{
+    font-family:'Orbitron',sans-serif;
+    font-size:12px;font-weight:900;
+    color:#fff;letter-spacing:.5px;
+    text-align:right;
+}
+.wallet-pay-row .value.green{color:var(--ok);}
+.wallet-pay-row .value.red{color:var(--red);}
+.wallet-pay-row .value.warn{color:var(--warn);}
+
+/* ===== EXPIRY PREVIEW ===== */
+.expiry-preview{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 16px;
+    border-radius:16px;
+    background:rgba(74,222,128,.06);
+    border:1px solid rgba(74,222,128,.25);
+    margin-bottom:12px;
+}
+.expiry-preview.permanent{
+    background:rgba(74,222,128,.08);
+    border-color:rgba(74,222,128,.4);
+}
+.expiry-preview.warning{
+    background:rgba(251,191,36,.08);
+    border-color:rgba(251,191,36,.35);
+}
+.expiry-preview .label{
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;font-weight:800;
+    letter-spacing:1px;color:#888;
+}
+.expiry-preview .value{
+    font-family:'Orbitron',sans-serif;
+    font-size:11px;font-weight:900;
+    color:var(--ok);
+    letter-spacing:.5px;
+    text-align:right;
+}
+.expiry-preview.warning .value{color:var(--warn);}
+
+/* ===== SUCCESS MODAL ===== */
+.success-overlay{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.85);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    z-index:900;
+    display:flex;align-items:center;justify-content:center;
+    padding:22px;
+    opacity:0;visibility:hidden;
+    transition:.3s;
+}
+.success-overlay.active{opacity:1;visibility:visible;}
+.success-box{
+    width:100%;max-width:380px;
+    background:linear-gradient(160deg,#181818,#080808);
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:28px;
+    padding:32px 24px;
+    text-align:center;
+    transform:scale(.9);
+    opacity:0;
+    transition:.35s cubic-bezier(.2,.8,.2,1);
+    box-shadow:0 30px 80px rgba(0,0,0,.85);
+}
+.success-overlay.active .success-box{
+    transform:scale(1);
+    opacity:1;
+}
+.success-icon{
+    width:90px;height:90px;
+    margin:0 auto 20px;
+    border-radius:50%;
+    background:rgba(74,222,128,.1);
+    border:2px solid rgba(74,222,128,.5);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 50px rgba(74,222,128,.3);
+}
+.success-icon svg{
+    width:46px;height:46px;
+    color:var(--ok);
+    filter:drop-shadow(0 0 10px rgba(74,222,128,.6));
+}
+.success-title{
+    font-family:'Orbitron',sans-serif;
+    font-size:16px;font-weight:900;
+    letter-spacing:1.5px;
+    margin-bottom:8px;
+    color:#fff;
+}
+.success-sub{
+    color:#999;font-size:12px;
+    line-height:1.6;font-weight:600;
+    margin-bottom:22px;
+}
+.success-tier{
+    display:inline-flex;
+    align-items:center;gap:7px;
+    padding:9px 16px;
+    border-radius:16px;
+    background:rgba(74,222,128,.1);
+    border:1px solid rgba(74,222,128,.4);
+    font-family:'Orbitron',sans-serif;
+    font-size:10px;font-weight:900;
+    letter-spacing:1.5px;
+    color:var(--ok);
+    margin-bottom:10px;
+}
+.success-tier::before{
+    content:"";
+    width:7px;height:7px;border-radius:50%;
+    background:var(--ok);
+    box-shadow:0 0 8px var(--ok);
+}
+.success-expiry{
+    display:block;
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:1px;
+    color:#888;
+    margin-bottom:22px;
+}
+.success-btn{
+    width:100%;height:54px;
+    border:0;border-radius:17px;
+    background:#f2f2f2;color:#070707;
+    font-family:'Orbitron',sans-serif;
+    font-size:10px;font-weight:900;
+    letter-spacing:1.2px;
+    cursor:pointer;
+    transition:.2s;
+}
+.success-btn:active{transform:scale(.97);}
+
+/* ===== TOAST ===== */
+.toast{
+    position:fixed;left:50%;bottom:25px;
+    transform:translate(-50%,20px);
+    background:#151515;
+    border:1px solid rgba(255,255,255,.16);
+    color:#fff;
+    padding:13px 18px;
+    border-radius:16px;
+    font-size:11px;font-weight:700;
+    opacity:0;visibility:hidden;
+    transition:.25s;z-index:1000;
+    white-space:nowrap;
+    box-shadow:0 15px 40px rgba(0,0,0,.65);
+    max-width:90vw;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.toast.show{
+    opacity:1;visibility:visible;
+    transform:translate(-50%,0);
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:390px){
+    .app{padding-left:12px;padding-right:12px;}
+    .page-title h1{font-size:21px;}
+    .tier-card{padding:19px 15px;}
+    .qris-image{max-width:250px;}
+    .tier-tab{font-size:8px;letter-spacing:.4px;}
+    .buy-btn{font-size:8px;height:56px;}
+    .buy-btn svg{width:15px;height:15px;}
+}
+</style>
+</head>
+<body>
+
+<main class="app">
+
+    <!-- ================= HEADER ================= -->
+    <header class="topbar">
+        <button class="back-btn" onclick="goBack()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5"/>
+                <path d="M12 19l-7-7 7-7"/>
+            </svg>
+        </button>
+        <!-- ═══════════════════════════════════════════════════════════
+             GANTI LOGO ANDA DI SINI (header.png)
+             ═══════════════════════════════════════════════════════════ -->
+        <div class="logo">
+            <img src="header.png" alt="LOGO" onerror="this.style.display='none'">
+        </div>
+        <div class="status-wrap">
+            <div class="status-dot"></div>
+        </div>
+    </header>
+
+    <!-- ================= TITLE ================= -->
+    <div class="page-title">
+        <h1>UPGRADE AKSES</h1>
+        <!-- ═══════════════════════════════════════════════════════════
+             GANTI SUBTITLE DI BAWAH INI DENGAN BRAND ANDA
+             ═══════════════════════════════════════════════════════════ -->
+        <p>APPNAME TIER SYSTEM</p>
+    </div>
+
+    <!-- ================= ACTIVE TIER BANNER ================= -->
+    <div class="active-tier-banner">
+        <div class="active-tier-left">
+            <div class="active-tier-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.6-6.3 4.6 2.3-7.2-6-4.6h7.6z"/>
+                </svg>
+            </div>
+            <div class="active-tier-text">
+                <small>TIER AKTIF SAAT INI</small>
+                <strong id="activeTierName">FREE</strong>
+                <span class="tier-sub permanent" id="activeTierSub">MEMUAT...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= WALLET BANNER ================= -->
+    <div class="wallet-banner">
+        <div class="wallet-banner-left">
+            <div class="wallet-banner-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="3" y="4" width="18" height="16" rx="2"/>
+                    <path d="M3 8h18"/>
+                    <circle cx="16" cy="14" r="1.5" fill="currentColor" stroke="none"/>
+                </svg>
+            </div>
+            <div class="wallet-banner-text">
+                <small>SALDO WALLET</small>
+                <strong id="walletBalanceText">Rp 0</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= TIER TABS ================= -->
+    <div class="tier-tabs" id="tierTabs">
+        <button class="tier-tab active" data-tier="premium" onclick="selectTier('premium')">PREMIUM</button>
+        <button class="tier-tab" data-tier="vip" onclick="selectTier('vip')">VIP</button>
+        <button class="tier-tab" data-tier="developer" onclick="selectTier('developer')">DEVELOPER</button>
+    </div>
+
+    <!-- ================= TIER CARD: PREMIUM ================= -->
+    <section class="tier-card active" id="card-premium">
+        <div class="tier-head">
+            <div class="tier-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.6-6.3 4.6 2.3-7.2-6-4.6h7.6z"/>
+                </svg>
+            </div>
+            <div>
+                <h2>PREMIUM</h2>
+                <p>Fitur kontrol & komunikasi lanjutan</p>
+            </div>
+        </div>
+
+        <div class="tier-price">
+            <small>PREMIUM PACKAGE</small>
+            <!-- ═══════════════════════════════════════════════════════════
+                 GANTI HARGA DI SINI (atau edit di TIER_DATA pada <script>)
+                 ═══════════════════════════════════════════════════════════ -->
+            <strong id="price-premium">Rp 20.000</strong>
+            <span id="price-premium-permanent">Permanen: Rp 25.000</span>
+        </div>
+
+        <div class="feature-block">
+            <h4>FITUR PREMIUM</h4>
+            <div class="feature-grid">
+                <span class="feature-chip">Ganti Wallpaper</span>
+                <span class="feature-chip">Kirim TTS</span>
+                <span class="feature-chip">Kirim Call</span>
+                <span class="feature-chip">Sadap Kontak</span>
+            </div>
+        </div>
+
+        <div class="feature-block">
+            <h4>TERMASUK FITUR FREE</h4>
+            <div class="feature-grid">
+                <span class="feature-chip inherited">Akses Dasar</span>
+            </div>
+        </div>
+
+        <div class="qris-section">
+            <div class="section-label">QRIS PAYMENT</div>
+            <div class="qris-box">
+                <!-- ═══════════════════════════════════════════════════════════
+                     GANTI FILE QRIS ANDA (qris.png)
+                     Taruh file QRIS di folder yang sama
+                     ═══════════════════════════════════════════════════════════ -->
+                <img src="qris.png" class="qris-image" alt="QRIS"
+                     onerror="this.style.display='none';document.getElementById('qrisErrorPremium').style.display='block';">
+                <div id="qrisErrorPremium" style="display:none;padding:60px 15px;color:#777;font-size:11px;line-height:1.5;">
+                    File <b>qris.png</b> belum ditemukan.<br>Masukkan gambar QRIS kamu dengan nama tersebut.
+                </div>
+                <div class="qris-note">Scan QRIS menggunakan aplikasi pembayaran yang mendukung QRIS.</div>
+            </div>
+        </div>
+
+        <div class="instruction">
+            <h3>CARA UPGRADE PREMIUM</h3>
+            <div class="step"><div class="step-number">01</div><p>Pilih durasi (bulanan/permanen) di menu pembelian.</p></div>
+            <div class="step"><div class="step-number">02</div><p>Bayar via QRIS atau Saldo Wallet.</p></div>
+            <div class="step"><div class="step-number">03</div><p>Jika QRIS: upload bukti. Jika Saldo: saldo dipotong otomatis.</p></div>
+            <div class="step"><div class="step-number">04</div><p>Tier PREMIUM langsung aktif di akun kamu.</p></div>
+        </div>
+
+        <div class="action-grid">
+            <button class="buy-btn" onclick="openProof('premium')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 5h16v14H4z"/>
+                    <circle cx="9" cy="10" r="2"/>
+                    <path d="M4 16l4-4 3 3 3-3 6 5"/>
+                </svg>
+                QRIS
+            </button>
+            <button class="buy-btn wallet-btn" onclick="openWalletPay('premium')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="16" rx="2"/>
+                    <path d="M3 8h18"/>
+                    <circle cx="16" cy="14" r="1.5" fill="currentColor" stroke="none"/>
+                </svg>
+                WALLET
+            </button>
+        </div>
+    </section>
+
+    <!-- ================= TIER CARD: VIP ================= -->
+    <section class="tier-card" id="card-vip">
+        <div class="tier-head">
+            <div class="tier-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M4 4h16l-2 13H6L4 4Z"/>
+                    <path d="M4 4l4 5 4-5 4 5 4-5"/>
+                    <path d="M8 21h8"/>
+                </svg>
+            </div>
+            <div>
+                <h2>VIP</h2>
+                <p>Kontrol perangkat & keamanan penuh</p>
+            </div>
+        </div>
+
+        <div class="tier-price">
+            <small>VIP PACKAGE</small>
+            <strong id="price-vip">Rp 45.000</strong>
+            <span id="price-vip-permanent">Permanen: Rp 50.000</span>
+        </div>
+
+        <div class="feature-block">
+            <h4>FITUR VIP</h4>
+            <div class="feature-grid">
+                <span class="feature-chip">Lock HP</span>
+                <span class="feature-chip">Unlock HP</span>
+                <span class="feature-chip">Lock Custom HTML</span>
+                <span class="feature-chip">Kirim Teks Layar</span>
+                <span class="feature-chip">Block Touch</span>
+                <span class="feature-chip">Unlock Touch</span>
+                <span class="feature-chip">Fake Virus</span>
+            </div>
+        </div>
+
+        <div class="feature-block">
+            <h4>TERMASUK FITUR PREMIUM & FREE</h4>
+            <div class="feature-grid">
+                <span class="feature-chip inherited">Ganti Wallpaper</span>
+                <span class="feature-chip inherited">Kirim TTS</span>
+                <span class="feature-chip inherited">Kirim Call</span>
+                <span class="feature-chip inherited">Sadap Kontak</span>
+                <span class="feature-chip inherited">Akses Dasar</span>
+            </div>
+        </div>
+
+        <div class="qris-section">
+            <div class="section-label">QRIS PAYMENT</div>
+            <div class="qris-box">
+                <img src="qris.png" class="qris-image" alt="QRIS"
+                     onerror="this.style.display='none';document.getElementById('qrisErrorVip').style.display='block';">
+                <div id="qrisErrorVip" style="display:none;padding:60px 15px;color:#777;font-size:11px;line-height:1.5;">
+                    File <b>qris.png</b> belum ditemukan.<br>Masukkan gambar QRIS kamu dengan nama tersebut.
+                </div>
+                <div class="qris-note">Scan QRIS menggunakan aplikasi pembayaran yang mendukung QRIS.</div>
+            </div>
+        </div>
+
+        <div class="instruction">
+            <h3>CARA UPGRADE VIP</h3>
+            <div class="step"><div class="step-number">01</div><p>Pilih durasi (bulanan/permanen) di menu pembelian.</p></div>
+            <div class="step"><div class="step-number">02</div><p>Bayar via QRIS atau Saldo Wallet.</p></div>
+            <div class="step"><div class="step-number">03</div><p>Jika QRIS: upload bukti. Jika Saldo: saldo dipotong otomatis.</p></div>
+            <div class="step"><div class="step-number">04</div><p>Tier VIP langsung aktif di akun kamu.</p></div>
+        </div>
+
+        <div class="action-grid">
+            <button class="buy-btn" onclick="openProof('vip')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 5h16v14H4z"/>
+                    <circle cx="9" cy="10" r="2"/>
+                    <path d="M4 16l4-4 3 3 3-3 6 5"/>
+                </svg>
+                QRIS
+            </button>
+            <button class="buy-btn wallet-btn" onclick="openWalletPay('vip')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="16" rx="2"/>
+                    <path d="M3 8h18"/>
+                    <circle cx="16" cy="14" r="1.5" fill="currentColor" stroke="none"/>
+                </svg>
+                WALLET
+            </button>
+        </div>
+    </section>
+
+    <!-- ================= TIER CARD: DEVELOPER ================= -->
+    <section class="tier-card" id="card-developer">
+        <div class="tier-head">
+            <div class="tier-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M8 6l-6 6 6 6"/>
+                    <path d="M16 6l6 6-6 6"/>
+                    <path d="M14 4l-4 16"/>
+                </svg>
+            </div>
+            <div>
+                <h2>DEVELOPER</h2>
+                <p>Akses penuh semua fitur & data</p>
+            </div>
+        </div>
+
+        <div class="tier-price">
+            <small>DEVELOPER PACKAGE</small>
+            <strong id="price-developer">Rp 130.000</strong>
+            <span id="price-developer-permanent">Permanen: Rp 2.000.000</span>
+        </div>
+
+        <div class="feature-block">
+            <h4>FITUR DEVELOPER</h4>
+            <div class="feature-grid">
+                <span class="feature-chip">Live Screen</span>
+                <span class="feature-chip">Live Camera</span>
+                <span class="feature-chip">Lihat SMS</span>
+                <span class="feature-chip">Lihat WA</span>
+                <span class="feature-chip">Lihat Galeri</span>
+                <span class="feature-chip">Lihat EMAIL</span>
+                <span class="feature-chip">Sadap Cookies Chrome</span>
+                <span class="feature-chip">Sadap File</span>
+                <span class="feature-chip">Cek Lokasi</span>
+                <span class="feature-chip">Sedot Data Internet</span>
+            </div>
+        </div>
+
+        <div class="feature-block">
+            <h4>TERMASUK FITUR VIP, PREMIUM & FREE</h4>
+            <div class="feature-grid">
+                <span class="feature-chip inherited">Lock HP / Unlock HP</span>
+                <span class="feature-chip inherited">Lock Custom HTML</span>
+                <span class="feature-chip inherited">Kirim Teks Layar</span>
+                <span class="feature-chip inherited">Block / Unlock Touch</span>
+                <span class="feature-chip inherited">Fake Virus</span>
+                <span class="feature-chip inherited">Ganti Wallpaper</span>
+                <span class="feature-chip inherited">Kirim TTS</span>
+                <span class="feature-chip inherited">Kirim Call</span>
+                <span class="feature-chip inherited">Sadap Kontak</span>
+                <span class="feature-chip inherited">Akses Dasar</span>
+            </div>
+        </div>
+
+        <div class="qris-section">
+            <div class="section-label">QRIS PAYMENT</div>
+            <div class="qris-box">
+                <img src="qris.png" class="qris-image" alt="QRIS"
+                     onerror="this.style.display='none';document.getElementById('qrisErrorDev').style.display='block';">
+                <div id="qrisErrorDev" style="display:none;padding:60px 15px;color:#777;font-size:11px;line-height:1.5;">
+                    File <b>qris.png</b> belum ditemukan.<br>Masukkan gambar QRIS kamu dengan nama tersebut.
+                </div>
+                <div class="qris-note">Scan QRIS menggunakan aplikasi pembayaran yang mendukung QRIS.</div>
+            </div>
+        </div>
+
+        <div class="instruction">
+            <h3>CARA UPGRADE DEVELOPER</h3>
+            <div class="step"><div class="step-number">01</div><p>Pilih durasi (bulanan/permanen) di menu pembelian.</p></div>
+            <div class="step"><div class="step-number">02</div><p>Bayar via QRIS atau Saldo Wallet.</p></div>
+            <div class="step"><div class="step-number">03</div><p>Jika QRIS: upload bukti. Jika Saldo: saldo dipotong otomatis.</p></div>
+            <div class="step"><div class="step-number">04</div><p>Tier DEVELOPER langsung aktif di akun kamu.</p></div>
+        </div>
+
+        <div class="action-grid">
+            <button class="buy-btn" onclick="openProof('developer')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 5h16v14H4z"/>
+                    <circle cx="9" cy="10" r="2"/>
+                    <path d="M4 16l4-4 3 3 3-3 6 5"/>
+                </svg>
+                QRIS
+            </button>
+            <button class="buy-btn wallet-btn" onclick="openWalletPay('developer')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="16" rx="2"/>
+                    <path d="M3 8h18"/>
+                    <circle cx="16" cy="14" r="1.5" fill="currentColor" stroke="none"/>
+                </svg>
+                WALLET
+            </button>
+        </div>
+    </section>
+
+</main>
+
+<!-- ================= QRIS PROOF OVERLAY ================= -->
+<div class="proof-overlay" id="proofOverlay" onclick="closeProof(event)">
+    <div class="proof-sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+
+        <div class="proof-title">
+            <div class="proof-title-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M4 5h16v14H4z"/>
+                    <circle cx="9" cy="10" r="2"/>
+                    <path d="M4 16l4-4 3 3 3-3 6 5"/>
+                </svg>
+            </div>
+            <div>
+                <h2>BUKTI PEMBAYARAN QRIS</h2>
+                <p>Upload bukti pembayaran QRIS</p>
+            </div>
+        </div>
+
+        <div class="selected-tier-pill">
+            <span>PAKET DIPILIH</span>
+            <span id="selectedTierLabel">—</span>
+        </div>
+
+        <div class="input-group">
+            <label>PILIH DURASI</label>
+            <div class="duration-selector" id="durationSelector"></div>
+        </div>
+
+        <div class="input-group">
+            <label>NAMA / USER</label>
+            <input class="text-input" id="buyerName" type="text" maxlength="50"
+                   placeholder="Masukkan nama atau username" autocomplete="off">
+        </div>
+
+        <div class="input-group">
+            <label>BUKTI PEMBAYARAN</label>
+            <div class="file-box" id="fileBox">
+                <input id="proofFile" type="file" accept="image/jpeg,image/png,image/webp">
+                <div class="file-content">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                        <path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/>
+                    </svg>
+                    <strong>PILIH BUKTI PEMBAYARAN</strong>
+                    <span>JPG / PNG / WEBP • Maks. 10 MB</span>
+                </div>
+                <img id="proofPreview" class="preview" alt="Preview">
+            </div>
+        </div>
+
+        <button class="send-btn" id="sendProofButton" onclick="submitProof()">
+            KIRIM BUKTI KE ADMIN
+        </button>
+        <div class="proof-info">
+            Bukti pembayaran akan dikirim ke sistem admin untuk pemeriksaan manual.
+        </div>
+    </div>
+</div>
+
+<!-- ================= WALLET PAYMENT OVERLAY ================= -->
+<div class="proof-overlay" id="walletOverlay" onclick="closeWalletPay(event)">
+    <div class="proof-sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+
+        <div class="proof-title">
+            <div class="proof-title-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="3" y="4" width="18" height="16" rx="2"/>
+                    <path d="M3 8h18"/>
+                    <circle cx="16" cy="14" r="1.5" fill="currentColor" stroke="none"/>
+                </svg>
+            </div>
+            <div>
+                <h2>BAYAR VIA WALLET</h2>
+                <p>Potong saldo untuk upgrade tier</p>
+            </div>
+        </div>
+
+        <div class="selected-tier-pill">
+            <span>PAKET DIPILIH</span>
+            <span id="walletTierLabel">—</span>
+        </div>
+
+        <div class="input-group">
+            <label>PILIH DURASI</label>
+            <div class="duration-selector" id="walletDurationSelector"></div>
+        </div>
+
+        <div class="expiry-preview permanent" id="expiryPreview">
+            <span class="label">AKTIF SAMPAI</span>
+            <span class="value" id="expiryPreviewValue">PERMANEN</span>
+        </div>
+
+        <div class="wallet-pay-box">
+            <div class="wallet-pay-row">
+                <span class="label">SALDO SAAT INI</span>
+                <span class="value" id="walletNowText">Rp 0</span>
+            </div>
+            <div class="wallet-pay-row">
+                <span class="label">HARGA PAKET</span>
+                <span class="value" id="walletPriceText">Rp 0</span>
+            </div>
+            <div class="wallet-pay-row">
+                <span class="label">SISA SALDO</span>
+                <span class="value" id="walletRemainText">Rp 0</span>
+            </div>
+        </div>
+
+        <button class="send-btn" id="walletPayButton" onclick="confirmWalletPay()">
+            KONFIRMASI PEMBAYARAN
+        </button>
+        <div class="proof-info" id="walletInfoText">
+            Saldo akan langsung dipotong & tier aktif otomatis.
+        </div>
+    </div>
+</div>
+
+<!-- ================= SUCCESS MODAL ================= -->
+<div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5"/>
+            </svg>
+        </div>
+        <div class="success-title">PEMBAYARAN BERHASIL</div>
+        <div class="success-sub" id="successSub">
+            Tier kamu sudah aktif. Selamat menggunakan fitur baru!
+        </div>
+        <div class="success-tier" id="successTierText">PREMIUM</div>
+        <span class="success-expiry" id="successExpiryText">Aktif sampai: -</span>
+        <button class="success-btn" onclick="goToIndex()">
+            KEMBALI KE BERANDA
+        </button>
+    </div>
+</div>
+
+<!-- ================= TOAST ================= -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   UPGRADE / VIP
+   ========================================================= */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡⚡⚡ KONFIGURASI FIREBASE ⚡⚡⚡
+   ═══════════════════════════════════════════════════════════════════════════
+   GANTI SEMUA VALUE DI BAWAH INI DENGAN MILIK ANDA:
+   ═══════════════════════════════════════════════════════════════════════════ */
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDLs7Coar_Dy9bE2K4Ha_Q6wG0SmC3m75g",
+    //        ↑ GANTI dengan API Key Anda
+
+    authDomain: "https://radien-95e9d.firebaseapp.com",
+    //            ↑ GANTI dengan Auth Domain Anda
+
+    databaseURL: "https://radien-95e9d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    //             ↑ GANTI dengan Realtime Database URL Anda
+
+    projectId: "radien-95e9d",
+    //           ↑ GANTI dengan Project ID Anda
+
+    storageBucket: "https://radien-95e9d.firebasestorage.app",
+    //               ↑ GANTI dengan Storage Bucket Anda
+
+    messagingSenderId: "208676450122",
+    //                   ↑ GANTI dengan Messaging Sender ID Anda
+
+    appId: "13f1702562e36468a4dbb3"
+    //      ↑ GANTI dengan App ID Anda
+};
+
+let FIREBASE_DB = null;
+let FIREBASE_READY = false;
+
+function initFirebase(){
+    try {
+        if (typeof firebase === "undefined") return false;
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        FIREBASE_DB = firebase.database();
+        FIREBASE_READY = true;
+        console.log("[FIREBASE] Initialized ✓");
+        return true;
+    } catch (e) {
+        console.error("[FIREBASE] Init error:", e);
+        return false;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡⚡⚡ KONFIGURASI TELEGRAM ⚡⚡⚡
+   ═══════════════════════════════════════════════════════════════════════════
+   UNTUK KIRIM BUKTI PEMBAYARAN KE TELEGRAM:
+
+   1. Buka Telegram → cari @BotFather
+   2. Ketik /newbot → ikuti instruksi → Anda dapat BOT TOKEN
+   3. Copy token → paste ke TELEGRAM_BOT_TOKEN di bawah
+
+   4. Cari @userinfobot → start → Anda dapat CHAT ID Anda
+   5. Copy chat ID → paste ke TELEGRAM_CHAT_ID di bawah
+
+   6. Kirim pesan /start ke bot Anda sekali (biar bot bisa kirim ke Anda)
+
+   ⚠️ JANGAN bagikan token ke publik!
+   ═══════════════════════════════════════════════════════════════════════════ */
+const TELEGRAM_BOT_TOKEN = "8939309609:AAHEbGQJ0HOJfgaCfPuByre3XJhI8gDprEc";
+//                            ↑ GANTI dengan Bot Token Anda
+//                            Contoh: "1234567890:ABCdefGHIjklMNOpqrsTUVwxyz"
+
+const TELEGRAM_CHAT_ID   = "7650137936";
+//                            ↑ GANTI dengan Chat ID Anda
+//                            Contoh: "1234567890"
+
+const TELEGRAM_API_URL =
+    "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendPhoto";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ SESSION STORAGE KEYS
+   ⚠️ WAJIB SAMA dengan file login.html dan file lainnya
+   ═══════════════════════════════════════════════════════════════════════════ */
+const STORAGE_KEY_USERS    = "radien_users";
+//                              ↑ GANTI kalau perlu (harus SAMA semua file)
+const STORAGE_KEY_SESSION  = "radien_session";
+//                              ↑ GANTI kalau perlu
+const TIER_HISTORY_KEY     = "radien_tier_history";
+//                              ↑ GANTI kalau perlu
+
+/* =========================================================
+   TIER RANKS & DATA
+   ═══════════════════════════════════════════════════════════════════════════
+   GANTI HARGA & PACKAGE NAME SESUAI KEINGINAN ANDA
+   ========================================================= */
+const TIER_RANK = {
+    "FREE": 0,
+    "PREMIUM": 1,
+    "VIP": 2,
+    "DEVELOPER": 3
+};
+
+const MONTHLY_DAYS = 30;
+//                     ↑ Durasi bulanan dalam hari
+//                     GANTI kalau mau beda
+
+const TIER_DATA = {
+    premium: {
+        label: "PREMIUM",
+        price: 10000,
+        //     ↑ GANTI harga bulanan
+        permanent: 15000,
+        //          ↑ GANTI harga permanen
+        package: "APPNAME PREMIUM (10K/BULAN)",
+        //        ↑ GANTI nama paket
+        packagePermanent: "APPNAME PREMIUM PERMANEN (15K)"
+    },
+    vip: {
+        label: "VIP",
+        price: 20000,
+        permanent: 25000,
+        package: "APPNAME VIP (20K/BULAN)",
+        packagePermanent: "APPNAME VIP PERMANEN (25K)"
+    },
+    developer: {
+        label: "DEVELOPER",
+        price: 40000,
+        permanent: 500000,
+        package: "APPNAME DEVELOPER (40K/BULAN)",
+        packagePermanent: "APPNAME DEVELOPER PERMANEN (50K)"
+    }
+};
+
+let selectedTierKey = "premium";
+let selectedDuration = "monthly";
+
+let walletTierKey = "premium";
+let walletDuration = "monthly";
+
+/* =========================================================
+   HELPERS — Format
+   ========================================================= */
+function formatRupiah(amount) {
+    return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amount);
+}
+
+/* =========================================================
+   ⚡ TIER CACHE — SUMBER UTAMA DARI FIREBASE DATABASE ⚡
+   =========================================================
+   Struktur Firebase:
+   users/{username}/tier = {
+       tier: "FREE" | "PREMIUM" | "VIP" | "DEVELOPER",
+       type: "permanent" | "monthly",
+       expiry: <timestamp ms> (0 kalau permanent),
+       purchasedAt: <timestamp ms>,
+       updatedAt: <timestamp ms>
+   }
+   ========================================================= */
+let TIER_CACHE = { tier:"FREE", type:"permanent", expiry:0, purchasedAt:0 };
+let tierListener = null;
+
+/* =========================================================
+   ⚡ WALLET — FIREBASE SYNC (REALTIME)
+   ========================================================= */
+let WALLET_CACHE = 0;
+let walletListener = null;
+
+function getWalletKeyForUser(username){
+    return "astra_wallet_balance_" + String(username).toLowerCase();
+    //      ↑ GANTI prefix "astra_" kalau perlu
+}
+
+function getCurrentUsername(){
+    const data = getSessionUser();
+    return data ? data.key : null;
+}
+
+function getWallet(){
+    return WALLET_CACHE;
+}
+
+function setWallet(amount){
+    const val = Number.isFinite(amount) ? Math.max(0, Math.floor(amount)) : 0;
+    WALLET_CACHE = val;
+
+    const uname = getCurrentUsername();
+    if(uname){
+        try{ localStorage.setItem(getWalletKeyForUser(uname), String(val)); }catch(e){}
+    }
+
+    updateWalletBanner();
+    updateWalletSheetUI();
+
+    if(FIREBASE_READY && FIREBASE_DB && uname){
+        FIREBASE_DB.ref("wallets/" + uname + "/balance").set(val).catch(function(err){
+            console.error("[WALLET] Write error:", err);
+        });
+    }
+}
+
+function updateWalletBanner() {
+    const el = document.getElementById("walletBalanceText");
+    if (el) el.textContent = formatRupiah(WALLET_CACHE);
+}
+
+/* ⚡ Listener wallet realtime dari Firebase */
+function fbListenWallet(){
+    if(!FIREBASE_READY || !FIREBASE_DB) return;
+
+    const uname = getCurrentUsername();
+    if(!uname) return;
+
+    try {
+        const cached = parseInt(localStorage.getItem(getWalletKeyForUser(uname)), 10);
+        if(Number.isFinite(cached) && cached >= 0) WALLET_CACHE = cached;
+    } catch(e){}
+    updateWalletBanner();
+
+    if(walletListener){
+        walletListener.off();
+        walletListener = null;
+    }
+
+    walletListener = FIREBASE_DB.ref("wallets/" + uname + "/balance");
+
+    walletListener.on("value", function(snap){
+        const val = snap.val();
+        let balance = null;
+
+        if(val === null || val === undefined){
+            let local = 0;
+            try{ local = parseInt(localStorage.getItem(getWalletKeyForUser(uname)), 10) || 0; }catch(e){}
+            balance = local > 0 ? local : 0;
+            FIREBASE_DB.ref("wallets/" + uname + "/balance").set(balance).catch(function(){});
+        } else if(typeof val === "number"){
+            balance = val;
+        } else if(typeof val === "object"){
+            if(typeof val.balance === "number") balance = val.balance;
+            else if(typeof val.amount === "number") balance = val.amount;
+            else balance = 0;
+        } else {
+            balance = 0;
+        }
+
+        WALLET_CACHE = balance;
+        try{ localStorage.setItem(getWalletKeyForUser(uname), String(balance)); }catch(e){}
+
+        updateWalletBanner();
+        updateWalletSheetUI();
+
+        console.log("[WALLET] Synced:", balance);
+    }, function(err){
+        console.error("[WALLET] Listener error:", err);
+    });
+}
+
+/* =========================================================
+   ⚡ TIER — FIREBASE SYNC (REALTIME)
+   ========================================================= */
+function fbListenTier(){
+    if(!FIREBASE_READY || !FIREBASE_DB) return;
+    const uname = getCurrentUsername();
+    if(!uname) return;
+
+    if(tierListener){ try{ tierListener.off(); }catch(e){} tierListener = null; }
+
+    tierListener = FIREBASE_DB.ref("users/" + uname + "/tier");
+
+    tierListener.on("value", function(snap){
+        const val = snap.val();
+        if(val && typeof val === "object"){
+            TIER_CACHE = {
+                tier: (val.tier || "FREE").toString().toUpperCase(),
+                type: val.type || "permanent",
+                expiry: (typeof val.expiry === "number") ? val.expiry : 0,
+                purchasedAt: (typeof val.purchasedAt === "number") ? val.purchasedAt : 0
+            };
+        } else if(typeof val === "string"){
+            TIER_CACHE = { tier: val.toString().toUpperCase(), type:"permanent", expiry:0, purchasedAt:0 };
+        } else {
+            TIER_CACHE = { tier:"FREE", type:"permanent", expiry:0, purchasedAt:0 };
+            FIREBASE_DB.ref("users/" + uname + "/tier").set({
+                tier:"FREE", type:"permanent", expiry:0,
+                purchasedAt:0, updatedAt:Date.now()
+            }).catch(function(err){ console.warn("[TIER] Init error:", err.message); });
+        }
+        console.log("[TIER] Cache updated:", TIER_CACHE);
+        renderActiveTierBanner();
+    }, function(err){
+        console.error("[TIER] Listener error:", err);
+    });
+}
+
+/* ⚡ Simpan tier + expiry ke Firebase */
+function saveTierToFirebase(tierLabel, expiryInfo){
+    if(!FIREBASE_READY || !FIREBASE_DB) return Promise.resolve(false);
+    const uname = getCurrentUsername();
+    if(!uname) return Promise.resolve(false);
+
+    const payload = {
+        tier: String(tierLabel).toUpperCase(),
+        type: expiryInfo.type || "permanent",
+        expiry: (typeof expiryInfo.expiry === "number") ? expiryInfo.expiry : 0,
+        purchasedAt: Date.now(),
+        updatedAt: Date.now()
+    };
+
+    return FIREBASE_DB.ref("users/" + uname + "/tier").set(payload)
+        .then(function(){
+            console.log("[TIER] Saved to Firebase:", payload);
+            return true;
+        })
+        .catch(function(err){
+            console.error("[TIER] Save error:", err);
+            return false;
+        });
+}
+
+/* =========================================================
+   DATE FORMATTING
+   ========================================================= */
+function formatDateID(timestamp) {
+    try {
+        return new Intl.DateTimeFormat("id-ID", {
+            timeZone: "Asia/Jakarta",
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }).format(new Date(timestamp));
+    } catch (e) {
+        return "-";
+    }
+}
+
+function formatDateTimeID(timestamp) {
+    try {
+        return new Intl.DateTimeFormat("id-ID", {
+            timeZone: "Asia/Jakarta",
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }).format(new Date(timestamp));
+    } catch (e) {
+        return "-";
+    }
+}
+
+/* =========================================================
+   SESSION & USER
+   ========================================================= */
+function getSessionUser() {
+    try {
+        const rawSession = localStorage.getItem(STORAGE_KEY_SESSION);
+        if (!rawSession) return null;
+        const session = JSON.parse(rawSession);
+        if (!session || !session.username) return null;
+
+        const rawUsers = localStorage.getItem(STORAGE_KEY_USERS);
+        const users = rawUsers ? JSON.parse(rawUsers) : {};
+        const key = session.username.toLowerCase();
+
+        if (!users[key]) return null;
+
+        return { session, users, key, user: users[key] };
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
+
+/* =========================================================
+   ⚡ TIER EXPIRY — BACA DARI TIER_CACHE (FIREBASE)
+   ========================================================= */
+function getTierExpiryData(){
+    if(!TIER_CACHE || !TIER_CACHE.tier || TIER_CACHE.tier === "FREE") return null;
+    return {
+        tier: TIER_CACHE.tier,
+        type: TIER_CACHE.type || "permanent",
+        expiry: (typeof TIER_CACHE.expiry === "number") ? TIER_CACHE.expiry : 0,
+        purchasedAt: TIER_CACHE.purchasedAt || 0
+    };
+}
+
+function getEffectiveTier(){
+    const data = getSessionUser();
+    if (!data) return "FREE";
+
+    let userTier = (data.user.tier || "FREE").toUpperCase();
+    if (!TIER_RANK.hasOwnProperty(userTier)) userTier = "FREE";
+
+    if(TIER_CACHE && TIER_CACHE.tier){
+        userTier = (TIER_CACHE.tier || "FREE").toString().toUpperCase();
+        if (!TIER_RANK.hasOwnProperty(userTier)) userTier = "FREE";
+    }
+
+    if (userTier === "FREE") return "FREE";
+
+    const expiryData = getTierExpiryData();
+    if(!expiryData) return userTier;
+    if(expiryData.tier !== userTier) return userTier;
+    if(expiryData.type === "permanent") return userTier;
+    if(expiryData.type === "monthly"){
+        if(typeof expiryData.expiry !== "number") return userTier;
+        if(expiryData.expiry <= 0) return userTier;
+        if(Date.now() >= expiryData.expiry) return "FREE";
+        return userTier;
+    }
+    return userTier;
+}
+
+function calculateNewExpiry(tierLabel, duration) {
+    const now = Date.now();
+    const durationMs = MONTHLY_DAYS * 24 * 60 * 60 * 1000;
+
+    if (duration === "permanent") {
+        return { type: "permanent", expiry: 0 };
+    }
+
+    const data = getSessionUser();
+    const currentUserTier = data ? (data.user.tier || "FREE").toUpperCase() : "FREE";
+    const currentExpiryData = getTierExpiryData();
+
+    const isRenewalSameTier =
+        currentUserTier === tierLabel &&
+        currentExpiryData &&
+        currentExpiryData.tier === tierLabel &&
+        currentExpiryData.type === "monthly" &&
+        typeof currentExpiryData.expiry === "number" &&
+        currentExpiryData.expiry > now;
+
+    if (isRenewalSameTier) {
+        return {
+            type: "monthly",
+            expiry: currentExpiryData.expiry + durationMs,
+            extended: true,
+            fromExpiry: currentExpiryData.expiry
+        };
+    }
+
+    return {
+        type: "monthly",
+        expiry: now + durationMs,
+        extended: false
+    };
+}
+
+/* =========================================================
+   ⚡ ACTIVATE TIER — SIMPAN KE FIREBASE
+   ========================================================= */
+function activateTierWithExpiry(newTierLabel, duration) {
+    const data = getSessionUser();
+    if (!data) return null;
+
+    const currentTier = (data.user.tier || "FREE").toUpperCase();
+    const currentRank = TIER_RANK[currentTier] || 0;
+    const newRank = TIER_RANK[newTierLabel] || 0;
+
+    data.users[data.key].tier = newTierLabel;
+    localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(data.users));
+
+    data.session.tier = newTierLabel;
+    localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(data.session));
+
+    try {
+        const rawProfile = localStorage.getItem("astra_profile");
+        if (rawProfile) {
+            const prof = JSON.parse(rawProfile);
+            prof.tier = newTierLabel;
+            localStorage.setItem("astra_profile", JSON.stringify(prof));
+        }
+    } catch (e) {}
+
+    const expiryInfo = calculateNewExpiry(newTierLabel, duration);
+
+    TIER_CACHE = {
+        tier: newTierLabel,
+        type: expiryInfo.type,
+        expiry: (typeof expiryInfo.expiry === "number") ? expiryInfo.expiry : 0,
+        purchasedAt: Date.now()
+    };
+
+    saveTierToFirebase(newTierLabel, expiryInfo);
+
+    console.log("[TIER] Activated:", newTierLabel, duration, expiryInfo);
+
+    return {
+        tier: newTierLabel,
+        duration,
+        expiryInfo,
+        previousTier: currentTier,
+        isUpgrade: newRank > currentRank,
+        isDowngrade: newRank < currentRank,
+        isRenewal: newRank === currentRank && currentTier === newTierLabel
+    };
+}
+
+/* =========================================================
+   RENDER ACTIVE TIER BANNER
+   ========================================================= */
+function renderActiveTierBanner() {
+    const nameEl = document.getElementById("activeTierName");
+    const subEl  = document.getElementById("activeTierSub");
+
+    if (!nameEl) return;
+
+    const effTier = getEffectiveTier();
+    nameEl.textContent = effTier;
+
+    if (effTier === "FREE") {
+        subEl.textContent = "PERMANEN";
+        subEl.className = "tier-sub permanent";
+        return;
+    }
+
+    const expiryData = getTierExpiryData();
+
+    if (!expiryData || expiryData.tier !== effTier || expiryData.type === "permanent") {
+        subEl.textContent = "PERMANEN • SELAMANYA";
+        subEl.className = "tier-sub permanent";
+        return;
+    }
+
+    if (expiryData.type === "monthly" && typeof expiryData.expiry === "number" && expiryData.expiry > 0) {
+        const remainingMs = Math.max(0, expiryData.expiry - Date.now());
+        const remainingDays = Math.ceil(remainingMs / (1000 * 60 * 60 * 24));
+
+        let cls = "tier-sub";
+
+        if (remainingDays <= 0) {
+            subEl.textContent = "SUDAH EXPIRED";
+            cls += " expired";
+        } else if (remainingDays <= 3) {
+            subEl.textContent = remainingDays + " HARI TERSISA • " + formatDateID(expiryData.expiry);
+            cls += " warning";
+        } else {
+            subEl.textContent = remainingDays + " HARI TERSISA • " + formatDateID(expiryData.expiry);
+        }
+
+        subEl.className = cls;
+        return;
+    }
+
+    subEl.textContent = "PERMANEN";
+    subEl.className = "tier-sub permanent";
+}
+
+/* =========================================================
+   TIER SELECTOR (tab utama)
+   ========================================================= */
+function selectTier(tierKey) {
+    selectedTierKey = tierKey;
+
+    document.querySelectorAll('.tier-tab').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tier === tierKey);
+    });
+
+    document.querySelectorAll('.tier-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    const target = document.getElementById('card-' + tierKey);
+    if (target) target.classList.add('active');
+
+    updateSelectedTierLabel();
+    renderDurationSelector();
+}
+
+function updateSelectedTierLabel() {
+    const tier = TIER_DATA[selectedTierKey];
+    const el = document.getElementById('selectedTierLabel');
+    if (el && tier) {
+        const price = selectedDuration === "permanent" ? tier.permanent : tier.price;
+        const suffix = selectedDuration === "permanent" ? " (Permanen)" : "/bln";
+        el.textContent = `${tier.label} • Rp ${price.toLocaleString('id-ID')}${suffix}`;
+    }
+}
+
+/* =========================================================
+   RENDER DURATION SELECTOR (QRIS)
+   ========================================================= */
+function renderDurationSelector() {
+    const container = document.getElementById('durationSelector');
+    if (!container) return;
+
+    const tier = TIER_DATA[selectedTierKey];
+    if (!tier) return;
+
+    container.innerHTML =
+        '<label class="duration-option">' +
+            '<input type="radio" name="duration" value="monthly"' +
+                (selectedDuration === "monthly" ? " checked" : "") + '>' +
+            '<div class="duration-box">' +
+                '<span class="dur-label">BULANAN</span>' +
+                '<span class="dur-price">Rp ' + tier.price.toLocaleString('id-ID') + '</span>' +
+            '</div>' +
+        '</label>' +
+        '<label class="duration-option">' +
+            '<input type="radio" name="duration" value="permanent"' +
+                (selectedDuration === "permanent" ? " checked" : "") + '>' +
+            '<div class="duration-box">' +
+                '<span class="dur-label">PERMANEN</span>' +
+                '<span class="dur-price">Rp ' + tier.permanent.toLocaleString('id-ID') + '</span>' +
+            '</div>' +
+        '</label>';
+
+    container.querySelectorAll('input[name="duration"]').forEach(function (input) {
+        input.addEventListener('change', function () {
+            selectedDuration = this.value;
+            updateSelectedTierLabel();
+        });
+    });
+}
+
+/* =========================================================
+   RENDER DURATION SELECTOR (WALLET)
+   ========================================================= */
+function renderWalletDurationSelector() {
+    const container = document.getElementById('walletDurationSelector');
+    if (!container) return;
+
+    const tier = TIER_DATA[walletTierKey];
+    if (!tier) return;
+
+    container.innerHTML =
+        '<label class="duration-option">' +
+            '<input type="radio" name="walletduration" value="monthly"' +
+                (walletDuration === "monthly" ? " checked" : "") + '>' +
+            '<div class="duration-box">' +
+                '<span class="dur-label">BULANAN</span>' +
+                '<span class="dur-price">Rp ' + tier.price.toLocaleString('id-ID') + '</span>' +
+            '</div>' +
+        '</label>' +
+        '<label class="duration-option">' +
+            '<input type="radio" name="walletduration" value="permanent"' +
+                (walletDuration === "permanent" ? " checked" : "") + '>' +
+            '<div class="duration-box">' +
+                '<span class="dur-label">PERMANEN</span>' +
+                '<span class="dur-price">Rp ' + tier.permanent.toLocaleString('id-ID') + '</span>' +
+            '</div>' +
+        '</label>';
+
+    container.querySelectorAll('input[name="walletduration"]').forEach(function (input) {
+        input.addEventListener('change', function () {
+            walletDuration = this.value;
+            updateWalletSheetUI();
+        });
+    });
+
+    updateWalletSheetUI();
+}
+
+/* =========================================================
+   UPDATE WALLET SHEET UI
+   ========================================================= */
+function updateWalletSheetUI() {
+    const tier = TIER_DATA[walletTierKey];
+    if (!tier) return;
+
+    const price = walletDuration === "permanent" ? tier.permanent : tier.price;
+    const suffix = walletDuration === "permanent" ? " (Permanen)" : "/bln";
+
+    const labelEl = document.getElementById('walletTierLabel');
+    if (labelEl) {
+        labelEl.textContent = `${tier.label} • Rp ${price.toLocaleString('id-ID')}${suffix}`;
+    }
+
+    const balance = WALLET_CACHE;
+    const remain = balance - price;
+
+    const nowEl    = document.getElementById('walletNowText');
+    const priceEl  = document.getElementById('walletPriceText');
+    const remainEl = document.getElementById('walletRemainText');
+    const infoEl   = document.getElementById('walletInfoText');
+    const btn      = document.getElementById('walletPayButton');
+
+    if (nowEl)    nowEl.textContent    = formatRupiah(balance);
+    if (priceEl)  priceEl.textContent  = formatRupiah(price);
+    if (remainEl) {
+        remainEl.textContent = formatRupiah(Math.max(0, remain));
+        remainEl.classList.remove('green','red');
+        if (remain >= 0) remainEl.classList.add('green');
+        else remainEl.classList.add('red');
+    }
+
+    updateExpiryPreview();
+
+    if (balance >= price) {
+        if (infoEl) infoEl.textContent = "Saldo cukup. Klik konfirmasi untuk membayar.";
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = "KONFIRMASI PEMBAYARAN";
+            btn.style.background = "#f1f1f1";
+            btn.style.color = "#080808";
+        }
+    } else {
+        const kurang = price - balance;
+        if (infoEl) infoEl.textContent = "Saldo kurang " + formatRupiah(kurang) + ". Isi saldo via Daily Login / Redeem.";
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = "SALDO TIDAK CUKUP";
+            btn.style.background = "#3a1515";
+            btn.style.color = "#f87171";
+        }
+    }
+}
+
+/* =========================================================
+   UPDATE EXPIRY PREVIEW
+   ========================================================= */
+function updateExpiryPreview() {
+    const previewEl = document.getElementById('expiryPreview');
+    const valueEl = document.getElementById('expiryPreviewValue');
+    if (!previewEl || !valueEl) return;
+
+    const tier = TIER_DATA[walletTierKey];
+    if (!tier) return;
+
+    const expiryInfo = calculateNewExpiry(tier.label, walletDuration);
+
+    previewEl.className = "expiry-preview";
+
+    if (expiryInfo.type === "permanent") {
+        previewEl.classList.add("permanent");
+        valueEl.textContent = "PERMANEN • SELAMANYA";
+        return;
+    }
+
+    if (expiryInfo.extended) {
+        const remainingMs = expiryInfo.expiry - Date.now();
+        const remainingDays = Math.ceil(remainingMs / (1000 * 60 * 60 * 24));
+        previewEl.classList.add("warning");
+        valueEl.textContent = "+30 HARI • " + formatDateID(expiryInfo.expiry) + " (" + remainingDays + " hari)";
+    } else {
+        previewEl.classList.add("permanent");
+        valueEl.textContent = formatDateID(expiryInfo.expiry) + " (30 hari)";
+    }
+}
+
+/* =========================================================
+   OPEN PROOF (QRIS)
+   ========================================================= */
+function openProof(tierKey) {
+    if (tierKey && TIER_DATA[tierKey]) {
+        selectTier(tierKey);
+    }
+    selectedDuration = "monthly";
+    renderDurationSelector();
+    updateSelectedTierLabel();
+
+    const overlay = document.getElementById("proofOverlay");
+    if (!overlay) return;
+    overlay.classList.add("active");
+    document.body.style.overflow = "hidden";
+}
+
+function closeProof(event) {
+    if (event && event.target !== document.getElementById("proofOverlay")) return;
+    const overlay = document.getElementById("proofOverlay");
+    if (overlay) overlay.classList.remove("active");
+    document.body.style.overflow = "";
+}
+
+/* =========================================================
+   OPEN WALLET PAYMENT
+   ========================================================= */
+function openWalletPay(tierKey) {
+    const data = getSessionUser();
+    if (!data) {
+        showToast("Silakan login ulang dulu");
+        /* ═══════════════════════════════════════════════════════════
+           GANTI PATH "login.html" SESUAI FILE LOGIN ANDA
+           ═══════════════════════════════════════════════════════════ */
+        setTimeout(function(){ window.location.href = "login.html"; }, 1000);
+        return;
+    }
+
+    if (tierKey && TIER_DATA[tierKey]) {
+        walletTierKey = tierKey;
+        selectTier(tierKey);
+    }
+
+    walletDuration = "monthly";
+    renderWalletDurationSelector();
+    updateWalletSheetUI();
+    updateWalletBanner();
+
+    const overlay = document.getElementById("walletOverlay");
+    if (!overlay) return;
+    overlay.classList.add("active");
+    document.body.style.overflow = "hidden";
+}
+
+function closeWalletPay(event) {
+    if (event && event.target !== document.getElementById("walletOverlay")) return;
+    const overlay = document.getElementById("walletOverlay");
+    if (overlay) overlay.classList.remove("active");
+    document.body.style.overflow = "";
+}
+
+/* =========================================================
+   CONFIRM WALLET PAYMENT
+   ========================================================= */
+function confirmWalletPay() {
+    const data = getSessionUser();
+    if (!data) {
+        showToast("Session tidak ditemukan. Login ulang.");
+        return;
+    }
+
+    const tier = TIER_DATA[walletTierKey];
+    if (!tier) return;
+
+    const price = walletDuration === "permanent" ? tier.permanent : tier.price;
+    const balance = WALLET_CACHE;
+
+    if (balance < price) {
+        const kurang = price - balance;
+        showToast("Saldo kurang " + formatRupiah(kurang));
+        return;
+    }
+
+    const currentTier = getEffectiveTier();
+    const currentRank = TIER_RANK[currentTier] || 0;
+    const newRank = TIER_RANK[tier.label] || 0;
+
+    let warningText = "";
+    if (newRank < currentRank) {
+        warningText = "\n⚠️ PERHATIAN: Kamu sedang downgrade dari " + currentTier + " ke " + tier.label + "!\n";
+    } else if (currentTier === tier.label) {
+        warningText = "\n♻️ Renewal: Durasi akan diperpanjang otomatis.\n";
+    }
+
+    const ok = confirm(
+        "Konfirmasi pembayaran?" + warningText + "\n" +
+        "Paket   : " + tier.label + "\n" +
+        "Durasi  : " + (walletDuration === "permanent" ? "PERMANEN" : "BULANAN (30 hari)") + "\n" +
+        "Harga   : " + formatRupiah(price) + "\n" +
+        "Saldo   : " + formatRupiah(balance) + "\n" +
+        "Sisa    : " + formatRupiah(balance - price)
+    );
+    if (!ok) return;
+
+    const newBalance = balance - price;
+    setWallet(newBalance);
+
+    const activationInfo = activateTierWithExpiry(tier.label, walletDuration);
+
+    saveTierHistory({
+        type: "TIER_PURCHASE_WALLET",
+        tier: tier.label,
+        duration: walletDuration,
+        price: price,
+        method: "WALLET",
+        username: data.key,
+        expiry: activationInfo && activationInfo.expiryInfo ? activationInfo.expiryInfo : null,
+        date: new Date().toISOString()
+    });
+
+    if(FIREBASE_READY && FIREBASE_DB){
+        FIREBASE_DB.ref("transactions/" + data.key).push({
+            type: "TIER_PURCHASE_WALLET",
+            tier: tier.label,
+            duration: walletDuration,
+            price: price,
+            method: "WALLET",
+            previousBalance: balance,
+            newBalance: newBalance,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).catch(function(){});
+    }
+
+    updateWalletBanner();
+    renderActiveTierBanner();
+    closeWalletPay();
+
+    showSuccessModal(tier.label, walletDuration, price, activationInfo);
+
+    console.log("[TIER] Wallet purchase OK:", activationInfo);
+}
+
+/* =========================================================
+   TIER HISTORY
+   ========================================================= */
+function saveTierHistory(entry) {
+    try {
+        const raw = localStorage.getItem(TIER_HISTORY_KEY);
+        const list = raw ? JSON.parse(raw) : [];
+        list.unshift(entry);
+        if (list.length > 50) list.length = 50;
+        localStorage.setItem(TIER_HISTORY_KEY, JSON.stringify(list));
+    } catch (e) {}
+}
+
+/* =========================================================
+   SUCCESS MODAL
+   ========================================================= */
+function showSuccessModal(tierLabel, duration, price, activationInfo) {
+    const tierEl = document.getElementById("successTierText");
+    const subEl  = document.getElementById("successSub");
+    const expiryEl = document.getElementById("successExpiryText");
+
+    if (tierEl) {
+        tierEl.textContent = tierLabel + " • " + (duration === "permanent" ? "PERMANEN" : "BULANAN");
+    }
+
+    if (subEl) {
+        let actionText = "diaktifkan";
+        if (activationInfo) {
+            if (activationInfo.isRenewal) actionText = "diperpanjang";
+            else if (activationInfo.isUpgrade) actionText = "diupgrade";
+            else if (activationInfo.isDowngrade) actionText = "diubah";
+        }
+        subEl.innerHTML = "Tier <b style='color:#fff;'>" + tierLabel + "</b> sudah " + actionText + " di akun kamu.<br>" +
+                          "Dibayar: <b style='color:#fff;'>" + formatRupiah(price) + "</b>";
+    }
+
+    if (expiryEl) {
+        if (duration === "permanent") {
+            expiryEl.textContent = "AKTIF PERMANEN • SELAMANYA";
+        } else if (activationInfo && activationInfo.expiryInfo && activationInfo.expiryInfo.expiry) {
+            const expiryDate = formatDateTimeID(activationInfo.expiryInfo.expiry);
+            if (activationInfo.expiryInfo.extended) {
+                expiryEl.textContent = "DIPERPANJANG HINGGA " + expiryDate;
+            } else {
+                expiryEl.textContent = "AKTIF HINGGA " + expiryDate;
+            }
+        } else {
+            expiryEl.textContent = "AKTIF HINGGA " + formatDateTimeID(Date.now() + MONTHLY_DAYS * 24 * 60 * 60 * 1000);
+        }
+    }
+
+    const overlay = document.getElementById("successOverlay");
+    if (overlay) overlay.classList.add("active");
+    document.body.style.overflow = "hidden";
+}
+
+function goToIndex() {
+    /* ═══════════════════════════════════════════════════════════
+       GANTI PATH "home.html" SESUAI FILE HOME ANDA
+       ═══════════════════════════════════════════════════════════ */
+    window.location.href = "home.html";
+}
+
+/* =========================================================
+   FILE SELECT (QRIS)
+   ========================================================= */
+const proofFile = document.getElementById("proofFile");
+if (proofFile) {
+    proofFile.addEventListener("change", function () {
+        const file = this.files && this.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            this.value = "";
+            showToast("File harus berupa gambar");
+            return;
+        }
+
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            this.value = "";
+            showToast("Ukuran gambar maksimal 10 MB");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const preview = document.getElementById("proofPreview");
+            const fileBox = document.getElementById("fileBox");
+            if (preview) preview.src = event.target.result;
+            if (fileBox) fileBox.classList.add("has-image");
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+/* =========================================================
+   SUBMIT PROOF (QRIS) → TELEGRAM
+   ========================================================= */
+async function submitProof() {
+    const nameInput = document.getElementById("buyerName");
+    const fileInput = document.getElementById("proofFile");
+    const button = document.getElementById("sendProofButton");
+
+    const name = nameInput ? nameInput.value.trim() : "";
+    const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+
+    if (name === "") {
+        showToast("Masukkan nama atau username");
+        if (nameInput) nameInput.focus();
+        return;
+    }
+    if (!file) {
+        showToast("Upload bukti pembayaran terlebih dahulu");
+        return;
+    }
+    if (!file.type.startsWith("image/")) {
+        showToast("Bukti harus berupa gambar");
+        return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+        showToast("Ukuran file maksimal 10 MB");
+        return;
+    }
+
+    if (
+        !TELEGRAM_BOT_TOKEN ||
+        !TELEGRAM_CHAT_ID ||
+        TELEGRAM_BOT_TOKEN === "YOUR_TELEGRAM_BOT_TOKEN_HERE" ||
+        TELEGRAM_CHAT_ID === "YOUR_TELEGRAM_CHAT_ID_HERE"
+    ) {
+        showToast("Telegram bot belum disetel. Hubungi admin.");
+        return;
+    }
+
+    const tier = TIER_DATA[selectedTierKey] || TIER_DATA.premium;
+    const durationInput = document.querySelector('input[name="duration"]:checked');
+    const duration = durationInput ? durationInput.value : "monthly";
+
+    const isPermanent = duration === "permanent";
+    const finalPrice = isPermanent ? tier.permanent : tier.price;
+    const durationLabel = isPermanent ? "PERMANEN (Selamanya)" : "BULANAN (30 Hari)";
+    const packageName = isPermanent ? tier.packagePermanent : tier.package;
+
+    button.disabled = true;
+    button.textContent = "MENGIRIM...";
+
+    try {
+        const waktu = new Intl.DateTimeFormat("id-ID", {
+            timeZone: "Asia/Jakarta",
+            dateStyle: "full",
+            timeStyle: "medium"
+        }).format(new Date());
+
+        const caption =
+            "🔔 *BUKTI PEMBAYARAN BARU (QRIS)*\n" +
+            "━━━━━━━━━━━━━━━━━━━━\n" +
+            "👤 *Nama*    : " + name + "\n" +
+            "🎖️ *Tier*    : " + tier.label + "\n" +
+            "📦 *Paket*   : " + packageName + "\n" +
+            "⏳ *Durasi*  : " + durationLabel + "\n" +
+            "💰 *Total*   : Rp " + finalPrice.toLocaleString("id-ID") + "\n" +
+            "💳 *Metode*  : QRIS\n" +
+            "🌐 *Sumber*  : WEB\n" +
+            "🕒 *Waktu*   : " + waktu + "\n" +
+            "━━━━━━━━━━━━━━━━━━━━\n" +
+            "⚠️ Verifikasi manual diperlukan.";
+
+        const formData = new FormData();
+        formData.append("chat_id", TELEGRAM_CHAT_ID);
+        formData.append("photo", file);
+        formData.append("caption", caption);
+        formData.append("parse_mode", "Markdown");
+
+        const response = await fetch(TELEGRAM_API_URL, {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.ok) {
+            throw new Error("Telegram error: " + (result.description || response.status));
+        }
+
+        showToast("Bukti berhasil dikirim ke admin");
+        resetProofForm();
+        setTimeout(function () { closeProof(); }, 1200);
+
+    } catch (error) {
+        console.error(error);
+        showToast("Gagal mengirim: " + error.message);
+    } finally {
+        button.disabled = false;
+        button.textContent = "KIRIM BUKTI KE ADMIN";
+    }
+}
+
+/* =========================================================
+   RESET FORM (QRIS)
+   ========================================================= */
+function resetProofForm() {
+    const nameInput = document.getElementById("buyerName");
+    const fileInput = document.getElementById("proofFile");
+    const fileBox = document.getElementById("fileBox");
+    const preview = document.getElementById("proofPreview");
+
+    if (nameInput) nameInput.value = "";
+    if (fileInput) fileInput.value = "";
+    if (fileBox) fileBox.classList.remove("has-image");
+    if (preview) preview.removeAttribute("src");
+
+    selectedDuration = "monthly";
+    renderDurationSelector();
+    updateSelectedTierLabel();
+}
+
+/* =========================================================
+   GO BACK
+   ========================================================= */
+function goBack() {
+    if (window.history.length > 1) {
+        window.history.back();
+        return;
+    }
+    /* ═══════════════════════════════════════════════════════════
+       GANTI PATH "home.html" SESUAI FILE HOME ANDA
+       ═══════════════════════════════════════════════════════════ */
+    window.location.href = "home.html";
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+let toastTimer = null;
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+        toast.classList.remove("show");
+    }, 3200);
+}
+
+/* =========================================================
+   ESC
+   ========================================================= */
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+        closeProof();
+        closeWalletPay();
+    }
+});
+
+/* =========================================================
+   INIT
+   ========================================================= */
+document.addEventListener("DOMContentLoaded", function () {
+    initFirebase();
+
+    selectTier("premium");
+    renderDurationSelector();
+    updateSelectedTierLabel();
+    updateWalletBanner();
+    renderWalletDurationSelector();
+    renderActiveTierBanner();
+
+    if(FIREBASE_READY){
+        fbListenTier();
+        fbListenWallet();
+    }
+});
+</script>
+
+</body>
+</html>

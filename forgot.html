@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI JUDUL HALAMAN SESUAI BRAND ANDA
+     ═══════════════════════════════════════════════════════════ -->
+<title>LUPA SANDI • APPNAME</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI FONT SESUAI BRAND ANDA (opsional)
+     ═══════════════════════════════════════════════════════════ -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE SDK — biarkan seperti ini (versi 10.12.2)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<style>
+
+/* =========================================================
+   FORGOT PASSWORD PAGE
+   CYBERPUNK BLACK & WHITE
+   ========================================================= */
+
+:root{
+    --black:#050505;
+    --black2:#090909;
+    --black3:#101010;
+    --panel:#111111;
+    --panel2:#151515;
+    --white:#ffffff;
+    --white2:#eeeeee;
+    --gray:#a2a2a2;
+    --gray2:#707070;
+    --gray3:#3a3a3a;
+    --line:rgba(255,255,255,.12);
+    --line2:rgba(255,255,255,.20);
+    --ok:#4ade80;
+    --err:#f87171;
+    --warn:#facc15;
+}
+
+*{
+    margin:0;padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html{
+    width:100%;min-height:100%;
+    background:#000;
+    scroll-behavior:smooth;
+}
+
+body{
+    width:100%;
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 50% -10%, rgba(255,255,255,.07), transparent 32%),
+        radial-gradient(circle at 100% 40%, rgba(255,255,255,.025), transparent 35%),
+        #050505;
+    color:#fff;
+    font-family:'Rajdhani',Arial,Helvetica,sans-serif;
+    overflow-x:hidden;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:30px 16px 40px;
+    position:relative;
+}
+
+body::before{
+    content:"";position:fixed;inset:0;
+    background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+    background-size:34px 34px;
+    pointer-events:none;z-index:0;
+}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:#050505;}
+::-webkit-scrollbar-thumb{background:#444;border-radius:20px;}
+
+/* =========================================================
+   WRAPPER
+   ========================================================= */
+
+.forgot-wrapper{
+    width:100%;
+    max-width:440px;
+    position:relative;
+    z-index:1;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.forgot-header{
+    text-align:center;
+    margin-bottom:24px;
+}
+
+.forgot-logo{
+    width:170px;
+    height:58px;
+    margin:0 auto 18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.forgot-logo img{
+    width:100%;
+    max-width:170px;
+    max-height:55px;
+    object-fit:contain;
+    display:block;
+    filter:drop-shadow(0 0 8px rgba(255,255,255,.2));
+}
+
+.forgot-title{
+    font-family:'Orbitron',sans-serif;
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    text-shadow:0 0 14px rgba(255,255,255,.18);
+    margin-bottom:8px;
+}
+
+.forgot-subtitle{
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:3px;
+    color:#777;
+}
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.forgot-card{
+    background:linear-gradient(160deg, rgba(255,255,255,.075), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:30px;
+    padding:28px 22px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.6),
+        inset 0 0 60px rgba(255,255,255,.02);
+}
+
+.forgot-card::before{
+    content:"";position:absolute;
+    width:220px;height:220px;border-radius:50%;
+    background:rgba(255,255,255,.05);
+    top:-120px;right:-90px;
+    filter:blur(8px);
+    pointer-events:none;
+}
+
+.forgot-card::after{
+    content:"";position:absolute;
+    width:180px;height:180px;border-radius:50%;
+    background:rgba(255,255,255,.03);
+    bottom:-110px;left:-80px;
+    filter:blur(8px);
+    pointer-events:none;
+}
+
+/* =========================================================
+   INFO HEADER DI CARD
+   ========================================================= */
+
+.info-header{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    margin-bottom:22px;
+    position:relative;
+    z-index:1;
+    padding-bottom:20px;
+    border-bottom:1px solid rgba(255,255,255,.1);
+}
+
+.info-icon{
+    width:52px;
+    height:52px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.18);
+    background:#0d0d0d;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    box-shadow:0 0 20px rgba(255,255,255,.05);
+}
+
+.info-icon svg{
+    width:24px;
+    height:24px;
+    color:#fff;
+}
+
+.info-text{
+    flex:1;
+    min-width:0;
+}
+
+.info-text h3{
+    font-family:'Orbitron',sans-serif;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:1px;
+    margin-bottom:6px;
+    color:#fff;
+}
+
+.info-text p{
+    font-size:12px;
+    line-height:1.5;
+    color:#999;
+    font-weight:600;
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.form-field{
+    margin-bottom:16px;
+    position:relative;
+    z-index:1;
+}
+
+.form-label{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin:0 6px 8px;
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:1.5px;
+    color:#888;
+}
+
+.form-label .required{
+    color:#f87171;
+    font-size:10px;
+}
+
+.input-wrapper{
+    position:relative;
+    display:flex;
+    align-items:center;
+}
+
+.input-icon{
+    position:absolute;
+    left:16px;
+    top:50%;
+    transform:translateY(-50%);
+    width:18px;
+    height:18px;
+    color:#666;
+    pointer-events:none;
+    z-index:2;
+    transition:.2s;
+}
+
+.form-input{
+    width:100%;
+    height:56px;
+    border-radius:17px;
+    border:1px solid rgba(255,255,255,.15);
+    background:#0d0d0d;
+    color:#fff;
+    padding:0 16px 0 46px;
+    font-family:'Rajdhani',sans-serif;
+    font-size:15px;
+    font-weight:600;
+    outline:none;
+    transition:.2s;
+    position:relative;
+    z-index:1;
+}
+
+.form-input:focus{
+    border-color:rgba(255,255,255,.45);
+    background:#141414;
+    box-shadow:0 0 25px rgba(255,255,255,.06);
+}
+
+.form-input:focus + .input-icon,
+.input-wrapper:focus-within .input-icon{
+    color:#fff;
+}
+
+.form-input::placeholder{
+    color:#555;
+}
+
+.field-error{
+    display:none;
+    margin:6px 6px 0;
+    color:#f87171;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.3px;
+}
+
+.field-error.show{
+    display:block;
+    animation:shake .3s;
+}
+
+@keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-4px);}
+    75%{transform:translateX(4px);}
+}
+
+.form-input.valid{
+    border-color:rgba(74,222,128,.5);
+}
+
+.form-input.invalid{
+    border-color:rgba(248,113,113,.55);
+}
+
+/* =========================================================
+   SUBMIT BUTTON
+   ========================================================= */
+
+.submit-btn{
+    width:100%;
+    height:60px;
+    border:0;
+    outline:none;
+    border-radius:20px;
+    background:#f2f2f2;
+    color:#080808;
+    font-family:'Orbitron',sans-serif;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:1.5px;
+    cursor:pointer;
+    transition:.2s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    position:relative;
+    z-index:1;
+    box-shadow:0 10px 30px rgba(255,255,255,.1);
+    margin-bottom:14px;
+    margin-top:8px;
+}
+
+.submit-btn:active{
+    transform:scale(.97);
+}
+
+.submit-btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+.submit-btn svg{
+    width:18px;
+    height:18px;
+}
+
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+.divider-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:16px 0;
+    position:relative;
+    z-index:1;
+}
+
+.divider-row .line{
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent);
+}
+
+.divider-row .text{
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:2px;
+    color:#555;
+}
+
+/* =========================================================
+   BACK LINK
+   ========================================================= */
+
+.back-box{
+    text-align:center;
+    margin-top:20px;
+    position:relative;
+    z-index:1;
+}
+
+.back-box a{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    color:#fff;
+    font-family:'Orbitron',sans-serif;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.2px;
+    text-decoration:none;
+    padding:12px 22px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.18);
+    background:#111;
+    transition:.2s;
+}
+
+.back-box a:hover{
+    background:#1c1c1c;
+    border-color:rgba(255,255,255,.35);
+}
+
+.back-box a svg{
+    width:14px;
+    height:14px;
+}
+
+/* =========================================================
+   INFO FOOTER
+   ========================================================= */
+
+.forgot-footer{
+    text-align:center;
+    margin-top:24px;
+    color:#555;
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;
+    letter-spacing:2px;
+    font-weight:800;
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+.toast{
+    position:fixed;
+    left:50%;
+    bottom:35px;
+    transform:translate(-50%,20px);
+    background:#151515;
+    border:1px solid rgba(255,255,255,.18);
+    color:#fff;
+    padding:14px 22px;
+    border-radius:16px;
+    font-size:11.5px;
+    font-weight:700;
+    opacity:0;
+    visibility:hidden;
+    transition:.3s cubic-bezier(.2,.8,.2,1);
+    z-index:9999;
+    box-shadow:0 15px 45px rgba(0,0,0,.7);
+    max-width:90vw;
+    text-align:center;
+    letter-spacing:.3px;
+}
+
+.toast.show{
+    opacity:1;
+    visibility:visible;
+    transform:translate(-50%,0);
+}
+
+.toast.success{
+    border-color:rgba(74,222,128,.4);
+    box-shadow:0 15px 45px rgba(74,222,128,.15);
+}
+
+.toast.error{
+    border-color:rgba(248,113,113,.4);
+    box-shadow:0 15px 45px rgba(248,113,113,.15);
+}
+
+/* =========================================================
+   SUCCESS OVERLAY
+   ========================================================= */
+
+.success-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.85);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:10000;
+    opacity:0;
+    visibility:hidden;
+    transition:.35s;
+}
+
+.success-overlay.active{
+    opacity:1;
+    visibility:visible;
+}
+
+.success-box{
+    width:100%;
+    max-width:360px;
+    background:linear-gradient(160deg, #181818, #080808);
+    border:1px solid rgba(74,222,128,.35);
+    border-radius:30px;
+    padding:36px 26px;
+    text-align:center;
+    transform:translateY(20px) scale(.95);
+    transition:.4s cubic-bezier(.2,.8,.2,1);
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.85),
+        0 0 60px rgba(74,222,128,.1);
+}
+
+.success-overlay.active .success-box{
+    transform:translateY(0) scale(1);
+}
+
+.success-icon{
+    width:76px;
+    height:76px;
+    border-radius:50%;
+    background:#0d0d0d;
+    border:2px solid rgba(74,222,128,.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 22px;
+    box-shadow:0 0 30px rgba(74,222,128,.25);
+    animation:successPop .5s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes successPop{
+    0%{transform:scale(.4);opacity:0;}
+    60%{transform:scale(1.1);}
+    100%{transform:scale(1);opacity:1;}
+}
+
+.success-icon svg{
+    width:38px;
+    height:38px;
+    color:#4ade80;
+}
+
+.success-title{
+    font-family:'Orbitron',sans-serif;
+    font-size:16px;
+    font-weight:900;
+    letter-spacing:1.5px;
+    margin-bottom:12px;
+    color:#fff;
+}
+
+.success-text{
+    font-size:12.5px;
+    color:#999;
+    line-height:1.6;
+    font-weight:600;
+    margin-bottom:6px;
+}
+
+.success-email{
+    font-family:'Orbitron',sans-serif;
+    font-size:12px;
+    font-weight:900;
+    color:#4ade80;
+    letter-spacing:.5px;
+    margin-bottom:20px;
+    text-shadow:0 0 12px rgba(74,222,128,.4);
+    word-break:break-all;
+    padding:0 6px;
+}
+
+.success-steps{
+    text-align:left;
+    background:#0d0d0d;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:16px;
+    padding:16px;
+    margin-bottom:22px;
+}
+
+.success-step{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    font-size:11.5px;
+    color:#bbb;
+    font-weight:600;
+    line-height:1.5;
+    margin-bottom:10px;
+}
+
+.success-step:last-child{
+    margin-bottom:0;
+}
+
+.success-step-num{
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:#1a1a1a;
+    border:1px solid rgba(255,255,255,.2);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;
+    font-weight:900;
+    flex-shrink:0;
+    margin-top:1px;
+}
+
+.success-btn{
+    width:100%;
+    height:54px;
+    border:0;
+    outline:none;
+    border-radius:17px;
+    background:#f2f2f2;
+    color:#080808;
+    font-family:'Orbitron',sans-serif;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.2px;
+    cursor:pointer;
+    transition:.2s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.success-btn:active{transform:scale(.97);}
+
+.success-btn svg{
+    width:16px;
+    height:16px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media(max-width:390px){
+    body{padding:24px 12px 30px;}
+    .forgot-card{padding:24px 18px;}
+    .forgot-title{font-size:19px;}
+    .forgot-logo{width:150px;height:50px;}
+    .forgot-logo img{max-width:150px;}
+    .form-input{height:52px;font-size:14px;}
+    .submit-btn{height:56px;}
+    .success-box{padding:30px 22px;}
+    .info-icon{width:46px;height:46px;}
+    .info-icon svg{width:22px;height:22px;}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="forgot-wrapper">
+
+    <!-- ================= HEADER ================= -->
+    <div class="forgot-header">
+
+        <!-- ═══════════════════════════════════════════════════════════
+             GANTI LOGO ANDA DI SINI (header.png)
+             Taruh file logo di folder yang sama dengan file HTML ini
+             ═══════════════════════════════════════════════════════════ -->
+        <div class="forgot-logo">
+            <img src="header.png" alt="LOGO" onerror="this.style.display='none';">
+        </div>
+
+        <div class="forgot-title">LUPA SANDI</div>
+        <div class="forgot-subtitle">RESET PASSWORD AKUN</div>
+
+    </div>
+
+    <!-- ================= CARD ================= -->
+    <div class="forgot-card">
+
+        <!-- ===== INFO HEADER ===== -->
+        <div class="info-header">
+            <div class="info-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="3" y="5" width="18" height="14" rx="2.5"/>
+                    <path d="M3 7l9 6 9-6"/>
+                </svg>
+            </div>
+            <div class="info-text">
+                <h3>RESET VIA EMAIL</h3>
+                <p>Masukkan email terdaftar. Kami akan mengirim link untuk reset kata sandi kamu.</p>
+            </div>
+        </div>
+
+        <!-- ===== EMAIL INPUT ===== -->
+        <div class="form-field">
+            <div class="form-label">
+                <span>EMAIL TERDAFTAR</span>
+                <span class="required">*</span>
+            </div>
+            <div class="input-wrapper">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="3" y="5" width="18" height="14" rx="2.5"/>
+                    <path d="M3 7l9 6 9-6"/>
+                </svg>
+                <input class="form-input" id="inputEmail" type="email"
+                       placeholder="nama@email.com"
+                       autocomplete="email"
+                       inputmode="email"
+                       style="text-transform:lowercase;">
+            </div>
+            <div class="field-error" id="errEmail">Email wajib diisi</div>
+        </div>
+
+        <!-- ===== SUBMIT ===== -->
+        <button class="submit-btn" id="submitBtn" onclick="submitReset()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M22 2L11 13"/>
+                <path d="M22 2l-7 20-4-9-9-4 20-7z"/>
+            </svg>
+            KIRIM LINK RESET
+        </button>
+
+        <!-- ===== DIVIDER ===== -->
+        <div class="divider-row">
+            <div class="line"></div>
+            <div class="text">ATAU</div>
+            <div class="line"></div>
+        </div>
+
+        <!-- ===== BACK LINK ===== -->
+        <!-- ═══════════════════════════════════════════════════════════
+             GANTI PATH "login.html" SESUAI FILE LOGIN ANDA
+             ═══════════════════════════════════════════════════════════ -->
+        <div class="back-box">
+            <a href="login.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M19 12H5"/>
+                    <path d="M12 19l-7-7 7-7"/>
+                </svg>
+                KEMBALI KE LOGIN
+            </a>
+        </div>
+
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <!-- ═══════════════════════════════════════════════════════════
+         GANTI "APPNAME" DI BAWAH INI DENGAN BRAND ANDA
+         ═══════════════════════════════════════════════════════════ -->
+    <div class="forgot-footer">
+        APPNAME • VERSION 1.0 • 2026
+    </div>
+
+</div>
+
+<!-- ================= TOAST ================= -->
+<div class="toast" id="toast"></div>
+
+<!-- ================= SUCCESS OVERLAY ================= -->
+<div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path d="M20 6L9 17l-5-5"/>
+            </svg>
+        </div>
+
+        <div class="success-title">EMAIL TERKIRIM</div>
+
+        <div class="success-text">
+            Link reset password telah dikirim ke:
+        </div>
+
+        <div class="success-email" id="successEmail">nama@email.com</div>
+
+        <div class="success-steps">
+            <div class="success-step">
+                <div class="success-step-num">1</div>
+                <div>Buka kotak masuk email kamu</div>
+            </div>
+            <div class="success-step">
+                <div class="success-step-num">2</div>
+                <div>Cek folder <b style="color:#fff;">Spam</b> kalau tidak ketemu</div>
+            </div>
+            <div class="success-step">
+                <div class="success-step-num">3</div>
+                <div>Klik link reset & buat password baru</div>
+            </div>
+            <div class="success-step">
+                <div class="success-step-num">4</div>
+                <div>Login ulang dengan password baru</div>
+            </div>
+        </div>
+
+        <button class="success-btn" onclick="goToLogin()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M19 12H5"/>
+                <path d="M12 19l-7-7 7-7"/>
+            </svg>
+            KEMBALI KE LOGIN
+        </button>
+
+    </div>
+</div>
+
+<script>
+
+/* =========================================================
+   FORGOT PASSWORD — FIREBASE AUTH
+   ========================================================= */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡⚡⚡ KONFIGURASI FIREBASE ⚡⚡⚡
+   ═══════════════════════════════════════════════════════════════════════════
+   GANTI SEMUA VALUE DI BAWAH INI DENGAN MILIK ANDA:
+
+   1. Buka Firebase Console → Project Settings → General
+   2. Scroll ke "Your apps" → pilih Web App
+   3. Copy config dan paste ke sini
+   4. Pastikan sudah AKTIFKAN "Authentication" → "Sign-in method" → "Email/Password"
+   5. Pastikan Realtime Database sudah dibuat (bukan Firestore)
+   ═══════════════════════════════════════════════════════════════════════════ */
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDLs7Coar_Dy9bE2K4Ha_Q6wG0SmC3m75g",
+    //        ↑ GANTI dengan API Key Anda
+
+    authDomain: "https://radien-95e9d.firebaseapp.com",
+    //            ↑ GANTI dengan Auth Domain Anda
+
+    databaseURL: "https://radien-95e9d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    //             ↑ GANTI dengan Realtime Database URL Anda
+
+    projectId: "radien-95e9d",
+    //           ↑ GANTI dengan Project ID Anda
+
+    storageBucket: "https://radien-95e9d.firebasestorage.app",
+    //               ↑ GANTI dengan Storage Bucket Anda
+
+    messagingSenderId: "208676450122",
+    //                   ↑ GANTI dengan Messaging Sender ID Anda
+
+    appId: "13f1702562e36468a4dbb3"
+    //      ↑ GANTI dengan App ID Anda
+};
+
+let FIREBASE_AUTH = null;
+let FIREBASE_DB = null;
+let FIREBASE_READY = false;
+
+function initFirebase(){
+    try {
+        if (typeof firebase === "undefined") {
+            console.warn("[FIREBASE] SDK belum dimuat");
+            return false;
+        }
+        if (!firebase.apps.length) {
+            firebase.initializeApp(FIREBASE_CONFIG);
+        }
+        FIREBASE_AUTH = firebase.auth();
+        FIREBASE_DB = firebase.database();
+        FIREBASE_READY = true;
+        console.log("[FIREBASE] Initialized ✓", FIREBASE_CONFIG.projectId);
+        return true;
+    } catch (e) {
+        console.error("[FIREBASE] Init error:", e);
+        FIREBASE_READY = false;
+        return false;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ SESSION STORAGE KEYS
+   ⚠️ WAJIB SAMA dengan file login.html
+   ═══════════════════════════════════════════════════════════════════════════ */
+const STORAGE_KEY_USERS = "astra_users";
+//                          ↑ GANTI kalau perlu (harus SAMA dengan login.html)
+const STORAGE_KEY_REMEMBER = "astra_remember";
+//                              ↑ GANTI kalau perlu
+const FIREBASE_USER_LOOKUP_PATH = "astra_user_by_username";
+//                                   ↑ GANTI kalau perlu (path Firebase untuk lookup username → email)
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+let toastTimer = null;
+
+function showToast(msg, type){
+    const toast = document.getElementById("toast");
+    if(!toast) return;
+
+    toast.textContent = msg;
+    toast.className = "toast show" + (type ? " " + type : "");
+
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){
+        toast.className = "toast";
+    }, 3500);
+}
+
+/* =========================================================
+   FIELD ERROR & STATE
+   ========================================================= */
+
+function showError(fieldId, show){
+    const el = document.getElementById(fieldId);
+    if(!el) return;
+    if(show) el.classList.add("show");
+    else el.classList.remove("show");
+}
+
+function setInputState(inputId, state){
+    const input = document.getElementById(inputId);
+    if(!input) return;
+    input.classList.remove("valid", "invalid");
+    if(state === "valid") input.classList.add("valid");
+    if(state === "invalid") input.classList.add("invalid");
+}
+
+/* =========================================================
+   STORAGE HELPERS
+   ========================================================= */
+
+function getUsers(){
+    try{
+        const raw = localStorage.getItem(STORAGE_KEY_USERS);
+        return raw ? JSON.parse(raw) : {};
+    }catch(e){
+        return {};
+    }
+}
+
+function getRememberData(){
+    try{
+        const raw = localStorage.getItem(STORAGE_KEY_REMEMBER);
+        return raw ? JSON.parse(raw) : null;
+    }catch(e){
+        return null;
+    }
+}
+
+/* =========================================================
+   VALIDASI EMAIL
+   ========================================================= */
+
+function isValidEmail(email){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+}
+
+function validateEmail(){
+    const input = document.getElementById("inputEmail");
+    const val = input.value.trim().toLowerCase();
+
+    if(val === ""){
+        setInputState("inputEmail", "");
+        return false;
+    }
+
+    if(!isValidEmail(val)){
+        setInputState("inputEmail", "invalid");
+        return false;
+    }
+
+    setInputState("inputEmail", "valid");
+    return true;
+}
+
+/* =========================================================
+   ⚡ LOOKUP EMAIL — Kalau user masukkan username,
+      coba cari email di Firebase
+   ========================================================= */
+
+function resolveEmail(identity){
+    const id = identity.toLowerCase().trim();
+
+    /* Kalau sudah format email → langsung pakai */
+    if(isValidEmail(id)){
+        return Promise.resolve(id);
+    }
+
+    /* Cek dari localStorage cache dulu */
+    const users = getUsers();
+    if(users[id] && users[id].email){
+        return Promise.resolve(users[id].email);
+    }
+
+    /* Cari di Firebase by username */
+    if(FIREBASE_READY && FIREBASE_DB){
+        return FIREBASE_DB.ref(FIREBASE_USER_LOOKUP_PATH + "/" + id).once("value")
+            .then(function(snap){
+                if(snap.exists()){
+                    const data = snap.val();
+                    if(data && data.email){
+                        return data.email;
+                    }
+                }
+                /* Balikin identity apa adanya — biar Firebase yg error */
+                return id;
+            })
+            .catch(function(){
+                return id;
+            });
+    }
+
+    return Promise.resolve(id);
+}
+
+/* =========================================================
+   ⚡ SUBMIT RESET PASSWORD
+   ========================================================= */
+
+function submitReset(){
+    const ok = validateEmail();
+
+    if(!ok){
+        showError("errEmail", true);
+        showToast("Masukkan email yang valid", "error");
+        document.getElementById("inputEmail").focus();
+        return;
+    }
+
+    showError("errEmail", false);
+
+    if(!FIREBASE_READY || !FIREBASE_AUTH){
+        showToast("Firebase belum siap. Refresh halaman.", "error");
+        return;
+    }
+
+    const rawInput = document.getElementById("inputEmail").value.trim().toLowerCase();
+
+    /* Disable button + loading */
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    btn.innerHTML =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" ' +
+            'style="animation:spin 1s linear infinite;">' +
+            '<path d="M21 12a9 9 0 1 1-6.2-8.6"/>' +
+        '</svg>MENGIRIM...';
+
+    /* Resolve email (kalau user ketik username) → kirim reset */
+    resolveEmail(rawInput)
+        .then(function(email){
+            return FIREBASE_AUTH.sendPasswordResetEmail(email)
+                .then(function(){
+                    return email;
+                });
+        })
+        .then(function(email){
+            console.log("[RESET] Email sent to:", email);
+
+            /* Tampilkan success overlay */
+            document.getElementById("successEmail").textContent = email;
+            document.getElementById("successOverlay").classList.add("active");
+
+            /* Save email ke remember (biar login form auto-fill) */
+            try{
+                localStorage.setItem(STORAGE_KEY_REMEMBER, JSON.stringify({
+                    identity: email,
+                    remember: true,
+                    lastLogin: Date.now()
+                }));
+            }catch(e){}
+
+            /* Reset button */
+            btn.disabled = false;
+            btn.innerHTML =
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+                    '<path d="M22 2L11 13"/>' +
+                    '<path d="M22 2l-7 20-4-9-9-4 20-7z"/>' +
+                '</svg>KIRIM LINK RESET';
+        })
+        .catch(function(error){
+            console.error("[RESET] Error:", error);
+
+            /* Reset button */
+            btn.disabled = false;
+            btn.innerHTML =
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+                    '<path d="M22 2L11 13"/>' +
+                    '<path d="M22 2l-7 20-4-9-9-4 20-7z"/>' +
+                '</svg>KIRIM LINK RESET';
+
+            let msg = "Gagal mengirim link reset.";
+            const code = error && error.code ? error.code : "";
+
+            if(code === "auth/user-not-found"){
+                msg = "Email tidak terdaftar di sistem";
+                setInputState("inputEmail", "invalid");
+            }
+            else if(code === "auth/invalid-email"){
+                msg = "Format email tidak valid";
+                setInputState("inputEmail", "invalid");
+            }
+            else if(code === "auth/too-many-requests"){
+                msg = "Terlalu banyak permintaan. Coba lagi nanti.";
+            }
+            else if(code === "auth/network-request-failed"){
+                msg = "Koneksi internet bermasalah";
+            }
+            else if(error && error.message){
+                msg = error.message;
+            }
+
+            showToast(msg, "error");
+        });
+}
+
+/* =========================================================
+   GO TO LOGIN
+   ========================================================= */
+
+function goToLogin(){
+    /* ═══════════════════════════════════════════════════════════
+       GANTI PATH "login.html" DI BAWAH INI SESUAI FILE LOGIN ANDA
+       ═══════════════════════════════════════════════════════════ */
+    window.location.href = "login.html";
+}
+
+/* =========================================================
+   AUTO FILL EMAIL — dari remember data
+   ========================================================= */
+
+function autoFillEmail(){
+    const rememberData = getRememberData();
+    const input = document.getElementById("inputEmail");
+
+    if(!input) return;
+
+    if(rememberData && rememberData.identity){
+        input.value = rememberData.identity;
+        setInputState("inputEmail", "valid");
+    }
+
+    /* Fokus ke input */
+    setTimeout(function(){
+        input.focus();
+        if(input.value){
+            input.select();
+        }
+    }, 300);
+}
+
+/* =========================================================
+   EVENT LISTENERS
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    /* Init Firebase */
+    initFirebase();
+
+    /* Auto fill email */
+    autoFillEmail();
+
+    /* Force lowercase */
+    const inputEmail = document.getElementById("inputEmail");
+    if(inputEmail){
+        inputEmail.addEventListener("input", function(){
+            this.value = this.value.toLowerCase().replace(/\s/g, "");
+        });
+
+        /* Realtime validation */
+        inputEmail.addEventListener("blur", function(){
+            if(this.value.trim() !== "") validateEmail();
+        });
+
+        /* Enter untuk submit */
+        inputEmail.addEventListener("keydown", function(e){
+            if(e.key === "Enter"){
+                e.preventDefault();
+                submitReset();
+            }
+        });
+    }
+
+    /* ESC untuk tutup overlay */
+    document.addEventListener("keydown", function(e){
+        if(e.key === "Escape"){
+            const overlay = document.getElementById("successOverlay");
+            if(overlay && overlay.classList.contains("active")){
+                goToLogin();
+            }
+        }
+    });
+
+    /* Enter di overlay → ke login */
+    document.addEventListener("keydown", function(e){
+        if(e.key === "Enter"){
+            const overlay = document.getElementById("successOverlay");
+            if(overlay && overlay.classList.contains("active")){
+                goToLogin();
+            }
+        }
+    });
+
+});
+
+</script>
+
+<style>
+@keyframes spin{
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
+}
+</style>
+
+</body>
+</html>

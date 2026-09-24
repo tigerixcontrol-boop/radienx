@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI JUDUL HALAMAN SESUAI BRAND ANDA
+     ═══════════════════════════════════════════════════════════ -->
+<title>APPNAME • DevPanel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI FONT SESUAI BRAND ANDA (opsional)
+     ═══════════════════════════════════════════════════════════ -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE SDK — biarkan seperti ini (versi 10.12.2)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#050505;--text:#ffffff;--text-dim:#888;--text-mid:#ccc;--border:rgba(255,255,255,.15);}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;min-height:100%;background:var(--bg);}
+body{
+  background:
+    radial-gradient(circle at 15% 10%,rgba(255,255,255,.06),transparent 40%),
+    radial-gradient(circle at 85% 80%,rgba(255,255,255,.05),transparent 45%),
+    var(--bg);
+  color:var(--text);font-family:'Rajdhani',Arial,sans-serif;
+  overflow-x:hidden;padding-bottom:40px;min-height:100vh;
+}
+body::before{
+  content:"";position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:34px 34px;pointer-events:none;z-index:-1;
+}
+.app{width:100%;max-width:620px;margin:0 auto;padding:0 18px;}
+.topbar{height:88px;display:flex;align-items:center;justify-content:space-between;padding:0 4px;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-logo{
+  width:44px;height:44px;border-radius:14px;border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,#161616,#0a0a0a) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.5),rgba(255,255,255,.15)) border-box;
+  display:flex;align-items:center;justify-content:center;
+}
+.brand-logo svg{width:22px;height:22px;color:#fff;}
+.brand-text h1{font-family:'Orbitron',sans-serif;font-size:15px;font-weight:900;letter-spacing:1.5px;}
+.brand-text p{font-family:'Orbitron',sans-serif;font-size:8px;font-weight:800;letter-spacing:2.5px;color:var(--text-dim);margin-top:3px;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.user-chip{
+  display:flex;align-items:center;gap:10px;padding:7px 14px 7px 7px;border-radius:22px;border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,#0d0d0d,#050505) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.1)) border-box;
+}
+.user-chip-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(145deg,#161616,#0a0a0a);
+  border:1.5px solid rgba(255,255,255,.4);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;color:#fff;
+}
+.user-chip-info{line-height:1.15;}
+.user-chip-name{font-family:'Orbitron',sans-serif;font-size:9px;font-weight:900;letter-spacing:.5px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.user-chip-tier{font-family:'Orbitron',sans-serif;font-size:7px;font-weight:800;letter-spacing:1.5px;color:var(--text-dim);margin-top:2px;}
+.user-chip-tier.dev{color:#fff;}
+.logout-icon-btn{
+  width:42px;height:42px;border-radius:14px;border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,#161616,#0a0a0a) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.1)) border-box;
+  color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.logout-icon-btn svg{width:18px;height:18px;color:#fff;}
+.page-title{margin-top:8px;margin-bottom:22px;text-align:center;}
+.page-title h2{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;letter-spacing:1.5px;}
+.page-title p{font-family:'Orbitron',sans-serif;font-size:9px;font-weight:800;letter-spacing:3px;color:var(--text-dim);margin-top:8px;}
+.card{
+  border-radius:24px;padding:22px 20px;margin-bottom:16px;border:1.5px solid transparent;
+  background:
+    linear-gradient(160deg,rgba(15,15,15,.9),rgba(5,5,5,.9)) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.28),rgba(255,255,255,.08),rgba(255,255,255,.28)) border-box;
+  box-shadow:0 0 24px -8px rgba(255,255,255,.08);
+  position:relative;overflow:hidden;
+}
+.card-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.card-header-icon{
+  width:42px;height:42px;border-radius:13px;border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,#161616,#0a0a0a) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.5),rgba(255,255,255,.15)) border-box;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.card-header-icon svg{width:20px;height:20px;color:#fff;}
+.card-header-text{flex:1;min-width:0;}
+.card-header-text h3{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;letter-spacing:.8px;margin-bottom:4px;}
+.card-header-text p{font-size:11px;font-weight:700;color:var(--text-dim);letter-spacing:.3px;}
+.field{margin-bottom:16px;}
+.field:last-child{margin-bottom:0;}
+.field label{
+  display:block;font-family:'Orbitron',sans-serif;font-size:9px;
+  font-weight:800;letter-spacing:1.5px;color:var(--text-mid);margin-bottom:9px;margin-left:4px;
+}
+.field input,.field select{
+  width:100%;height:54px;border:1.5px solid transparent;border-radius:16px;
+  background:
+    linear-gradient(145deg,#0d0d0d,#050505) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.3),rgba(255,255,255,.1)) border-box;
+  color:#fff;padding:0 16px;
+  font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;
+  outline:none;transition:.2s;
+  -webkit-text-fill-color:#fff !important;
+}
+.field input:focus,.field select:focus{
+  background:
+    linear-gradient(145deg,#0d0d0d,#050505) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.7),rgba(255,255,255,.3)) border-box;
+}
+.field input::placeholder{color:#555;-webkit-text-fill-color:#555 !important;}
+.field select{
+  appearance:none;-webkit-appearance:none;
+  background-image:
+    linear-gradient(145deg,#0d0d0d,#050505),
+    linear-gradient(135deg,rgba(255,255,255,.3),rgba(255,255,255,.1)),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.5'><path d='M6 9l6 6 6-6'/></svg>");
+  background-position:0 0,0 0,right 18px center;
+  background-size:100% 100%,300% 100%,12px 12px;
+  background-repeat:no-repeat;
+  background-origin:border-box,border-box,padding-box;
+  background-clip:padding-box,border-box,padding-box;
+  padding-right:46px;
+}
+.field .hint{font-size:10px;color:var(--text-dim);font-weight:600;margin-top:7px;margin-left:4px;letter-spacing:.3px;}
+.pass-wrap{position:relative;}
+.pass-toggle{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  width:38px;height:38px;border:0;background:transparent;color:#fff;cursor:pointer;
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+}
+.pass-toggle svg{width:18px;height:18px;color:#fff;}
+.pass-wrap input{padding-right:52px;}
+.type-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+.type-btn{
+  padding:14px 8px;border-radius:14px;border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,#0d0d0d,#050505) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.25),rgba(255,255,255,.08)) border-box;
+  color:var(--text-mid);
+  font-family:'Orbitron',sans-serif;font-size:9px;font-weight:900;
+  letter-spacing:.8px;cursor:pointer;transition:.2s;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.type-btn svg{width:20px;height:20px;color:inherit;}
+.type-btn.active{background:#fff;color:#080808;background-image:none;box-shadow:0 0 20px rgba(255,255,255,.2);}
+.type-btn.active svg{color:#080808;}
+.btn{
+  width:100%;height:58px;border-radius:17px;border:0;
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;
+  letter-spacing:1.2px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:transform .15s;
+}
+.btn:active{transform:scale(.97);}
+.btn:disabled{opacity:.6;cursor:not-allowed;}
+.btn-primary{background:#fff;color:#080808;box-shadow:0 4px 16px rgba(255,255,255,.2);}
+.btn-primary svg{width:18px;height:18px;color:#080808;}
+.btn-secondary{
+  border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,#161616,#0a0a0a) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.4),rgba(255,255,255,.15)) border-box;
+  color:#fff;
+}
+.btn-secondary svg{width:16px;height:16px;color:#fff;}
+.result-card{
+  border-radius:20px;padding:20px;border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,#0d0d0d,#050505) padding-box,
+    linear-gradient(135deg,#fff,#888,#fff) border-box;
+  margin-top:16px;display:none;animation:fadeUp .35s ease;
+}
+.result-card.show{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.result-label{font-family:'Orbitron',sans-serif;font-size:8px;font-weight:800;letter-spacing:2px;color:var(--text-dim);text-align:center;margin-bottom:12px;}
+.result-code{
+  font-family:'Orbitron',monospace;font-size:15px;font-weight:900;
+  letter-spacing:1.8px;color:#fff;text-align:center;
+  padding:16px 12px;background:#000;border-radius:14px;
+  border:1.5px solid rgba(255,255,255,.3);
+  word-break:break-all;line-height:1.5;
+  user-select:all;-webkit-user-select:all;
+}
+.result-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;}
+.code-list{display:flex;flex-direction:column;gap:8px;}
+.code-item{
+  border-radius:16px;padding:14px;border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,#0d0d0d,#050505) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.06)) border-box;
+  transition:.15s;position:relative;
+}
+.code-item.used{opacity:.5;}
+.code-item.used::after{
+  content:"USED";position:absolute;top:10px;right:12px;
+  font-family:'Orbitron',sans-serif;font-size:7px;font-weight:900;
+  letter-spacing:1.5px;padding:3px 8px;border-radius:6px;background:#333;color:#888;
+}
+.code-item-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.code-item-code{
+  font-family:'Orbitron',monospace;font-size:10.5px;font-weight:900;
+  letter-spacing:1px;color:#fff;word-break:break-all;flex:1;line-height:1.4;
+}
+.code-item-copy{
+  width:32px;height:32px;border-radius:9px;border:0;
+  background:rgba(255,255,255,.08);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:.15s;
+}
+.code-item-copy:active{transform:scale(.9);background:rgba(255,255,255,.2);}
+.code-item-copy svg{width:14px;height:14px;}
+.code-item-reward{font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.reward-tag{
+  display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:8px;
+  font-family:'Orbitron',sans-serif;font-size:8px;font-weight:900;
+  letter-spacing:.5px;background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.15);
+}
+.reward-tag.wallet{background:rgba(255,255,255,.15);}
+.reward-tag.tier{background:rgba(255,255,255,.2);}
+.code-item-meta{font-size:10px;color:var(--text-dim);font-weight:600;margin-top:7px;letter-spacing:.3px;}
+.code-item-actions{display:flex;gap:6px;margin-top:10px;}
+.code-item-actions button{
+  flex:1;height:34px;border-radius:10px;border:0;
+  font-family:'Orbitron',sans-serif;font-size:8px;font-weight:900;
+  letter-spacing:.8px;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.code-item-actions .btn-copy{background:#fff;color:#080808;}
+.code-item-actions .btn-copy svg{width:12px;height:12px;color:#080808;}
+.code-item-actions .btn-del{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15);}
+.code-item-actions .btn-del svg{width:12px;height:12px;color:#fff;}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.stat-box{
+  padding:16px 10px;border-radius:16px;border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,#0d0d0d,#050505) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.06)) border-box;
+  text-align:center;
+}
+.stat-value{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;letter-spacing:.5px;margin-bottom:5px;}
+.stat-label{font-family:'Orbitron',sans-serif;font-size:7px;font-weight:800;letter-spacing:1.5px;color:var(--text-dim);}
+.empty{padding:44px 20px;text-align:center;border:1.5px dashed rgba(255,255,255,.15);border-radius:18px;}
+.empty svg{width:44px;height:44px;color:#444;margin-bottom:12px;}
+.empty h4{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;letter-spacing:1px;margin-bottom:6px;}
+.empty p{font-size:11px;font-weight:600;color:var(--text-dim);line-height:1.5;}
+.fullscreen-msg{
+  position:fixed;inset:0;background:#050505;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:20px;z-index:999;padding:30px;text-align:center;
+}
+.fullscreen-msg.hidden{display:none;}
+.spinner{width:48px;height:48px;border-radius:50%;border:3px solid rgba(255,255,255,.15);border-top-color:#fff;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.fullscreen-msg h3{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;letter-spacing:1.5px;}
+.fullscreen-msg p{font-size:12px;font-weight:600;color:var(--text-dim);max-width:280px;line-height:1.6;}
+.login-screen{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:22px;z-index:998;
+  background:
+    radial-gradient(circle at 15% 10%,rgba(255,255,255,.06),transparent 40%),
+    radial-gradient(circle at 85% 80%,rgba(255,255,255,.05),transparent 45%),
+    #050505;
+  overflow-y:auto;
+}
+.login-screen.hidden{display:none;}
+.login-screen::before{
+  content:"";position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:34px 34px;pointer-events:none;
+}
+.login-card{
+  width:100%;max-width:420px;border-radius:26px;padding:28px 24px;border:1.5px solid transparent;
+  background:
+    linear-gradient(160deg,rgba(15,15,15,.96),rgba(5,5,5,.96)) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.08),rgba(255,255,255,.35)) border-box;
+  box-shadow:0 0 32px -6px rgba(255,255,255,.15);
+  position:relative;z-index:2;animation:loginIn .4s ease;
+}
+@keyframes loginIn{from{opacity:0;transform:translateY(20px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+.login-brand{display:flex;align-items:center;gap:14px;padding-bottom:20px;margin-bottom:22px;border-bottom:1px solid var(--border);}
+.login-brand-text h2{font-family:'Orbitron',sans-serif;font-size:17px;font-weight:900;letter-spacing:1.5px;}
+.login-brand-text p{font-family:'Orbitron',sans-serif;font-size:8px;font-weight:800;letter-spacing:2.5px;color:var(--text-dim);margin-top:5px;}
+.captcha-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.captcha-display{
+  flex:1;height:66px;border-radius:14px;border:1.5px solid rgba(255,255,255,.22);
+  background:
+    repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0 6px,transparent 6px 12px),
+    linear-gradient(145deg,#0a0a0a,#000);
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  position:relative;overflow:hidden;user-select:none;-webkit-user-select:none;
+}
+.captcha-display::before{
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(80deg,transparent 45%,rgba(255,255,255,.06) 47%,transparent 49%),
+    linear-gradient(-65deg,transparent 42%,rgba(255,255,255,.05) 44%,transparent 46%),
+    linear-gradient(20deg,transparent 55%,rgba(255,255,255,.04) 57%,transparent 59%);
+  pointer-events:none;
+}
+.captcha-char{
+  font-family:'Orbitron',monospace;font-size:24px;font-weight:900;
+  color:#fff;text-shadow:0 0 10px rgba(255,255,255,.5);
+  display:inline-block;position:relative;
+}
+.captcha-refresh{
+  width:66px;height:66px;border-radius:14px;border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,#161616,#0a0a0a) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.4),rgba(255,255,255,.15)) border-box;
+  color:#fff;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:transform .2s;
+}
+.captcha-refresh:active{transform:scale(.9) rotate(-180deg);}
+.captcha-refresh svg{width:22px;height:22px;color:#fff;}
+.login-error{
+  display:none;padding:12px 14px;border-radius:14px;border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,rgba(30,10,10,.9),rgba(15,5,5,.9)) padding-box,
+    linear-gradient(135deg,rgba(255,80,80,.5),rgba(255,80,80,.15)) border-box;
+  color:#fff;font-size:11px;font-weight:700;letter-spacing:.3px;
+  margin-bottom:14px;line-height:1.4;align-items:center;gap:10px;
+}
+.login-error.show{display:flex;}
+.login-error svg{width:16px;height:16px;color:#fff;flex-shrink:0;}
+.login-error.warn{
+  background:
+    linear-gradient(145deg,rgba(30,25,5,.9),rgba(15,10,0,.9)) padding-box,
+    linear-gradient(135deg,rgba(255,200,80,.5),rgba(255,200,80,.15)) border-box;
+}
+.login-error.info{
+  background:
+    linear-gradient(145deg,rgba(5,20,30,.9),rgba(0,10,15,.9)) padding-box,
+    linear-gradient(135deg,rgba(80,180,255,.5),rgba(80,180,255,.15)) border-box;
+}
+.login-error.success{
+  background:
+    linear-gradient(145deg,rgba(5,30,15,.9),rgba(0,15,5,.9)) padding-box,
+    linear-gradient(135deg,rgba(80,255,140,.5),rgba(80,255,140,.15)) border-box;
+}
+.login-footer{
+  text-align:center;margin-top:18px;
+  font-family:'Orbitron',sans-serif;font-size:8px;font-weight:800;
+  letter-spacing:1.8px;color:var(--text-dim);line-height:1.7;
+}
+.login-footer strong{color:#fff;}
+.toast{
+  position:fixed;left:50%;bottom:30px;transform:translate(-50%,20px);
+  padding:13px 20px;border-radius:15px;border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,#151515,#050505) padding-box,
+    linear-gradient(90deg,#444,#fff,#888,#fff,#444) border-box;
+  color:#fff;font-size:12px;font-weight:800;
+  opacity:0;visibility:hidden;transition:.3s;
+  z-index:1000;max-width:90vw;text-align:center;
+  box-shadow:0 0 22px rgba(255,255,255,.15);
+}
+.toast.show{opacity:1;visibility:visible;transform:translate(-50%,0);}
+.tabs{display:flex;gap:6px;padding:4px;border-radius:15px;background:rgba(0,0,0,.4);border:1px solid var(--border);margin-bottom:16px;}
+.tab{
+  flex:1;height:42px;border:0;border-radius:11px;
+  background:transparent;color:var(--text-dim);
+  font-family:'Orbitron',sans-serif;font-size:9px;font-weight:900;
+  letter-spacing:1px;cursor:pointer;transition:.15s;
+}
+.tab.active{background:#fff;color:#080808;}
+.debug-box{
+  margin-top:14px;padding:14px;border-radius:14px;border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,rgba(10,15,20,.9),rgba(5,8,10,.9)) padding-box,
+    linear-gradient(135deg,rgba(100,180,255,.4),rgba(100,180,255,.1)) border-box;
+  font-family:'Courier New',monospace;font-size:10px;color:#ccc;
+  line-height:1.5;word-break:break-word;max-height:220px;overflow-y:auto;
+  display:none;white-space:pre-wrap;
+}
+.debug-box.show{display:block;}
+.debug-box strong{
+  font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1px;
+  color:#fff;display:block;margin-bottom:8px;
+}
+.debug-box .k{color:#7dd3fc;}
+.debug-box .v{color:#fef08a;}
+.debug-box .ok{color:#86efac;}
+.debug-box .bad{color:#fca5a5;}
+.debug-box .warn{color:#fbbf24;}
+
+.setup-screen{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:22px;z-index:997;
+  background:
+    radial-gradient(circle at 15% 10%,rgba(255,255,255,.06),transparent 40%),
+    radial-gradient(circle at 85% 80%,rgba(255,255,255,.05),transparent 45%),
+    #050505;
+  overflow-y:auto;
+}
+.setup-screen.hidden{display:none;}
+.setup-screen::before{
+  content:"";position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:34px 34px;pointer-events:none;
+}
+.setup-card{
+  width:100%;max-width:420px;border-radius:26px;padding:28px 24px;border:1.5px solid transparent;
+  background:
+    linear-gradient(160deg,rgba(15,15,15,.96),rgba(5,5,5,.96)) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.08),rgba(255,255,255,.35)) border-box;
+  box-shadow:0 0 32px -6px rgba(255,255,255,.15);
+  position:relative;z-index:2;
+}
+.setup-header{
+  text-align:center;margin-bottom:22px;padding-bottom:20px;
+  border-bottom:1px solid var(--border);
+}
+.setup-icon{
+  width:64px;height:64px;margin:0 auto 14px;
+  border-radius:20px;border:2px solid transparent;
+  background:
+    linear-gradient(145deg,#1a1a1a,#0a0a0a) padding-box,
+    linear-gradient(135deg,#fff,#888) border-box;
+  display:flex;align-items:center;justify-content:center;
+}
+.setup-icon svg{width:30px;height:30px;color:#fff;}
+.setup-header h2{
+  font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;
+  letter-spacing:1.2px;margin-bottom:8px;
+}
+.setup-header p{
+  font-size:11px;line-height:1.5;font-weight:700;color:#ccc;
+}
+.setup-header p b{color:#fff;}
+.setup-info{
+  margin-top:6px;padding:14px;border-radius:14px;border:1.5px solid transparent;
+  background:
+    linear-gradient(145deg,rgba(30,25,5,.6),rgba(15,10,0,.6)) padding-box,
+    linear-gradient(135deg,rgba(255,200,80,.4),rgba(255,200,80,.1)) border-box;
+  font-size:11px;line-height:1.6;color:#ccc;
+  margin-bottom:16px;
+}
+.setup-info strong{
+  font-family:'Orbitron',sans-serif;font-size:9px;
+  letter-spacing:1px;color:#fbbf24;display:block;margin-bottom:6px;
+}
+.setup-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;}
+@media(max-width:390px){
+  .app{padding:0 14px;}
+  .type-grid{grid-template-columns:1fr;}
+  .type-btn{flex-direction:row;justify-content:center;padding:14px 12px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .user-chip{padding:6px 10px 6px 6px;gap:7px;}
+  .user-chip-avatar{width:28px;height:28px;font-size:10px;}
+  .user-chip-name{font-size:8px;max-width:70px;}
+  .captcha-char{font-size:20px;}
+  .captcha-display,.captcha-refresh{height:58px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L3 7v10l9 5 9-5V7l-9-5Z"/>
+          <path d="M12 22V12"/>
+          <path d="M3 7l9 5 9-5"/>
+        </svg>
+      </div>
+      <div class="login-brand-text">
+        <h2>DEVPANEL LOGIN</h2>
+        <p>RESTRICTED • DEVELOPER ONLY</p>
+      </div>
+    </div>
+
+    <div class="login-error" id="loginError">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 8v4"/>
+        <path d="M12 16h.01"/>
+      </svg>
+      <span id="loginErrorText">Username atau password salah</span>
+    </div>
+
+    <div class="field">
+      <label>USERNAME</label>
+      <input id="loginUsername" type="text" placeholder="Masukkan username" autocomplete="username" autocapitalize="off" spellcheck="false">
+    </div>
+
+    <div class="field">
+      <label>PASSWORD</label>
+      <div class="pass-wrap">
+        <input id="loginPassword" type="password" placeholder="Password akun kamu" autocomplete="current-password">
+        <button type="button" class="pass-toggle" onclick="toggleLoginPassword()" tabindex="-1">
+          <svg id="passEye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>CAPTCHA</label>
+      <div class="captcha-row">
+        <div class="captcha-display" id="captchaDisplay"></div>
+        <button type="button" class="captcha-refresh" onclick="refreshCaptcha()" title="Ganti captcha">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 12a9 9 0 1 1-3-6.7"/>
+            <path d="M21 4v5h-5"/>
+          </svg>
+        </button>
+      </div>
+      <input id="loginCaptcha" type="text" placeholder="Ketik captcha di atas" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="6">
+      <div class="hint">Ketik 5 karakter yang terlihat</div>
+    </div>
+
+    <button class="btn btn-primary" id="loginBtn" onclick="doLogin()" style="margin-top:6px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/>
+        <line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+      MASUK
+    </button>
+
+    <button type="button" class="btn btn-secondary" onclick="showDebugData()" style="margin-top:10px;height:46px;font-size:9px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M21 21l-4.3-4.3"/>
+      </svg>
+      CEK DATA USER
+    </button>
+
+    <div class="debug-box" id="debugBox"></div>
+
+    <div class="login-footer">
+      🔒 <strong>SECURE ACCESS</strong><br>
+      Hanya untuk tier DEVELOPER
+    </div>
+  </div>
+</div>
+
+<!-- SETUP PASSWORD SCREEN -->
+<div class="setup-screen hidden" id="setupScreen">
+  <div class="setup-card">
+    <div class="setup-header">
+      <div class="setup-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="4" y="10" width="16" height="11" rx="2.5"/>
+          <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+          <circle cx="12" cy="15.5" r="1.5" fill="currentColor"/>
+        </svg>
+      </div>
+      <h2>BUAT PASSWORD DEVPANEL</h2>
+      <p>Ini pertama kalinya akun <b id="setupUsername">-</b> login ke DevPanel.<br>Silakan buat password khusus untuk DevPanel.</p>
+    </div>
+
+    <div class="setup-info">
+      <strong>⚠️ PENTING</strong>
+      Password ini berbeda dengan password login utama. Disimpan di Firebase di path <b>users/&lt;username&gt;/password</b>. Simpan baik-baik, karena akan dipakai untuk login DevPanel ke depannya.
+    </div>
+
+    <div class="login-error" id="setupError">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 8v4"/>
+        <path d="M12 16h.01"/>
+      </svg>
+      <span id="setupErrorText">Error</span>
+    </div>
+
+    <div class="field">
+      <label>PASSWORD BARU</label>
+      <div class="pass-wrap">
+        <input id="setupPassword1" type="password" placeholder="Minimal 6 karakter" autocomplete="new-password">
+        <button type="button" class="pass-toggle" onclick="toggleSetupPass(1)" tabindex="-1">
+          <svg id="setupEye1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>KONFIRMASI PASSWORD</label>
+      <div class="pass-wrap">
+        <input id="setupPassword2" type="password" placeholder="Ulangi password baru" autocomplete="new-password">
+        <button type="button" class="pass-toggle" onclick="toggleSetupPass(2)" tabindex="-1">
+          <svg id="setupEye2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="setup-actions">
+      <button class="btn btn-secondary" onclick="cancelSetupPassword()">BATAL</button>
+      <button class="btn btn-primary" id="setupBtn" onclick="submitSetupPassword()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+        SIMPAN
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="fullscreen-msg hidden" id="loadingScreen">
+  <div class="spinner"></div>
+  <h3 id="loadingTitle">MEMUAT DEVPANEL</h3>
+  <p id="loadingMsg">Menghubungkan ke Firebase...</p>
+</div>
+
+<div class="fullscreen-msg hidden" id="lockScreen">
+  <div style="width:52px;height:52px;border-radius:16px;border:1.5px solid rgba(255,255,255,.4);background:#0d0d0d;display:flex;align-items:center;justify-content:center;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:24px;height:24px;">
+      <rect x="4" y="10" width="16" height="10" rx="2"/>
+      <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+    </svg>
+  </div>
+  <h3 id="lockTitle">AKSES DITOLAK</h3>
+  <p id="lockMsg">Halaman ini hanya untuk akun DEVELOPER.</p>
+  <button class="btn btn-primary" style="max-width:280px;margin-top:10px;" onclick="lockLogout()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5"/>
+      <path d="M12 19l-7-7 7-7"/>
+    </svg>
+    KEMBALI KE LOGIN
+  </button>
+</div>
+
+<main class="app" id="appContent" style="display:none;">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L3 7v10l9 5 9-5V7l-9-5Z"/>
+          <path d="M12 22V12"/>
+          <path d="M3 7l9 5 9-5"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>DEVPANEL</h1>
+        <!-- ═══════════════════════════════════════════════════════════
+             GANTI NAMA BRAND DI BAWAH INI
+             ═══════════════════════════════════════════════════════════ -->
+        <p>APPNAME • CODE GENERATOR</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip">
+        <div class="user-chip-avatar" id="userAvatar">A</div>
+        <div class="user-chip-info">
+          <div class="user-chip-name" id="userName">-</div>
+          <div class="user-chip-tier dev" id="userTier">-</div>
+        </div>
+      </div>
+      <button class="logout-icon-btn" onclick="logoutDevPanel()" title="Logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="page-title">
+    <h2>Generate Redeem Code</h2>
+    <p>BUAT KODE UNTUK USER</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-value" id="statTotal">0</div>
+      <div class="stat-label">TOTAL KODE</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value" id="statUnused">0</div>
+      <div class="stat-label">BELUM DIPAKAI</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value" id="statUsed">0</div>
+      <div class="stat-label">SUDAH DIPAKAI</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="7" cy="12" r="3"/>
+          <path d="M10 12h11"/>
+          <path d="M18 12v3"/>
+          <path d="M15 12v2"/>
+        </svg>
+      </div>
+      <div class="card-header-text">
+        <h3>BUAT KODE BARU</h3>
+        <p>Pilih jenis reward dan generate</p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>JENIS REWARD</label>
+      <div class="type-grid">
+        <button class="type-btn active" data-type="wallet" onclick="selectType('wallet')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="6" width="18" height="13" rx="2"/>
+            <path d="M3 10h18"/>
+            <circle cx="17" cy="14.5" r="1" fill="currentColor"/>
+          </svg>
+          WALLET
+        </button>
+        <button class="type-btn" data-type="tier" onclick="selectType('tier')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l3 7 7 1-5 5 1.5 7L12 19l-6.5 3L7 15l-5-5 7-1 3-7z"/>
+          </svg>
+          TIER
+        </button>
+        <button class="type-btn" data-type="bundle" onclick="selectType('bundle')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 12v10H4V12"/>
+            <path d="M2 7h20v5H2z"/>
+            <path d="M12 22V7"/>
+            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+          </svg>
+          BUNDLE
+        </button>
+      </div>
+    </div>
+
+    <div class="field" id="fieldWallet">
+      <label>JUMLAH WALLET (Rp)</label>
+      <input type="number" id="inputWallet" value="10000" min="1000" max="50000" step="500" inputmode="numeric">
+      <div class="hint">Min Rp1.000 • Max Rp50.000</div>
+    </div>
+
+    <div class="field" id="fieldTier" style="display:none;">
+      <label>TIER YANG DIDAPAT</label>
+      <select id="inputTier">
+        <option value="PREMIUM">PREMIUM</option>
+        <option value="VIP">VIP</option>
+      </select>
+    </div>
+
+    <div class="field" id="fieldTierType" style="display:none;">
+      <label>DURASI TIER</label>
+      <select id="inputTierType" onchange="toggleTierDuration()">
+        <option value="permanent">PERMANEN</option>
+        <option value="monthly">BULANAN</option>
+      </select>
+    </div>
+
+    <div class="field" id="fieldTierDuration" style="display:none;">
+      <label>DURASI (HARI)</label>
+      <input type="number" id="inputTierDuration" value="30" min="1" max="365" inputmode="numeric">
+    </div>
+
+    <div class="field">
+      <label>JUMLAH KODE (Batch)</label>
+      <input type="number" id="inputBatch" value="1" min="1" max="50" inputmode="numeric">
+      <div class="hint">Bisa generate sampai 50 kode sekaligus</div>
+    </div>
+
+    <button class="btn btn-primary" onclick="generateCodes()" style="margin-top:8px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M13 2L4 14h6l-1 8 9-12h-6l1-8Z"/>
+      </svg>
+      GENERATE KODE
+    </button>
+
+    <div class="result-card" id="resultCard">
+      <div class="result-label" id="resultLabel">KODE BERHASIL DIBUAT</div>
+      <div class="result-code" id="resultCode">-</div>
+      <div class="result-actions">
+        <button class="btn btn-secondary" onclick="copyResultCode()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          SALIN
+        </button>
+        <button class="btn btn-secondary" onclick="shareResultCode()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <path d="M8.6 13.5l6.8 4"/>
+            <path d="M15.4 6.5l-6.8 4"/>
+          </svg>
+          SHARE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="9" y1="13" x2="15" y2="13"/>
+          <line x1="9" y1="17" x2="15" y2="17"/>
+        </svg>
+      </div>
+      <div class="card-header-text">
+        <h3>DAFTAR KODE</h3>
+        <p>Semua kode yang kamu buat</p>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-filter="all" onclick="setFilter('all')">SEMUA</button>
+      <button class="tab" data-filter="unused" onclick="setFilter('unused')">BELUM DIPAKAI</button>
+      <button class="tab" data-filter="used" onclick="setFilter('used')">SUDAH DIPAKAI</button>
+    </div>
+
+    <div class="code-list" id="codeList">
+      <div class="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="7" cy="12" r="3"/>
+          <path d="M10 12h11"/>
+          <path d="M18 12v3"/>
+        </svg>
+        <h4>BELUM ADA KODE</h4>
+        <p>Buat kode pertama kamu dengan form di atas</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡⚡⚡ KONFIGURASI FIREBASE ⚡⚡⚡
+   ═══════════════════════════════════════════════════════════════════════════
+   GANTI SEMUA VALUE DI BAWAH INI DENGAN MILIK ANDA:
+
+   1. Buka Firebase Console → Project Settings → General
+   2. Scroll ke "Your apps" → pilih Web App
+   3. Copy config dan paste ke sini
+   4. Pastikan Realtime Database sudah dibuat (bukan Firestore)
+   ═══════════════════════════════════════════════════════════════════════════ */
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDLs7Coar_Dy9bE2K4Ha_Q6wG0SmC3m75g",
+    //        ↑ GANTI dengan API Key Anda
+
+    authDomain: "https://radien-95e9d.firebaseapp.com",
+    //            ↑ GANTI dengan Auth Domain Anda
+
+    databaseURL: "https://radien-95e9d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    //             ↑ GANTI dengan Realtime Database URL Anda
+
+    projectId: "radien-95e9d",
+    //           ↑ GANTI dengan Project ID Anda
+
+    storageBucket: "https://radien-95e9d.firebasestorage.app",
+    //               ↑ GANTI dengan Storage Bucket Anda
+
+    messagingSenderId: "208676450122",
+    //                   ↑ GANTI dengan Messaging Sender ID Anda
+
+    appId: "13f1702562e36468a4dbb3"
+    //      ↑ GANTI dengan App ID Anda
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ SESSION STORAGE KEYS
+   ⚠️ WAJIB SAMA dengan file login.html dan home.html
+   ═══════════════════════════════════════════════════════════════════════════ */
+const DEVPANEL_SESSION_KEY = "astra_devpanel_session";
+//                             ↑ GANTI kalau perlu
+const STORAGE_KEY_USERS = "astra_users";
+//                          ↑ GANTI kalau perlu (harus SAMA dengan login.html)
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ KONFIGURASI REDEEM CODE
+   ═══════════════════════════════════════════════════════════════════════════ */
+const CODE_PREFIX = "RADIEN";
+//                    ↑ GANTI prefix kode redeem (contoh: "MYAPP")
+
+const TIER_RANK = { "FREE":0, "PREMIUM":1, "VIP":2, "DEVELOPER":3 };
+
+const PASSWORD_KEYS = [
+    "password","pass","pwd","passwd","pass_word","passkey",
+    "pin","passcode","userpass","user_pass","secret"
+];
+
+let FIREBASE_DB = null;
+let FIREBASE_READY = false;
+let ACTIVE_USER = null;
+let USER_TIER = "FREE";
+let pendingSetupUsername = null;
+
+let selectedType = "wallet";
+let currentFilter = "all";
+let allCodes = [];
+let codesListener = null;
+let lastGeneratedCode = "";
+
+let currentCaptcha = "";
+let loginBusy = false;
+
+/* ═══════════════════════════════════════════════════════════════
+   INIT FIREBASE
+   ═══════════════════════════════════════════════════════════════ */
+function initFirebase(){
+    try{
+        if(typeof firebase === "undefined") return false;
+        if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        FIREBASE_DB = firebase.database();
+        FIREBASE_READY = true;
+        return true;
+    }catch(e){ console.error("[FIREBASE]", e); return false; }
+}
+
+function getLocalUsers(){
+    try{
+        const raw = localStorage.getItem(STORAGE_KEY_USERS);
+        return raw ? JSON.parse(raw) : {};
+    }catch(e){ return {}; }
+}
+
+function findPassword(obj){
+    if(!obj || typeof obj !== "object") return null;
+    const keys = Object.keys(obj);
+    for(let i=0;i<keys.length;i++){
+        const k = keys[i];
+        if(PASSWORD_KEYS.indexOf(k.toLowerCase()) !== -1){
+            const v = obj[k];
+            if(typeof v === "string" && v.length > 0){ return { field: k, value: v }; }
+        }
+    }
+    for(let i=0;i<keys.length;i++){
+        const k = keys[i];
+        if(k.toLowerCase().indexOf("pass") !== -1){
+            const v = obj[k];
+            if(typeof v === "string" && v.length > 0){ return { field: k, value: v }; }
+        }
+    }
+    return null;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FETCH FROM FIREBASE
+   ═══════════════════════════════════════════════════════════════ */
+function fetchUserFromFirebase(username){
+    return new Promise(function(resolve){
+        const uname = username.toLowerCase();
+        if(!FIREBASE_READY || !FIREBASE_DB){ resolve({ ok:false, reason:"firebase_offline" }); return; }
+        FIREBASE_DB.ref("users/"+uname).once("value").then(function(snap){
+            const data = snap.val();
+            if(!data){ resolve({ ok:false, reason:"user_not_found" }); return; }
+            const passInfo = findPassword(data);
+            resolve({
+                ok:true,
+                userData: data,
+                fbPassword: passInfo ? passInfo.value : null,
+                fbPasswordField: passInfo ? passInfo.field : null
+            });
+        }).catch(function(err){
+            console.error("[FIREBASE]", err);
+            resolve({ ok:false, reason:"firebase_error", message: err.message });
+        });
+    });
+}
+
+function fetchUserTier(username){
+    return new Promise(function(resolve){
+        const uname = username.toLowerCase();
+        if(!FIREBASE_READY || !FIREBASE_DB){ resolve({ tier:"FREE", type:"permanent", expiry:0 }); return; }
+        FIREBASE_DB.ref("users/"+uname+"/tier").once("value").then(function(snap){
+            const val = snap.val();
+            let tier = "FREE", type = "permanent", expiry = 0;
+            if(val && typeof val === "object"){
+                tier = (val.tier || "FREE").toString().toUpperCase();
+                type = val.type || "permanent";
+                expiry = parseInt(val.expiry || 0, 10) || 0;
+            } else if(typeof val === "string"){
+                tier = val.toUpperCase();
+            }
+            if(tier !== "FREE" && type === "monthly" && expiry > 0 && Date.now() >= expiry){ tier = "FREE"; }
+            resolve({ tier: tier, type: type, expiry: expiry });
+        }).catch(function(err){
+            console.error("[FIREBASE]", err);
+            resolve({ tier:"FREE", type:"permanent", expiry:0 });
+        });
+    });
+}
+
+function savePasswordToFirebase(username, password){
+    return new Promise(function(resolve){
+        if(!FIREBASE_READY || !FIREBASE_DB){ resolve(false); return; }
+        const uname = username.toLowerCase();
+        FIREBASE_DB.ref("users/"+uname+"/password").set(password).then(function(){
+            console.log("[PASSWORD] ✅ Disimpan ke Firebase:", uname);
+            resolve(true);
+        }).catch(function(err){
+            console.error("[PASSWORD] ❌ Gagal:", err);
+            resolve(false);
+        });
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN HELPERS
+   ═══════════════════════════════════════════════════════════════ */
+function showLoginScreen(){
+    document.getElementById("loginScreen").classList.remove("hidden");
+    document.getElementById("setupScreen").classList.add("hidden");
+    document.getElementById("loadingScreen").classList.add("hidden");
+    document.getElementById("lockScreen").classList.add("hidden");
+    document.getElementById("appContent").style.display = "none";
+    refreshCaptcha();
+    hideLoginError();
+    setTimeout(function(){
+        const u = document.getElementById("loginUsername");
+        if(u && !u.value) u.focus();
+    }, 300);
+}
+function showSetupScreen(username){
+    pendingSetupUsername = username;
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("setupScreen").classList.remove("hidden");
+    document.getElementById("loadingScreen").classList.add("hidden");
+    document.getElementById("lockScreen").classList.add("hidden");
+    document.getElementById("appContent").style.display = "none";
+    document.getElementById("setupUsername").textContent = username;
+    document.getElementById("setupPassword1").value = "";
+    document.getElementById("setupPassword2").value = "";
+    document.getElementById("setupError").classList.remove("show");
+    setTimeout(function(){ document.getElementById("setupPassword1").focus(); }, 300);
+}
+function showLoading(title, msg){
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("setupScreen").classList.add("hidden");
+    document.getElementById("lockScreen").classList.add("hidden");
+    document.getElementById("appContent").style.display = "none";
+    document.getElementById("loadingScreen").classList.remove("hidden");
+    document.getElementById("loadingTitle").textContent = title || "MEMUAT DEVPANEL";
+    document.getElementById("loadingMsg").textContent = msg || "Menghubungkan...";
+}
+function showLock(title, msg){
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("setupScreen").classList.add("hidden");
+    document.getElementById("loadingScreen").classList.add("hidden");
+    document.getElementById("appContent").style.display = "none";
+    document.getElementById("lockScreen").classList.remove("hidden");
+    document.getElementById("lockTitle").textContent = title;
+    document.getElementById("lockMsg").textContent = msg;
+}
+function showApp(){
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("setupScreen").classList.add("hidden");
+    document.getElementById("loadingScreen").classList.add("hidden");
+    document.getElementById("lockScreen").classList.add("hidden");
+    document.getElementById("appContent").style.display = "block";
+}
+function lockLogout(){ clearSession(); window.location.reload(); }
+
+function saveSession(username){
+    try{
+        localStorage.setItem(DEVPANEL_SESSION_KEY, JSON.stringify({
+            username: username.toLowerCase(), loggedInAt: Date.now()
+        }));
+    }catch(e){}
+}
+function getSession(){
+    try{
+        const raw = localStorage.getItem(DEVPANEL_SESSION_KEY);
+        return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+}
+function clearSession(){
+    try{ localStorage.removeItem(DEVPANEL_SESSION_KEY); }catch(e){}
+}
+
+function showLoginError(msg, type){
+    const box = document.getElementById("loginError");
+    const txt = document.getElementById("loginErrorText");
+    txt.textContent = msg;
+    box.classList.remove("warn","info","success");
+    if(type) box.classList.add(type);
+    box.classList.add("show");
+    if(navigator.vibrate) navigator.vibrate(40);
+}
+function hideLoginError(){
+    document.getElementById("loginError").classList.remove("show");
+}
+function showSetupError(msg){
+    const box = document.getElementById("setupError");
+    const txt = document.getElementById("setupErrorText");
+    txt.textContent = msg;
+    box.classList.add("show");
+    if(navigator.vibrate) navigator.vibrate(40);
+}
+function hideSetupError(){
+    document.getElementById("setupError").classList.remove("show");
+}
+
+function toggleLoginPassword(){
+    const input = document.getElementById("loginPassword");
+    const icon = document.getElementById("passEye");
+    if(!input || !icon) return;
+    if(input.type === "password"){
+        input.type = "text";
+        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/>';
+    } else {
+        input.type = "password";
+        icon.innerHTML = '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>';
+    }
+}
+function toggleSetupPass(n){
+    const input = document.getElementById("setupPassword" + n);
+    const icon = document.getElementById("setupEye" + n);
+    if(!input || !icon) return;
+    if(input.type === "password"){
+        input.type = "text";
+        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/>';
+    } else {
+        input.type = "password";
+        icon.innerHTML = '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>';
+    }
+}
+
+function generateCaptcha(){
+    const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    let result = "";
+    for(let i=0;i<5;i++) result += chars.charAt(Math.floor(Math.random()*chars.length));
+    return result;
+}
+function refreshCaptcha(){
+    currentCaptcha = generateCaptcha();
+    const disp = document.getElementById("captchaDisplay");
+    if(!disp) return;
+    let html = "";
+    for(let i=0;i<currentCaptcha.length;i++){
+        const ch = currentCaptcha.charAt(i);
+        const rot = (Math.random() * 22 - 11).toFixed(1);
+        const ty = (Math.random() * 6 - 3).toFixed(1);
+        html += '<span class="captcha-char" style="transform:rotate(' + rot + 'deg) translateY(' + ty + 'px);">' + ch + '</span>';
+    }
+    disp.innerHTML = html;
+    const inp = document.getElementById("loginCaptcha");
+    if(inp) inp.value = "";
+}
+function validateCaptcha(){
+    const inp = document.getElementById("loginCaptcha");
+    if(!inp) return false;
+    const userInput = (inp.value || "").trim().toUpperCase();
+    if(!userInput) return false;
+    return userInput === currentCaptcha.toUpperCase();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DEBUG
+   ═══════════════════════════════════════════════════════════════ */
+function showDebugData(){
+    const uname = (document.getElementById("loginUsername").value || "").trim().toLowerCase();
+    if(!uname){ showLoginError("Isi username dulu sebelum cek data"); document.getElementById("loginUsername").focus(); return; }
+
+    const box = document.getElementById("debugBox");
+    box.classList.add("show");
+    box.innerHTML = '<strong>🔍 MENGAMBIL DATA...</strong>\n\nTunggu sebentar...';
+
+    if(!FIREBASE_READY || !FIREBASE_DB){
+        box.innerHTML = '<strong>❌ FIREBASE ERROR</strong>\n\nTidak dapat terhubung ke Firebase.';
+        return;
+    }
+
+    FIREBASE_DB.ref("users/"+uname).once("value").then(function(snap){
+        const data = snap.val();
+        let html = '';
+
+        html += '<strong>📡 FIREBASE: users/' + escapeHtml(uname) + '</strong>\n';
+        if(!data){
+            html += '<span class="bad">❌ User tidak ditemukan di Firebase</span>\n';
+        } else {
+            const flat = {};
+            (function flatten(o, p){
+                if(!o || typeof o !== "object") return;
+                Object.keys(o).forEach(function(k){
+                    const v = o[k];
+                    const path = p ? (p + "." + k) : k;
+                    if(v === null || v === undefined) flat[path] = "(null)";
+                    else if(typeof v === "object") flatten(v, path);
+                    else flat[path] = String(v);
+                });
+            })(data, "");
+            Object.keys(flat).forEach(function(k){
+                const v = flat[k];
+                const isPass = k.toLowerCase().indexOf("pass") !== -1;
+                let display = v;
+                if(k === "avatar" && v.length > 50){ display = v.substring(0, 50) + "... (avatar, " + v.length + " chars)"; }
+                const cls = isPass ? "ok" : "";
+                html += '<span class="k">' + escapeHtml(k) + '</span> = <span class="v ' + cls + '">' + escapeHtml(display) + '</span>\n';
+            });
+            const fbp = findPassword(data);
+            html += '\n';
+            if(fbp){ html += '<span class="ok">✅ Password di Firebase: ' + escapeHtml(fbp.field) + '</span>\n'; }
+            else { html += '<span class="bad">❌ Password di Firebase: TIDAK ADA (bisa di-setup)</span>\n'; }
+        }
+
+        html += '\n<strong>💾 LOCALSTORAGE: ' + escapeHtml(STORAGE_KEY_USERS) + '</strong>\n';
+        const users = getLocalUsers();
+        const ud = users[uname];
+        if(!ud){
+            html += '<span class="bad">❌ User tidak ada di localStorage</span>\n';
+        } else {
+            Object.keys(ud).forEach(function(k){
+                const v = ud[k];
+                let display = (typeof v === "object" && v !== null) ? JSON.stringify(v).substring(0, 60) : String(v);
+                if(k === "avatar" && display.length > 50){ display = display.substring(0, 50) + "..."; }
+                const isPass = k.toLowerCase().indexOf("pass") !== -1;
+                const cls = isPass ? "ok" : "";
+                html += '<span class="k">' + escapeHtml(k) + '</span> = <span class="v ' + cls + '">' + escapeHtml(display) + '</span>\n';
+            });
+        }
+
+        html += '\n───────────────────────\n';
+        html += '<strong>📝 KESIMPULAN:</strong>\n';
+        const fbp = findPassword(data || {});
+        const lp = findPassword(ud || {});
+        if(fbp){
+            html += '<span class="ok">✅ Password sudah ada di Firebase. Login pakai password itu.</span>';
+        } else if(lp){
+            html += '<span class="warn">⚠️ Password ada di localStorage. Akan dimigrasikan saat login.</span>';
+        } else {
+            html += '<span class="info">ℹ️ Belum ada password. Login sekali → akan diminta buat password baru.</span>';
+        }
+
+        box.innerHTML = html;
+    }).catch(function(err){
+        box.innerHTML = '<strong>❌ ERROR</strong>\n\n' + escapeHtml(err.message);
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SETUP PASSWORD FLOW
+   ═══════════════════════════════════════════════════════════════ */
+function cancelSetupPassword(){
+    pendingSetupUsername = null;
+    showLoginScreen();
+}
+function submitSetupPassword(){
+    if(!pendingSetupUsername){ showSetupError("Error: no user pending"); return; }
+
+    const p1 = document.getElementById("setupPassword1").value || "";
+    const p2 = document.getElementById("setupPassword2").value || "";
+
+    hideSetupError();
+
+    if(p1.length < 6){ showSetupError("Password minimal 6 karakter"); document.getElementById("setupPassword1").focus(); return; }
+    if(p1 !== p2){ showSetupError("Konfirmasi password tidak cocok"); document.getElementById("setupPassword2").focus(); return; }
+
+    const btn = document.getElementById("setupBtn");
+    btn.disabled = true;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2.5px;border-color:rgba(0,0,0,.2);border-top-color:#080808;"></div> MENYIMPAN...';
+
+    const username = pendingSetupUsername;
+
+    savePasswordToFirebase(username, p1).then(function(ok){
+        btn.disabled = false;
+        btn.innerHTML = orig;
+        if(!ok){
+            showSetupError("Gagal menyimpan ke Firebase. Cek koneksi.");
+            return;
+        }
+        showToast("✓ Password DevPanel berhasil dibuat!");
+
+        fetchUserFromFirebase(username).then(function(fbResult){
+            if(!fbResult.ok){
+                showSetupError("Gagal verifikasi setelah simpan");
+                return;
+            }
+            fetchUserTier(username).then(function(tierInfo){
+                const tier = tierInfo.tier;
+                const rank = TIER_RANK[tier] || 0;
+                if(rank < 3){
+                    showSetupError("Akun bukan DEVELOPER (tier: " + tier + ")");
+                    return;
+                }
+                ACTIVE_USER = { username: username, user: fbResult.userData };
+                USER_TIER = tier;
+                saveSession(username);
+                pendingSetupUsername = null;
+                bootPanel();
+            });
+        });
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOGIN PROCESS
+   ═══════════════════════════════════════════════════════════════ */
+function doLogin(){
+    if(loginBusy) return;
+
+    const unameEl = document.getElementById("loginUsername");
+    const passEl = document.getElementById("loginPassword");
+    const capEl = document.getElementById("loginCaptcha");
+
+    const username = (unameEl.value || "").trim().toLowerCase();
+    const password = (passEl.value || "");
+    const captchaInput = (capEl.value || "").trim();
+
+    hideLoginError();
+
+    if(username === ""){ showLoginError("Username tidak boleh kosong"); unameEl.focus(); return; }
+    if(password === ""){ showLoginError("Password tidak boleh kosong"); passEl.focus(); return; }
+    if(captchaInput === ""){ showLoginError("Isi captcha terlebih dahulu"); capEl.focus(); return; }
+    if(!validateCaptcha()){ showLoginError("Captcha salah! Coba lagi."); refreshCaptcha(); capEl.focus(); return; }
+
+    loginBusy = true;
+    const btn = document.getElementById("loginBtn");
+    btn.disabled = true;
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<div class="spinner" style="width:22px;height:22px;border-width:2.5px;border-color:rgba(0,0,0,.2);border-top-color:#080808;"></div> MEMVERIFIKASI...';
+
+    if(navigator.vibrate) navigator.vibrate(20);
+
+    fetchUserFromFirebase(username).then(function(fbResult){
+        const localUsers = getLocalUsers();
+        const localUser = localUsers[username];
+        const localPass = localUser ? findPassword(localUser) : null;
+
+        if(!fbResult.ok && fbResult.reason === "user_not_found" && !localUser){
+            loginBusy = false;
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+            showLoginError("Username tidak terdaftar");
+            refreshCaptcha();
+            return;
+        }
+
+        let expectedPassword = null;
+        let source = null;
+        if(fbResult.ok && fbResult.fbPassword){
+            expectedPassword = fbResult.fbPassword;
+            source = "firebase";
+        } else if(localPass){
+            expectedPassword = localPass.value;
+            source = "localStorage";
+        }
+
+        if(!expectedPassword){
+            loginBusy = false;
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+            console.log("[LOGIN] Belum ada password, masuk mode setup");
+            showSetupScreen(username);
+            return;
+        }
+
+        const inputTrim = password.trim();
+        const storedTrim = String(expectedPassword).trim();
+        let matched = false;
+        if(inputTrim === storedTrim) matched = true;
+        else if(inputTrim.toLowerCase() === storedTrim.toLowerCase()) matched = true;
+
+        if(!matched){
+            loginBusy = false;
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+            showLoginError("Password salah");
+            refreshCaptcha();
+            if(navigator.vibrate) navigator.vibrate([50, 30, 50]);
+            console.warn("[LOGIN] ❌ Password tidak cocok dari " + source);
+            return;
+        }
+
+        console.log("[LOGIN] ✅ Password cocok dari " + source);
+
+        const migratePromise = (source === "localStorage")
+            ? savePasswordToFirebase(username, expectedPassword)
+            : Promise.resolve(true);
+
+        migratePromise.then(function(migrated){
+            if(migrated && source === "localStorage"){
+                console.log("[MIGRATE] ✅ Password dimigrasikan ke Firebase");
+                showToast("✓ Password disimpan ke Firebase");
+            }
+
+            fetchUserTier(username).then(function(tierInfo){
+                const tier = tierInfo.tier;
+                const rank = TIER_RANK[tier] || 0;
+
+                if(rank < 3){
+                    loginBusy = false;
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    showLoginError("Akun bukan DEVELOPER (tier: " + tier + ")");
+                    refreshCaptcha();
+                    return;
+                }
+
+                const userData = fbResult.ok ? fbResult.userData : (localUser || {});
+                ACTIVE_USER = { username: username, user: userData };
+                USER_TIER = tier;
+                saveSession(username);
+
+                btn.innerHTML = originalHtml;
+                loginBusy = false;
+
+                console.log("[LOGIN] ✅✅ LOGIN BERHASIL! Tier:", tier);
+                showToast("✓ Login berhasil sebagai " + (userData.name || username));
+                bootPanel();
+            });
+        });
+    }).catch(function(err){
+        console.error("[LOGIN] Error:", err);
+        loginBusy = false;
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+        showLoginError("Error: " + err.message);
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BOOT PANEL
+   ═══════════════════════════════════════════════════════════════ */
+function bootPanel(){
+    showApp();
+    const name = (ACTIVE_USER.user && ACTIVE_USER.user.name) ? ACTIVE_USER.user.name : ACTIVE_USER.username;
+    document.getElementById("userName").textContent = name.toUpperCase();
+    document.getElementById("userTier").textContent = USER_TIER;
+    document.getElementById("userAvatar").textContent = (name.charAt(0) || "A").toUpperCase();
+    attachCodesListener();
+}
+
+function logoutDevPanel(){
+    if(!confirm("Yakin ingin logout dari DevPanel?")) return;
+    if(codesListener){ try{ codesListener.off(); }catch(e){} codesListener = null; }
+    clearSession();
+    ACTIVE_USER = null;
+    USER_TIER = "FREE";
+    allCodes = [];
+    lastGeneratedCode = "";
+    document.getElementById("loginUsername").value = "";
+    document.getElementById("loginPassword").value = "";
+    showLoginScreen();
+    showToast("✓ Logout berhasil");
+    if(navigator.vibrate) navigator.vibrate(30);
+}
+
+function tryAutoBoot(){
+    const session = getSession();
+    if(!session || !session.username){ showLoginScreen(); return; }
+
+    showLoading("MEMVERIFIKASI SESI", "Memuat akun " + session.username + "...");
+    const username = session.username.toLowerCase();
+
+    fetchUserFromFirebase(username).then(function(result){
+        if(!result.ok || !result.fbPassword){
+            clearSession();
+            showLoginScreen();
+            return;
+        }
+        fetchUserTier(username).then(function(tierInfo){
+            const tier = tierInfo.tier;
+            const rank = TIER_RANK[tier] || 0;
+            if(rank < 3){
+                clearSession();
+                showLock("AKSES DITOLAK", "Akun " + username + " bukan DEVELOPER (tier: " + tier + ").");
+                return;
+            }
+            ACTIVE_USER = { username: username, user: result.userData };
+            USER_TIER = tier;
+            saveSession(username);
+            bootPanel();
+        });
+    }).catch(function(err){
+        console.error("[AUTOBOOT]", err);
+        showLoginScreen();
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILS
+   ═══════════════════════════════════════════════════════════════ */
+function escapeHtml(s){
+    if(s === null || s === undefined) return "";
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+}
+function formatRupiah(n){
+    return new Intl.NumberFormat("id-ID", { style:"currency", currency:"IDR", minimumFractionDigits:0, maximumFractionDigits:0 }).format(n || 0);
+}
+function formatDate(ts){
+    if(!ts) return "-";
+    return new Date(ts).toLocaleString("id-ID", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit", hour12:false });
+}
+let toastTimer = null;
+function showToast(msg){
+    const el = document.getElementById("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 2500);
+}
+function vibrate(p){ if(navigator.vibrate) navigator.vibrate(p); }
+
+/* ═══════════════════════════════════════════════════════════════
+   GENERATE CODE
+   ═══════════════════════════════════════════════════════════════ */
+function genSegment(len){
+    const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    let s = "";
+    for(let i=0;i<len;i++) s += chars.charAt(Math.floor(Math.random()*chars.length));
+    return s;
+}
+function genCode(){ return CODE_PREFIX + "-" + genSegment(4) + "-" + genSegment(4) + "-" + genSegment(4) + "-" + genSegment(4); }
+function selectType(type){
+    selectedType = type;
+    document.querySelectorAll(".type-btn").forEach(function(b){ b.classList.toggle("active", b.dataset.type === type); });
+    const showWallet = (type === "wallet" || type === "bundle");
+    const showTier = (type === "tier" || type === "bundle");
+    document.getElementById("fieldWallet").style.display = showWallet ? "block" : "none";
+    document.getElementById("fieldTier").style.display = showTier ? "block" : "none";
+    document.getElementById("fieldTierType").style.display = showTier ? "block" : "none";
+    toggleTierDuration();
+    vibrate(15);
+}
+function toggleTierDuration(){
+    const typeEl = document.getElementById("inputTierType");
+    const field = document.getElementById("fieldTierDuration");
+    if(!typeEl || !field) return;
+    const show = (selectedType === "tier" || selectedType === "bundle") && typeEl.value === "monthly";
+    field.style.display = show ? "block" : "none";
+}
+function buildPayload(){
+    let payload = {
+        type: selectedType,
+        createdBy: ACTIVE_USER.username.toLowerCase(),
+        createdAt: Date.now(),
+        used: false, usedBy: null, usedAt: null
+    };
+    if(selectedType === "wallet" || selectedType === "bundle"){
+        const amt = parseInt(document.getElementById("inputWallet").value, 10);
+        if(!Number.isFinite(amt) || amt < 1000 || amt > 50000){ showToast("Jumlah wallet harus Rp1.000 - Rp50.000"); return null; }
+        payload.amount = amt;
+    }
+    if(selectedType === "tier" || selectedType === "bundle"){
+        payload.tier = document.getElementById("inputTier").value;
+        payload.tierType = document.getElementById("inputTierType").value;
+        if(payload.tierType === "monthly"){
+            const dur = parseInt(document.getElementById("inputTierDuration").value, 10);
+            if(!Number.isFinite(dur) || dur < 1 || dur > 365){ showToast("Durasi harus antara 1 - 365 hari"); return null; }
+            payload.tierDuration = dur;
+        } else { payload.tierDuration = 0; }
+    }
+    return payload;
+}
+function generateCodes(){
+    if(!FIREBASE_READY || !FIREBASE_DB){ showToast("Firebase belum tersambung"); return; }
+    if(!ACTIVE_USER){ showToast("Harus login dulu"); return; }
+
+    const payload = buildPayload();
+    if(!payload) return;
+
+    const batch = Math.max(1, Math.min(50, parseInt(document.getElementById("inputBatch").value, 10) || 1));
+    const codes = [];
+    for(let i=0;i<batch;i++) codes.push(genCode());
+
+    showToast("⏳ Generating " + batch + " kode...");
+    vibrate(30);
+
+    const checks = codes.map(function(c){ return FIREBASE_DB.ref("redeem_codes/"+c).once("value"); });
+    Promise.all(checks).then(function(snaps){
+        for(let i=0;i<snaps.length;i++){
+            let tries = 0;
+            while(snaps[i].exists() && tries < 5){ codes[i] = genCode(); tries++; }
+        }
+        const updates = {};
+        codes.forEach(function(c){ updates["redeem_codes/"+c] = payload; });
+        return FIREBASE_DB.ref().update(updates);
+    }).then(function(){
+        const code = codes[0];
+        lastGeneratedCode = code;
+        document.getElementById("resultLabel").textContent = batch > 1 ? (batch + " KODE BERHASIL DIBUAT — KODE PERTAMA:") : "KODE BERHASIL DIBUAT";
+        document.getElementById("resultCode").textContent = code;
+        document.getElementById("resultCard").classList.add("show");
+        showToast("✓ " + batch + " kode berhasil dibuat!");
+        vibrate([60, 40, 60]);
+        document.getElementById("resultCard").scrollIntoView({behavior:"smooth", block:"center"});
+    }).catch(function(err){
+        console.error("[GEN]", err);
+        showToast("Gagal: " + err.message);
+    });
+}
+function copyResultCode(){ if(!lastGeneratedCode){ showToast("Tidak ada kode"); return; } copyToClipboard(lastGeneratedCode, "✓ Kode disalin ke clipboard"); }
+function shareResultCode(){
+    if(!lastGeneratedCode){ showToast("Tidak ada kode"); return; }
+    const text = "🎁 " + CODE_PREFIX + " Redeem Code:\n" + lastGeneratedCode;
+    if(navigator.share){ navigator.share({ title:CODE_PREFIX + " Redeem Code", text:text }).catch(function(){}); }
+    else { copyToClipboard(lastGeneratedCode, "✓ Kode disalin"); }
+}
+function copyToClipboard(text, okMsg){
+    try{
+        if(navigator.clipboard){
+            navigator.clipboard.writeText(text).then(function(){ showToast(okMsg); vibrate(30); }).catch(function(){ fallbackCopy(text, okMsg); });
+        } else { fallbackCopy(text, okMsg); }
+    }catch(e){ fallbackCopy(text, okMsg); }
+}
+function fallbackCopy(text, okMsg){
+    try{
+        const ta = document.createElement("textarea");
+        ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        document.execCommand("copy"); document.body.removeChild(ta);
+        showToast(okMsg);
+    }catch(e){ showToast("Kode: " + text); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIST CODES
+   ═══════════════════════════════════════════════════════════════ */
+function attachCodesListener(){
+    if(codesListener){ try{ codesListener.off(); }catch(e){} codesListener = null; }
+    codesListener = FIREBASE_DB.ref("redeem_codes");
+    codesListener.on("value", function(snap){
+        const val = snap.val();
+        const list = [];
+        const myUname = ACTIVE_USER.username.toLowerCase();
+        if(val){
+            for(const code in val){
+                if(!val.hasOwnProperty(code)) continue;
+                const data = val[code];
+                if(!data || typeof data !== "object") continue;
+                if((data.createdBy || "").toString().toLowerCase() !== myUname) continue;
+                list.push({
+                    code: code,
+                    type: data.type || "wallet",
+                    amount: parseInt(data.amount || 0, 10) || 0,
+                    tier: (data.tier || "").toString().toUpperCase(),
+                    tierType: data.tierType || "permanent",
+                    tierDuration: parseInt(data.tierDuration || 0, 10) || 0,
+                    used: data.used === true,
+                    usedBy: data.usedBy || null,
+                    usedAt: parseInt(data.usedAt || 0, 10) || 0,
+                    createdAt: parseInt(data.createdAt || 0, 10) || 0
+                });
+            }
+        }
+        list.sort(function(a,b){ return (b.createdAt||0) - (a.createdAt||0); });
+        allCodes = list;
+        updateStats();
+        renderCodes();
+    }, function(err){ console.error("[CODES]", err); showToast("Gagal memuat kode: " + err.message); });
+}
+function updateStats(){
+    let total = allCodes.length, used = 0, unused = 0;
+    allCodes.forEach(function(c){ if(c.used) used++; else unused++; });
+    document.getElementById("statTotal").textContent = total;
+    document.getElementById("statUnused").textContent = unused;
+    document.getElementById("statUsed").textContent = used;
+}
+function setFilter(f){
+    currentFilter = f;
+    document.querySelectorAll(".tab").forEach(function(t){ t.classList.toggle("active", t.dataset.filter === f); });
+    renderCodes();
+    vibrate(15);
+}
+function renderCodes(){
+    const container = document.getElementById("codeList");
+    let list = allCodes.slice();
+    if(currentFilter === "unused") list = list.filter(function(c){ return !c.used; });
+    if(currentFilter === "used") list = list.filter(function(c){ return c.used; });
+
+    if(list.length === 0){
+        container.innerHTML =
+            '<div class="empty">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">' +
+                    '<circle cx="7" cy="12" r="3"/>' +
+                    '<path d="M10 12h11"/>' +
+                    '<path d="M18 12v3"/>' +
+                '</svg>' +
+                '<h4>' + (currentFilter === "all" ? "BELUM ADA KODE" : "TIDAK ADA HASIL") + '</h4>' +
+                '<p>' + (currentFilter === "all" ? "Buat kode pertama kamu dengan form di atas" : "Tidak ada kode dengan filter ini") + '</p>' +
+            '</div>';
+        return;
+    }
+
+    let html = "";
+    list.forEach(function(item){
+        let rewardTags = "";
+        if(item.type === "wallet" || item.type === "bundle"){
+            rewardTags += '<span class="reward-tag wallet">💰 ' + formatRupiah(item.amount) + '</span>';
+        }
+        if(item.type === "tier" || item.type === "bundle"){
+            const durText = item.tierType === "monthly" ? " (" + item.tierDuration + "H)" : " PERMANEN";
+            rewardTags += '<span class="reward-tag tier">⭐ ' + item.tier + durText + '</span>';
+        }
+        let meta = "Dibuat: " + formatDate(item.createdAt);
+        if(item.used){ meta += " • Dipakai oleh: " + (item.usedBy || "?") + " (" + formatDate(item.usedAt) + ")"; }
+
+        const codeEsc = item.code.replace(/'/g, "\\'");
+        html +=
+            '<div class="code-item' + (item.used ? ' used' : '') + '">' +
+                '<div class="code-item-head">' +
+                    '<div class="code-item-code">' + escapeHtml(item.code) + '</div>' +
+                    '<button class="code-item-copy" onclick="copyToClipboard(\'' + codeEsc + '\', \'✓ Kode disalin\')" title="Salin">' +
+                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                            '<rect x="9" y="9" width="13" height="13" rx="2"/>' +
+                            '<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>' +
+                        '</svg>' +
+                    '</button>' +
+                '</div>' +
+                '<div class="code-item-reward">' + rewardTags + '</div>' +
+                '<div class="code-item-meta">' + escapeHtml(meta) + '</div>' +
+                '<div class="code-item-actions">' +
+                    '<button class="btn-copy" onclick="copyToClipboard(\'' + codeEsc + '\', \'✓ Kode disalin\')">' +
+                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                            '<rect x="9" y="9" width="13" height="13" rx="2"/>' +
+                            '<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>' +
+                        '</svg>SALIN</button>' +
+                    '<button class="btn-del" onclick="deleteCode(\'' + codeEsc + '\')">' +
+                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                            '<path d="M3 6h18"/>' +
+                            '<path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>' +
+                            '<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>' +
+                        '</svg>HAPUS</button>' +
+                '</div>' +
+            '</div>';
+    });
+    container.innerHTML = html;
+}
+function deleteCode(code){
+    if(!confirm("Hapus kode " + code + "?\n\nTindakan ini tidak bisa dibatalkan.")) return;
+    if(!FIREBASE_DB) return;
+    FIREBASE_DB.ref("redeem_codes/"+code).remove().then(function(){
+        showToast("✓ Kode dihapus"); vibrate(40);
+    }).catch(function(err){ showToast("Gagal hapus: " + err.message); });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EVENT LISTENERS
+   ═══════════════════════════════════════════════════════════════ */
+document.getElementById("loginUsername").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); document.getElementById("loginPassword").focus(); }
+});
+document.getElementById("loginPassword").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); document.getElementById("loginCaptcha").focus(); }
+});
+document.getElementById("loginCaptcha").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); doLogin(); }
+});
+document.getElementById("loginUsername").addEventListener("input", hideLoginError);
+document.getElementById("loginPassword").addEventListener("input", hideLoginError);
+document.getElementById("loginCaptcha").addEventListener("input", function(){
+    hideLoginError();
+    this.value = this.value.toUpperCase();
+});
+document.getElementById("setupPassword2").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); submitSetupPassword(); }
+});
+document.getElementById("setupPassword1").addEventListener("input", hideSetupError);
+document.getElementById("setupPassword2").addEventListener("input", hideSetupError);
+
+/* ═══════════════════════════════════════════════════════════════
+   BOOT
+   ═══════════════════════════════════════════════════════════════ */
+(function boot(){
+    showLoading("MEMUAT DEVPANEL", "Menghubungkan ke Firebase...");
+    const ok = initFirebase();
+    setTimeout(function(){
+        if(!ok || !FIREBASE_READY){
+            showLock("FIREBASE ERROR", "Tidak dapat terhubung ke Firebase. Periksa koneksi internet kamu.");
+            return;
+        }
+        tryAutoBoot();
+    }, 500);
+})();
+</script>
+</body>
+</html>

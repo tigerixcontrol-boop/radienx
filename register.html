@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI JUDUL HALAMAN SESUAI BRAND ANDA
+     ═══════════════════════════════════════════════════════════ -->
+<title>REGISTER • APPNAME</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI FONT SESUAI BRAND ANDA (opsional)
+     ═══════════════════════════════════════════════════════════ -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE SDK — biarkan seperti ini (versi 10.12.2)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<style>
+
+/* =========================================================
+   REGISTER PAGE
+   CYBERPUNK BLACK & WHITE
+   ========================================================= */
+
+:root{
+    --black:#050505;
+    --black2:#090909;
+    --black3:#101010;
+    --panel:#111111;
+    --panel2:#151515;
+    --white:#ffffff;
+    --white2:#eeeeee;
+    --gray:#a2a2a2;
+    --gray2:#707070;
+    --gray3:#3a3a3a;
+    --line:rgba(255,255,255,.12);
+    --line2:rgba(255,255,255,.20);
+    --ok:#4ade80;
+    --err:#f87171;
+}
+
+*{
+    margin:0;padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html{
+    width:100%;min-height:100%;
+    background:#000;
+    scroll-behavior:smooth;
+}
+
+body{
+    width:100%;
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 50% -10%, rgba(255,255,255,.07), transparent 32%),
+        radial-gradient(circle at 100% 40%, rgba(255,255,255,.025), transparent 35%),
+        #050505;
+    color:#fff;
+    font-family:'Rajdhani',Arial,Helvetica,sans-serif;
+    overflow-x:hidden;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding:30px 16px 40px;
+    position:relative;
+}
+
+body::before{
+    content:"";position:fixed;inset:0;
+    background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+    background-size:34px 34px;
+    pointer-events:none;z-index:0;
+}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:#050505;}
+::-webkit-scrollbar-thumb{background:#444;border-radius:20px;}
+
+/* =========================================================
+   WRAPPER
+   ========================================================= */
+
+.register-wrapper{
+    width:100%;
+    max-width:460px;
+    position:relative;
+    z-index:1;
+}
+
+/* =========================================================
+   HEADER LOGO
+   ========================================================= */
+
+.register-header{
+    text-align:center;
+    margin-bottom:24px;
+}
+
+.register-logo{
+    width:170px;
+    height:58px;
+    margin:0 auto 18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.register-logo img{
+    width:100%;
+    max-width:170px;
+    max-height:55px;
+    object-fit:contain;
+    display:block;
+    filter:drop-shadow(0 0 8px rgba(255,255,255,.2));
+}
+
+.register-title{
+    font-family:'Orbitron',sans-serif;
+    font-size:24px;
+    font-weight:900;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    text-shadow:0 0 14px rgba(255,255,255,.18);
+    margin-bottom:8px;
+}
+
+.register-subtitle{
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:3px;
+    color:#777;
+}
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.register-card{
+    background:linear-gradient(160deg, rgba(255,255,255,.075), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:30px;
+    padding:28px 22px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.6),
+        inset 0 0 60px rgba(255,255,255,.02);
+}
+
+.register-card::before{
+    content:"";position:absolute;
+    width:220px;height:220px;border-radius:50%;
+    background:rgba(255,255,255,.05);
+    top:-120px;right:-90px;
+    filter:blur(8px);
+    pointer-events:none;
+}
+
+.register-card::after{
+    content:"";position:absolute;
+    width:180px;height:180px;border-radius:50%;
+    background:rgba(255,255,255,.03);
+    bottom:-110px;left:-80px;
+    filter:blur(8px);
+    pointer-events:none;
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.form-field{
+    margin-bottom:16px;
+    position:relative;
+    z-index:1;
+}
+
+.form-label{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin:0 6px 8px;
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:1.5px;
+    color:#888;
+}
+
+.form-label .required{
+    color:#f87171;
+    font-size:10px;
+}
+
+.input-wrapper{
+    position:relative;
+    display:flex;
+    align-items:center;
+}
+
+.input-icon{
+    position:absolute;
+    left:16px;
+    top:50%;
+    transform:translateY(-50%);
+    width:18px;
+    height:18px;
+    color:#666;
+    pointer-events:none;
+    z-index:2;
+    transition:.2s;
+}
+
+.form-input{
+    width:100%;
+    height:56px;
+    border-radius:17px;
+    border:1px solid rgba(255,255,255,.15);
+    background:#0d0d0d;
+    color:#fff;
+    padding:0 16px 0 46px;
+    font-family:'Rajdhani',sans-serif;
+    font-size:15px;
+    font-weight:600;
+    outline:none;
+    transition:.2s;
+    position:relative;
+    z-index:1;
+}
+
+.form-input:focus{
+    border-color:rgba(255,255,255,.45);
+    background:#141414;
+    box-shadow:0 0 25px rgba(255,255,255,.06);
+}
+
+.form-input:focus + .input-icon,
+.input-wrapper:focus-within .input-icon{
+    color:#fff;
+}
+
+.form-input::placeholder{
+    color:#555;
+}
+
+/* Input password dengan toggle mata */
+
+.form-input.password{
+    padding-right:52px;
+}
+
+.toggle-pass{
+    position:absolute;
+    right:14px;
+    top:50%;
+    transform:translateY(-50%);
+    width:36px;
+    height:36px;
+    border:0;
+    outline:none;
+    background:transparent;
+    color:#666;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:11px;
+    transition:.2s;
+    z-index:2;
+}
+
+.toggle-pass:hover{
+    color:#fff;
+    background:#1a1a1a;
+}
+
+.toggle-pass svg{
+    width:18px;
+    height:18px;
+}
+
+/* Error text */
+
+.field-error{
+    display:none;
+    margin:6px 6px 0;
+    color:#f87171;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.3px;
+}
+
+.field-error.show{
+    display:block;
+    animation:shake .3s;
+}
+
+@keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-4px);}
+    75%{transform:translateX(4px);}
+}
+
+/* Success validation */
+
+.form-input.valid{
+    border-color:rgba(74,222,128,.5);
+}
+
+.form-input.invalid{
+    border-color:rgba(248,113,113,.55);
+}
+
+/* =========================================================
+   PASSWORD STRENGTH
+   ========================================================= */
+
+.password-strength{
+    display:flex;
+    gap:5px;
+    margin:8px 6px 0;
+}
+
+.strength-bar{
+    flex:1;
+    height:4px;
+    border-radius:10px;
+    background:#1a1a1a;
+    transition:.3s;
+}
+
+.strength-bar.active.weak{background:#f87171;}
+.strength-bar.active.medium{background:#fbbf24;}
+.strength-bar.active.strong{background:#4ade80;}
+
+.strength-text{
+    margin:6px 6px 0;
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:1px;
+    color:#666;
+    text-align:right;
+    transition:.2s;
+}
+
+.strength-text.weak{color:#f87171;}
+.strength-text.medium{color:#fbbf24;}
+.strength-text.strong{color:#4ade80;}
+
+/* =========================================================
+   CHECKBOX TERMS
+   ========================================================= */
+
+.terms-row{
+    display:flex;
+    align-items:flex-start;
+    gap:11px;
+    margin:20px 4px 22px;
+    cursor:pointer;
+    position:relative;
+    z-index:1;
+}
+
+.terms-row input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+}
+
+.custom-checkbox{
+    width:22px;
+    height:22px;
+    flex-shrink:0;
+    border-radius:7px;
+    border:1px solid rgba(255,255,255,.2);
+    background:#0d0d0d;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.2s;
+    margin-top:1px;
+}
+
+.custom-checkbox svg{
+    width:13px;
+    height:13px;
+    color:#080808;
+    opacity:0;
+    transform:scale(.5);
+    transition:.2s;
+}
+
+.terms-row input:checked + .custom-checkbox{
+    background:#f2f2f2;
+    border-color:#f2f2f2;
+}
+
+.terms-row input:checked + .custom-checkbox svg{
+    opacity:1;
+    transform:scale(1);
+}
+
+.terms-text{
+    font-size:12px;
+    color:#999;
+    line-height:1.5;
+    font-weight:600;
+}
+
+.terms-text b{
+    color:#fff;
+    font-weight:800;
+}
+
+/* =========================================================
+   SUBMIT BUTTON
+   ========================================================= */
+
+.register-btn{
+    width:100%;
+    height:60px;
+    border:0;
+    outline:none;
+    border-radius:20px;
+    background:#f2f2f2;
+    color:#080808;
+    font-family:'Orbitron',sans-serif;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:1.5px;
+    cursor:pointer;
+    transition:.2s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    position:relative;
+    z-index:1;
+    box-shadow:0 10px 30px rgba(255,255,255,.1);
+    margin-bottom:14px;
+}
+
+.register-btn:active{
+    transform:scale(.97);
+}
+
+.register-btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+.register-btn svg{
+    width:18px;
+    height:18px;
+}
+
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+.divider-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:16px 0;
+    position:relative;
+    z-index:1;
+}
+
+.divider-row .line{
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent);
+}
+
+.divider-row .text{
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:2px;
+    color:#555;
+}
+
+/* =========================================================
+   LOGIN LINK
+   ========================================================= */
+
+.login-box{
+    text-align:center;
+    margin-top:20px;
+    position:relative;
+    z-index:1;
+}
+
+.login-box p{
+    font-size:12px;
+    color:#777;
+    font-weight:600;
+    margin-bottom:10px;
+}
+
+.login-box a{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    color:#fff;
+    font-family:'Orbitron',sans-serif;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.2px;
+    text-decoration:none;
+    padding:12px 22px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.18);
+    background:#111;
+    transition:.2s;
+}
+
+.login-box a:hover{
+    background:#1c1c1c;
+    border-color:rgba(255,255,255,.35);
+}
+
+.login-box a svg{
+    width:14px;
+    height:14px;
+}
+
+/* =========================================================
+   INFO FOOTER
+   ========================================================= */
+
+.register-footer{
+    text-align:center;
+    margin-top:24px;
+    color:#555;
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;
+    letter-spacing:2px;
+    font-weight:800;
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+.toast{
+    position:fixed;
+    left:50%;
+    bottom:35px;
+    transform:translate(-50%,20px);
+    background:#151515;
+    border:1px solid rgba(255,255,255,.18);
+    color:#fff;
+    padding:14px 22px;
+    border-radius:16px;
+    font-size:11.5px;
+    font-weight:700;
+    opacity:0;
+    visibility:hidden;
+    transition:.3s cubic-bezier(.2,.8,.2,1);
+    z-index:9999;
+    box-shadow:0 15px 45px rgba(0,0,0,.7);
+    max-width:90vw;
+    text-align:center;
+    letter-spacing:.3px;
+}
+
+.toast.show{
+    opacity:1;
+    visibility:visible;
+    transform:translate(-50%,0);
+}
+
+.toast.success{
+    border-color:rgba(74,222,128,.4);
+    box-shadow:0 15px 45px rgba(74,222,128,.15);
+}
+
+.toast.error{
+    border-color:rgba(248,113,113,.4);
+    box-shadow:0 15px 45px rgba(248,113,113,.15);
+}
+
+/* =========================================================
+   SUCCESS OVERLAY
+   ========================================================= */
+
+.success-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.85);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:10000;
+    opacity:0;
+    visibility:hidden;
+    transition:.35s;
+}
+
+.success-overlay.active{
+    opacity:1;
+    visibility:visible;
+}
+
+.success-box{
+    width:100%;
+    max-width:360px;
+    background:linear-gradient(160deg, #181818, #080808);
+    border:1px solid rgba(74,222,128,.35);
+    border-radius:30px;
+    padding:36px 26px;
+    text-align:center;
+    transform:translateY(20px) scale(.95);
+    transition:.4s cubic-bezier(.2,.8,.2,1);
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.85),
+        0 0 60px rgba(74,222,128,.1);
+}
+
+.success-overlay.active .success-box{
+    transform:translateY(0) scale(1);
+}
+
+.success-icon{
+    width:76px;
+    height:76px;
+    border-radius:50%;
+    background:#0d0d0d;
+    border:2px solid rgba(74,222,128,.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 22px;
+    box-shadow:0 0 30px rgba(74,222,128,.25);
+    animation:successPop .5s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes successPop{
+    0%{transform:scale(.4);opacity:0;}
+    60%{transform:scale(1.1);}
+    100%{transform:scale(1);opacity:1;}
+}
+
+.success-icon svg{
+    width:38px;
+    height:38px;
+    color:#4ade80;
+}
+
+.success-title{
+    font-family:'Orbitron',sans-serif;
+    font-size:17px;
+    font-weight:900;
+    letter-spacing:1.5px;
+    margin-bottom:10px;
+    color:#fff;
+}
+
+.success-text{
+    font-size:12.5px;
+    color:#999;
+    line-height:1.6;
+    font-weight:600;
+    margin-bottom:24px;
+}
+
+.success-btn{
+    width:100%;
+    height:54px;
+    border:0;
+    outline:none;
+    border-radius:17px;
+    background:#f2f2f2;
+    color:#080808;
+    font-family:'Orbitron',sans-serif;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.2px;
+    cursor:pointer;
+    transition:.2s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.success-btn:active{transform:scale(.97);}
+
+.success-btn svg{
+    width:16px;
+    height:16px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media(max-width:390px){
+    body{padding:24px 12px 30px;}
+    .register-card{padding:24px 18px;}
+    .register-title{font-size:21px;}
+    .register-logo{width:150px;height:50px;}
+    .register-logo img{max-width:150px;}
+    .form-input{height:52px;font-size:14px;}
+    .register-btn{height:56px;}
+    .success-box{padding:30px 22px;}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="register-wrapper">
+
+    <!-- ================= HEADER ================= -->
+    <div class="register-header">
+
+        <!-- ═══════════════════════════════════════════════════════════
+             GANTI LOGO ANDA DI SINI (header.png)
+             Taruh file logo di folder yang sama dengan file HTML ini
+             ═══════════════════════════════════════════════════════════ -->
+        <div class="register-logo">
+            <img src="header.png" alt="LOGO" onerror="this.style.display='none';">
+        </div>
+
+        <div class="register-title">DAFTAR AKUN</div>
+        <!-- ═══════════════════════════════════════════════════════════
+             GANTI SUBTITLE DI BAWAH INI DENGAN BRAND ANDA
+             ═══════════════════════════════════════════════════════════ -->
+        <div class="register-subtitle">APPNAME CONTROL SYSTEM</div>
+
+    </div>
+
+    <!-- ================= CARD ================= -->
+    <div class="register-card">
+
+        <!-- ===== NAMA ===== -->
+        <div class="form-field">
+            <div class="form-label">
+                <span>NAMA LENGKAP</span>
+                <span class="required">*</span>
+            </div>
+            <div class="input-wrapper">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M4 21c.8-4 3.5-6 8-6s7.2 2 8 6"/>
+                </svg>
+                <input class="form-input" id="inputName" type="text" maxlength="40"
+                       placeholder="Masukkan nama lengkap"
+                       autocomplete="name">
+            </div>
+            <div class="field-error" id="errName">Nama minimal 3 karakter</div>
+        </div>
+
+        <!-- ===== USERNAME ===== -->
+        <div class="form-field">
+            <div class="form-label">
+                <span>USERNAME</span>
+                <span class="required">*</span>
+            </div>
+            <div class="input-wrapper">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="7" r="3.5"/>
+                    <path d="M5 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/>
+                    <path d="M17 3.5l1.5 1.5-1.5 1.5"/>
+                </svg>
+                <input class="form-input" id="inputUsername" type="text" maxlength="20"
+                       placeholder="huruf, angka, underscore"
+                       autocomplete="username"
+                       style="text-transform:lowercase;">
+            </div>
+            <div class="field-error" id="errUsername">Username 3-20 karakter (a-z, 0-9, _)</div>
+        </div>
+
+        <!-- ===== EMAIL ===== -->
+        <div class="form-field">
+            <div class="form-label">
+                <span>EMAIL</span>
+                <span class="required">*</span>
+            </div>
+            <div class="input-wrapper">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="3" y="5" width="18" height="14" rx="2"/>
+                    <path d="M3 7l9 6 9-6"/>
+                </svg>
+                <input class="form-input" id="inputEmail" type="email"
+                       placeholder="contoh@email.com"
+                       autocomplete="email">
+            </div>
+            <div class="field-error" id="errEmail">Format email tidak valid</div>
+        </div>
+
+        <!-- ===== PASSWORD ===== -->
+        <div class="form-field">
+            <div class="form-label">
+                <span>KATA SANDI</span>
+                <span class="required">*</span>
+            </div>
+            <div class="input-wrapper">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="4" y="10" width="16" height="10" rx="2"/>
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+                </svg>
+                <input class="form-input password" id="inputPassword" type="password"
+                       placeholder="Minimal 6 karakter"
+                       autocomplete="new-password">
+                <button class="toggle-pass" onclick="togglePassword('inputPassword', this)" type="button" tabindex="-1">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Password strength -->
+            <div class="password-strength" id="strengthBars">
+                <div class="strength-bar"></div>
+                <div class="strength-bar"></div>
+                <div class="strength-bar"></div>
+            </div>
+            <div class="strength-text" id="strengthText">—</div>
+
+            <div class="field-error" id="errPassword">Kata sandi minimal 6 karakter</div>
+        </div>
+
+        <!-- ===== KONFIRMASI PASSWORD ===== -->
+        <div class="form-field">
+            <div class="form-label">
+                <span>KONFIRMASI KATA SANDI</span>
+                <span class="required">*</span>
+            </div>
+            <div class="input-wrapper">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="4" y="10" width="16" height="10" rx="2"/>
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+                    <path d="M9 15l2 2 4-4"/>
+                </svg>
+                <input class="form-input password" id="inputConfirm" type="password"
+                       placeholder="Ulangi kata sandi"
+                       autocomplete="new-password">
+                <button class="toggle-pass" onclick="togglePassword('inputConfirm', this)" type="button" tabindex="-1">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="field-error" id="errConfirm">Konfirmasi kata sandi tidak cocok</div>
+        </div>
+
+        <!-- ===== TERMS ===== -->
+        <label class="terms-row">
+            <input type="checkbox" id="inputTerms">
+            <div class="custom-checkbox">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <path d="M20 6L9 17l-5-5"/>
+                </svg>
+            </div>
+            <!-- ═══════════════════════════════════════════════════════════
+                 GANTI "APPNAME" DI BAWAH INI DENGAN BRAND ANDA
+                 ═══════════════════════════════════════════════════════════ -->
+            <div class="terms-text">
+                Saya setuju dengan <b>Syarat & Ketentuan</b> serta <b>Kebijakan Privasi</b> APPNAME
+            </div>
+        </label>
+
+        <!-- ===== SUBMIT ===== -->
+        <button class="register-btn" id="registerBtn" onclick="submitRegister()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            DAFTAR SEKARANG
+        </button>
+
+        <!-- ===== DIVIDER ===== -->
+        <div class="divider-row">
+            <div class="line"></div>
+            <div class="text">SUDAH PUNYA AKUN?</div>
+            <div class="line"></div>
+        </div>
+
+        <!-- ===== LOGIN LINK ===== -->
+        <!-- ═══════════════════════════════════════════════════════════
+             GANTI PATH "login.html" SESUAI FILE LOGIN ANDA
+             ═══════════════════════════════════════════════════════════ -->
+        <div class="login-box">
+            <a href="login.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                    <path d="M10 17l5-5-5-5"/>
+                    <path d="M15 12H3"/>
+                </svg>
+                MASUK KE AKUN
+            </a>
+        </div>
+
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <!-- ═══════════════════════════════════════════════════════════
+         GANTI "APPNAME" DI BAWAH INI DENGAN BRAND ANDA
+         ═══════════════════════════════════════════════════════════ -->
+    <div class="register-footer">
+        APPNAME • VERSION 1.0 • 2026
+    </div>
+
+</div>
+
+<!-- ================= TOAST ================= -->
+<div class="toast" id="toast"></div>
+
+<!-- ================= SUCCESS OVERLAY ================= -->
+<div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path d="M20 6L9 17l-5-5"/>
+            </svg>
+        </div>
+
+        <div class="success-title">REGISTRASI BERHASIL</div>
+
+        <div class="success-text">
+            Akun kamu sudah terdaftar.<br>
+            Silakan login untuk melanjutkan.
+        </div>
+
+        <button class="success-btn" onclick="goToLogin()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                <path d="M10 17l5-5-5-5"/>
+                <path d="M15 12H3"/>
+            </svg>
+            MASUK SEKARANG
+        </button>
+
+    </div>
+</div>
+
+<script>
+
+/* =========================================================
+   REGISTER — JAVASCRIPT + FIREBASE AUTH
+   ========================================================= */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡⚡⚡ KONFIGURASI FIREBASE ⚡⚡⚡
+   ═══════════════════════════════════════════════════════════════════════════
+   GANTI SEMUA VALUE DI BAWAH INI DENGAN MILIK ANDA:
+
+   1. Buka Firebase Console → Project Settings → General
+   2. Scroll ke "Your apps" → pilih Web App
+   3. Copy config dan paste ke sini
+   4. Pastikan sudah AKTIFKAN "Authentication" → "Sign-in method" → "Email/Password"
+   5. Pastikan Realtime Database sudah dibuat (bukan Firestore)
+   ═══════════════════════════════════════════════════════════════════════════ */
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDLs7Coar_Dy9bE2K4Ha_Q6wG0SmC3m75g",
+    //        ↑ GANTI dengan API Key Anda
+
+    authDomain: "https://radien-95e9d.firebaseapp.com",
+    //            ↑ GANTI dengan Auth Domain Anda
+
+    databaseURL: "https://radien-95e9d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    //             ↑ GANTI dengan Realtime Database URL Anda
+
+    projectId: "radien-95e9d",
+    //           ↑ GANTI dengan Project ID Anda
+
+    storageBucket: "https://radien-95e9d.firebasestorage.app",
+    //               ↑ GANTI dengan Storage Bucket Anda
+
+    messagingSenderId: "208676450122",
+    //                   ↑ GANTI dengan Messaging Sender ID Anda
+
+    appId: "13f1702562e36468a4dbb3"
+    //      ↑ GANTI dengan App ID Anda
+};
+
+let FIREBASE_AUTH = null;
+let FIREBASE_DB = null;
+let FIREBASE_READY = false;
+
+function initFirebase(){
+    try {
+        if (typeof firebase === "undefined") {
+            console.warn("[FIREBASE] SDK belum dimuat");
+            return false;
+        }
+        if (!firebase.apps.length) {
+            firebase.initializeApp(FIREBASE_CONFIG);
+        }
+        FIREBASE_AUTH = firebase.auth();
+        FIREBASE_DB = firebase.database();
+        FIREBASE_READY = true;
+        console.log("[FIREBASE] Initialized ✓", FIREBASE_CONFIG.projectId);
+        return true;
+    } catch (e) {
+        console.error("[FIREBASE] Init error:", e);
+        FIREBASE_READY = false;
+        return false;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ SESSION STORAGE KEYS
+   ⚠️ WAJIB SAMA dengan file login.html dan file lainnya
+   ═══════════════════════════════════════════════════════════════════════════ */
+const STORAGE_KEY_USERS = "astra_users";
+//                          ↑ GANTI kalau perlu (harus SAMA semua file)
+const STORAGE_KEY_SESSION = "astra_session";
+//                            ↑ GANTI kalau perlu (harus SAMA semua file)
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ FIREBASE DATABASE PATHS
+   ⚠️ Sesuaikan dengan struktur database Anda
+   ═══════════════════════════════════════════════════════════════════════════ */
+const DB_PATH_USERS = "astra_users";
+//                      ↑ Path utama user data (by UID)
+const DB_PATH_USER_BY_USERNAME = "astra_user_by_username";
+//                                  ↑ Path untuk lookup username → email/UID
+const DB_PATH_USERNAMES = "usernames";
+//                          ↑ Path reserve username (biar gak bisa dipakai 2x)
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ DEFAULT VALUES
+   ═══════════════════════════════════════════════════════════════════════════ */
+const DEFAULT_AVATAR = "profile.png";
+//                       ↑ GANTI dengan avatar default Anda
+const DEFAULT_TIER = "FREE";
+const DEFAULT_USER_ID_PREFIX = "ASTR-";
+//                                ↑ GANTI prefix ID user Anda
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ REDIRECT PATH
+   ═══════════════════════════════════════════════════════════════════════════ */
+const REDIRECT_AFTER_REGISTER = "login.html";
+//                                 ↑ GANTI ke halaman login Anda
+
+/* =========================================================
+   TOGGLE PASSWORD
+   ========================================================= */
+
+function togglePassword(inputId, btn){
+
+    const input = document.getElementById(inputId);
+    if(!input) return;
+
+    const isPassword = input.type === "password";
+    input.type = isPassword ? "text" : "password";
+
+    if(isPassword){
+        btn.innerHTML =
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">' +
+                '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>' +
+                '<path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>' +
+                '<path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>' +
+                '<path d="M1 1l22 22"/>' +
+            '</svg>';
+    }else{
+        btn.innerHTML =
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">' +
+                '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>' +
+                '<circle cx="12" cy="12" r="3"/>' +
+            '</svg>';
+    }
+
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+let toastTimer = null;
+
+function showToast(msg, type){
+
+    const toast = document.getElementById("toast");
+    if(!toast) return;
+
+    toast.textContent = msg;
+    toast.className = "toast show" + (type ? " " + type : "");
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(function(){
+        toast.className = "toast";
+    }, 3200);
+
+}
+
+/* =========================================================
+   FIELD ERROR
+   ========================================================= */
+
+function showError(fieldId, show){
+    const el = document.getElementById(fieldId);
+    if(!el) return;
+    if(show) el.classList.add("show");
+    else el.classList.remove("show");
+}
+
+function setInputState(inputId, state){
+    const input = document.getElementById(inputId);
+    if(!input) return;
+    input.classList.remove("valid", "invalid");
+    if(state === "valid") input.classList.add("valid");
+    if(state === "invalid") input.classList.add("invalid");
+}
+
+/* =========================================================
+   VALIDATION
+   ========================================================= */
+
+function validateName(){
+    const input = document.getElementById("inputName");
+    const val = input.value.trim();
+
+    if(val.length < 3){
+        setInputState("inputName", val.length > 0 ? "invalid" : "");
+        return false;
+    }
+    if(!/^[a-zA-Z\s\.\']+$/.test(val)){
+        setInputState("inputName", "invalid");
+        return false;
+    }
+    setInputState("inputName", "valid");
+    return true;
+}
+
+function validateUsername(){
+    const input = document.getElementById("inputUsername");
+    const val = input.value.trim().toLowerCase();
+
+    if(!/^[a-z0-9_]{3,20}$/.test(val)){
+        setInputState("inputUsername", val.length > 0 ? "invalid" : "");
+        return false;
+    }
+
+    /* ⚡ Cek username di localStorage dulu */
+    const users = getUsers();
+    if(users[val]){
+        setInputState("inputUsername", "invalid");
+        showError("errUsername", true);
+        document.getElementById("errUsername").textContent = "Username sudah digunakan";
+        return false;
+    }
+
+    document.getElementById("errUsername").textContent = "Username 3-20 karakter (a-z, 0-9, _)";
+    showError("errUsername", false);
+
+    setInputState("inputUsername", "valid");
+    return true;
+}
+
+function validateEmail(){
+    const input = document.getElementById("inputEmail");
+    const val = input.value.trim().toLowerCase();
+
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if(!re.test(val)){
+        setInputState("inputEmail", val.length > 0 ? "invalid" : "");
+        return false;
+    }
+
+    setInputState("inputEmail", "valid");
+    return true;
+}
+
+function validatePassword(){
+    const input = document.getElementById("inputPassword");
+    const val = input.value;
+
+    if(val.length < 6){
+        setInputState("inputPassword", val.length > 0 ? "invalid" : "");
+        return false;
+    }
+    setInputState("inputPassword", "valid");
+    return true;
+}
+
+function validateConfirm(){
+    const pass = document.getElementById("inputPassword").value;
+    const confirm = document.getElementById("inputConfirm").value;
+
+    if(confirm === "" || confirm !== pass){
+        setInputState("inputConfirm", confirm.length > 0 ? "invalid" : "");
+        return false;
+    }
+    setInputState("inputConfirm", "valid");
+    return true;
+}
+
+/* =========================================================
+   PASSWORD STRENGTH
+   ========================================================= */
+
+function checkPasswordStrength(){
+    const val = document.getElementById("inputPassword").value;
+    const bars = document.querySelectorAll(".strength-bar");
+    const text = document.getElementById("strengthText");
+
+    let score = 0;
+    if(val.length >= 6) score++;
+    if(val.length >= 10) score++;
+    if(/[A-Z]/.test(val)) score++;
+    if(/[0-9]/.test(val)) score++;
+    if(/[^a-zA-Z0-9]/.test(val)) score++;
+
+    let level = 0;
+    if(score >= 5) level = 3;
+    else if(score >= 3) level = 2;
+    else if(score >= 1) level = 1;
+
+    bars.forEach(function(b, i){
+        b.classList.remove("active", "weak", "medium", "strong");
+        if(i < level){
+            b.classList.add("active");
+            if(level === 1) b.classList.add("weak");
+            if(level === 2) b.classList.add("medium");
+            if(level === 3) b.classList.add("strong");
+        }
+    });
+
+    text.classList.remove("weak", "medium", "strong");
+
+    if(val === ""){
+        text.textContent = "—";
+    }else if(level === 1){
+        text.textContent = "LEMAH";
+        text.classList.add("weak");
+    }else if(level === 2){
+        text.textContent = "SEDANG";
+        text.classList.add("medium");
+    }else{
+        text.textContent = "KUAT";
+        text.classList.add("strong");
+    }
+}
+
+/* =========================================================
+   STORAGE — USERS (localStorage, cache lokal)
+   ========================================================= */
+
+function getUsers(){
+    try{
+        const raw = localStorage.getItem(STORAGE_KEY_USERS);
+        return raw ? JSON.parse(raw) : {};
+    }catch(e){
+        return {};
+    }
+}
+
+function saveUsers(users){
+    localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
+}
+
+/* =========================================================
+   GENERATE USER ID
+   ========================================================= */
+
+function generateUserID(){
+    const chars = "0123456789ABCDEF";
+    let id = DEFAULT_USER_ID_PREFIX;
+    for(let i = 0; i < 6; i++){
+        id += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return id;
+}
+
+/* =========================================================
+   ⚡ SUBMIT REGISTER — FIREBASE AUTH + DATABASE
+   ========================================================= */
+
+function submitRegister(){
+
+    /* Validasi */
+    const okName = validateName();
+    const okUser = validateUsername();
+    const okEmail = validateEmail();
+    const okPass = validatePassword();
+    const okConfirm = validateConfirm();
+    const terms = document.getElementById("inputTerms").checked;
+
+    showError("errName", !okName);
+    showError("errUsername", !okUser);
+    showError("errEmail", !okEmail);
+    showError("errPassword", !okPass);
+    showError("errConfirm", !okConfirm);
+
+    if(!okName){ showToast("Periksa kembali nama kamu", "error"); document.getElementById("inputName").focus(); return; }
+    if(!okUser){ showToast("Username tidak valid atau sudah dipakai", "error"); document.getElementById("inputUsername").focus(); return; }
+    if(!okEmail){ showToast("Email tidak valid", "error"); document.getElementById("inputEmail").focus(); return; }
+    if(!okPass){ showToast("Kata sandi minimal 6 karakter", "error"); document.getElementById("inputPassword").focus(); return; }
+    if(!okConfirm){ showToast("Konfirmasi kata sandi tidak cocok", "error"); document.getElementById("inputConfirm").focus(); return; }
+    if(!terms){ showToast("Setujui syarat & ketentuan dulu", "error"); return; }
+
+    /* Cek Firebase ready */
+    if(!FIREBASE_READY || !FIREBASE_AUTH){
+        showToast("Firebase belum siap. Refresh halaman.", "error");
+        return;
+    }
+
+    const btn = document.getElementById("registerBtn");
+    btn.disabled = true;
+    btn.innerHTML =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" ' +
+            'style="animation:spin 1s linear infinite;">' +
+            '<path d="M21 12a9 9 0 1 1-6.2-8.6"/>' +
+        '</svg>MENDAFTAR...';
+
+    const name = document.getElementById("inputName").value.trim();
+    const username = document.getElementById("inputUsername").value.trim().toLowerCase();
+    const email = document.getElementById("inputEmail").value.trim().toLowerCase();
+    const password = document.getElementById("inputPassword").value;
+
+    /* ⚡ Cek dulu username di Firebase Database */
+    FIREBASE_DB.ref(DB_PATH_USERNAMES + "/" + username).once("value")
+        .then(function(snap){
+            if(snap.exists()){
+                throw { code: "username-taken", message: "Username sudah digunakan" };
+            }
+            /* ⚡ Create user di Firebase Auth */
+            return FIREBASE_AUTH.createUserWithEmailAndPassword(email, password);
+        })
+        .then(function(userCredential){
+            const user = userCredential.user;
+            const uid = user.uid;
+            const userId = generateUserID();
+
+            /* Update displayName di Auth */
+            return user.updateProfile({ displayName: name })
+                .then(function(){
+                    /* ⚡ Simpan data user ke Realtime Database */
+                    const userData = {
+                        uid: uid,
+                        id: userId,
+                        name: name,
+                        username: username,
+                        email: email,
+                        tier: DEFAULT_TIER,
+                        avatar: DEFAULT_AVATAR,
+                        wallet: 0,
+                        dailyDay: 1,
+                        dailyLastClaim: null,
+                        createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        lastLogin: firebase.database.ServerValue.TIMESTAMP
+                    };
+
+                    const updates = {};
+
+                    /* Simpan by UID */
+                    updates[DB_PATH_USERS + "/" + uid] = userData;
+
+                    /* Simpan by username (untuk lookup) */
+                    updates[DB_PATH_USER_BY_USERNAME + "/" + username] = {
+                        uid: uid,
+                        id: userId,
+                        name: name,
+                        email: email,
+                        tier: DEFAULT_TIER
+                    };
+
+                    /* Reserve username (biar gak bisa dipakai orang lain) */
+                    updates[DB_PATH_USERNAMES + "/" + username] = uid;
+
+                    return FIREBASE_DB.ref().update(updates);
+                })
+                .then(function(){
+                    /* Simpan juga di localStorage buat cache */
+                    const users = getUsers();
+                    users[username] = {
+                        uid: uid,
+                        id: userId,
+                        name: name,
+                        username: username,
+                        email: email,
+                        tier: DEFAULT_TIER,
+                        avatar: DEFAULT_AVATAR,
+                        wallet: 0,
+                        dailyDay: 1,
+                        dailyLastClaim: null,
+                        createdAt: Date.now()
+                    };
+                    saveUsers(users);
+
+                    /* ⚡ Simpan session */
+                    const session = {
+                        uid: uid,
+                        userId: userId,
+                        username: username,
+                        email: email,
+                        name: name,
+                        loginAt: Date.now()
+                    };
+                    localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
+
+                    console.log("[REGISTER] User created:", uid, username);
+
+                    /* Reset button */
+                    btn.disabled = false;
+                    btn.innerHTML =
+                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+                            '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>' +
+                            '<circle cx="9" cy="7" r="4"/>' +
+                            '<path d="M22 21v-2a4 4 0 0 0-3-3.87"/>' +
+                            '<path d="M16 3.13a4 4 0 0 1 0 7.75"/>' +
+                        '</svg>DAFTAR SEKARANG';
+
+                    /* Success overlay */
+                    document.getElementById("successOverlay").classList.add("active");
+                });
+        })
+        .catch(function(error){
+            console.error("[REGISTER] Error:", error);
+
+            /* Reset button */
+            btn.disabled = false;
+            btn.innerHTML =
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+                    '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>' +
+                    '<circle cx="9" cy="7" r="4"/>' +
+                    '<path d="M22 21v-2a4 4 0 0 0-3-3.87"/>' +
+                    '<path d="M16 3.13a4 4 0 0 1 0 7.75"/>' +
+                '</svg>DAFTAR SEKARANG';
+
+            /* Tampilkan error sesuai kode */
+            let msg = "Registrasi gagal. Coba lagi.";
+            const code = error && error.code ? error.code : "";
+
+            if(code === "username-taken"){
+                msg = "Username sudah digunakan";
+                setInputState("inputUsername", "invalid");
+                showError("errUsername", true);
+                document.getElementById("errUsername").textContent = "Username sudah digunakan";
+            }
+            else if(code === "auth/email-already-in-use"){
+                msg = "Email sudah terdaftar";
+                setInputState("inputEmail", "invalid");
+                showError("errEmail", true);
+                document.getElementById("errEmail").textContent = "Email sudah terdaftar";
+            }
+            else if(code === "auth/invalid-email"){
+                msg = "Format email tidak valid";
+                setInputState("inputEmail", "invalid");
+            }
+            else if(code === "auth/weak-password"){
+                msg = "Kata sandi terlalu lemah";
+                setInputState("inputPassword", "invalid");
+            }
+            else if(code === "auth/network-request-failed"){
+                msg = "Koneksi internet bermasalah";
+            }
+            else if(code === "auth/operation-not-allowed"){
+                msg = "Metode Email/Password belum diaktifkan di Firebase Console";
+            }
+            else if(error && error.message){
+                msg = error.message;
+            }
+
+            showToast(msg, "error");
+        });
+
+}
+
+/* =========================================================
+   GO TO LOGIN
+   ========================================================= */
+
+function goToLogin(){
+    window.location.href = REDIRECT_AFTER_REGISTER;
+}
+
+/* =========================================================
+   EVENT LISTENERS
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    /* ⚡ Init Firebase */
+    initFirebase();
+
+    /* Username: force lowercase + filter */
+    const inputUsername = document.getElementById("inputUsername");
+    if(inputUsername){
+        inputUsername.addEventListener("input", function(){
+            this.value = this.value.toLowerCase().replace(/[^a-z0-9_]/g, "");
+        });
+    }
+
+    /* Email: force lowercase */
+    const inputEmail = document.getElementById("inputEmail");
+    if(inputEmail){
+        inputEmail.addEventListener("input", function(){
+            this.value = this.value.toLowerCase();
+        });
+    }
+
+    /* Password strength */
+    const inputPassword = document.getElementById("inputPassword");
+    if(inputPassword){
+        inputPassword.addEventListener("input", function(){
+            checkPasswordStrength();
+            const confirm = document.getElementById("inputConfirm");
+            if(confirm && confirm.value !== "") validateConfirm();
+        });
+    }
+
+    /* Realtime validation */
+    const inputName = document.getElementById("inputName");
+    if(inputName){
+        inputName.addEventListener("blur", function(){
+            if(this.value.trim() !== "") validateName();
+        });
+    }
+
+    if(inputUsername){
+        inputUsername.addEventListener("blur", function(){
+            if(this.value.trim() !== "") validateUsername();
+        });
+    }
+
+    if(inputEmail){
+        inputEmail.addEventListener("blur", function(){
+            if(this.value.trim() !== "") validateEmail();
+        });
+    }
+
+    if(inputPassword){
+        inputPassword.addEventListener("blur", function(){
+            if(this.value !== "") validatePassword();
+        });
+    }
+
+    const inputConfirm = document.getElementById("inputConfirm");
+    if(inputConfirm){
+        inputConfirm.addEventListener("input", function(){
+            if(this.value !== "") validateConfirm();
+        });
+    }
+
+    /* Enter untuk submit */
+    document.addEventListener("keydown", function(e){
+        if(e.key === "Enter"){
+            const btn = document.getElementById("registerBtn");
+            if(btn && !btn.disabled) submitRegister();
+        }
+    });
+
+});
+
+</script>
+
+<style>
+@keyframes spin{
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
+}
+</style>
+
+</body>
+</html>

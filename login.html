@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI JUDUL HALAMAN SESUAI BRAND ANDA
+     ═══════════════════════════════════════════════════════════ -->
+<title>LOGIN • APPNAME</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- ═══════════════════════════════════════════════════════════
+     GANTI FONT SESUAI BRAND ANDA (opsional)
+     ═══════════════════════════════════════════════════════════ -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE SDK — biarkan seperti ini (versi 10.12.2)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<style>
+
+/* =========================================================
+   LOGIN PAGE
+   CYBERPUNK BLACK & WHITE
+   ========================================================= */
+
+:root{
+    --black:#050505;
+    --black2:#090909;
+    --black3:#101010;
+    --panel:#111111;
+    --panel2:#151515;
+    --white:#ffffff;
+    --white2:#eeeeee;
+    --gray:#a2a2a2;
+    --gray2:#707070;
+    --gray3:#3a3a3a;
+    --line:rgba(255,255,255,.12);
+    --line2:rgba(255,255,255,.20);
+    --ok:#4ade80;
+    --err:#f87171;
+}
+
+*{
+    margin:0;padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html{
+    width:100%;min-height:100%;
+    background:#000;
+    scroll-behavior:smooth;
+}
+
+body{
+    width:100%;
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 50% -10%, rgba(255,255,255,.07), transparent 32%),
+        radial-gradient(circle at 100% 40%, rgba(255,255,255,.025), transparent 35%),
+        #050505;
+    color:#fff;
+    font-family:'Rajdhani',Arial,Helvetica,sans-serif;
+    overflow-x:hidden;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:30px 16px 40px;
+    position:relative;
+}
+
+body::before{
+    content:"";position:fixed;inset:0;
+    background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+    background-size:34px 34px;
+    pointer-events:none;z-index:0;
+}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:#050505;}
+::-webkit-scrollbar-thumb{background:#444;border-radius:20px;}
+
+/* =========================================================
+   WRAPPER
+   ========================================================= */
+
+.login-wrapper{
+    width:100%;
+    max-width:440px;
+    position:relative;
+    z-index:1;
+}
+
+/* =========================================================
+   HEADER LOGO
+   ========================================================= */
+
+.login-header{
+    text-align:center;
+    margin-bottom:24px;
+}
+
+.login-logo{
+    width:170px;
+    height:58px;
+    margin:0 auto 18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.login-logo img{
+    width:100%;
+    max-width:170px;
+    max-height:55px;
+    object-fit:contain;
+    display:block;
+    filter:drop-shadow(0 0 8px rgba(255,255,255,.2));
+}
+
+.login-title{
+    font-family:'Orbitron',sans-serif;
+    font-size:24px;
+    font-weight:900;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    text-shadow:0 0 14px rgba(255,255,255,.18);
+    margin-bottom:8px;
+}
+
+.login-subtitle{
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:3px;
+    color:#777;
+}
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.login-card{
+    background:linear-gradient(160deg, rgba(255,255,255,.075), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:30px;
+    padding:28px 22px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.6),
+        inset 0 0 60px rgba(255,255,255,.02);
+}
+
+.login-card::before{
+    content:"";position:absolute;
+    width:220px;height:220px;border-radius:50%;
+    background:rgba(255,255,255,.05);
+    top:-120px;right:-90px;
+    filter:blur(8px);
+    pointer-events:none;
+}
+
+.login-card::after{
+    content:"";position:absolute;
+    width:180px;height:180px;border-radius:50%;
+    background:rgba(255,255,255,.03);
+    bottom:-110px;left:-80px;
+    filter:blur(8px);
+    pointer-events:none;
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.form-field{
+    margin-bottom:16px;
+    position:relative;
+    z-index:1;
+}
+
+.form-label{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin:0 6px 8px;
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:1.5px;
+    color:#888;
+}
+
+.form-label .required{
+    color:#f87171;
+    font-size:10px;
+}
+
+.input-wrapper{
+    position:relative;
+    display:flex;
+    align-items:center;
+}
+
+.input-icon{
+    position:absolute;
+    left:16px;
+    top:50%;
+    transform:translateY(-50%);
+    width:18px;
+    height:18px;
+    color:#666;
+    pointer-events:none;
+    z-index:2;
+    transition:.2s;
+}
+
+.form-input{
+    width:100%;
+    height:56px;
+    border-radius:17px;
+    border:1px solid rgba(255,255,255,.15);
+    background:#0d0d0d;
+    color:#fff;
+    padding:0 16px 0 46px;
+    font-family:'Rajdhani',sans-serif;
+    font-size:15px;
+    font-weight:600;
+    outline:none;
+    transition:.2s;
+    position:relative;
+    z-index:1;
+}
+
+.form-input:focus{
+    border-color:rgba(255,255,255,.45);
+    background:#141414;
+    box-shadow:0 0 25px rgba(255,255,255,.06);
+}
+
+.form-input:focus + .input-icon,
+.input-wrapper:focus-within .input-icon{
+    color:#fff;
+}
+
+.form-input::placeholder{
+    color:#555;
+}
+
+.form-input.password{
+    padding-right:52px;
+}
+
+.toggle-pass{
+    position:absolute;
+    right:14px;
+    top:50%;
+    transform:translateY(-50%);
+    width:36px;
+    height:36px;
+    border:0;
+    outline:none;
+    background:transparent;
+    color:#666;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:11px;
+    transition:.2s;
+    z-index:2;
+}
+
+.toggle-pass:hover{
+    color:#fff;
+    background:#1a1a1a;
+}
+
+.toggle-pass svg{
+    width:18px;
+    height:18px;
+}
+
+/* Error text */
+
+.field-error{
+    display:none;
+    margin:6px 6px 0;
+    color:#f87171;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.3px;
+}
+
+.field-error.show{
+    display:block;
+    animation:shake .3s;
+}
+
+@keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-4px);}
+    75%{transform:translateX(4px);}
+}
+
+.form-input.valid{
+    border-color:rgba(74,222,128,.5);
+}
+
+.form-input.invalid{
+    border-color:rgba(248,113,113,.55);
+}
+
+/* =========================================================
+   REMEMBER & FORGOT
+   ========================================================= */
+
+.options-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin:16px 4px 22px;
+    gap:10px;
+    position:relative;
+    z-index:1;
+}
+
+.remember-box{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    cursor:pointer;
+    user-select:none;
+}
+
+.remember-box input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+}
+
+.custom-checkbox{
+    width:20px;
+    height:20px;
+    flex-shrink:0;
+    border-radius:6px;
+    border:1px solid rgba(255,255,255,.2);
+    background:#0d0d0d;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.2s;
+}
+
+.custom-checkbox svg{
+    width:12px;
+    height:12px;
+    color:#080808;
+    opacity:0;
+    transform:scale(.5);
+    transition:.2s;
+}
+
+.remember-box input:checked + .custom-checkbox{
+    background:#f2f2f2;
+    border-color:#f2f2f2;
+}
+
+.remember-box input:checked + .custom-checkbox svg{
+    opacity:1;
+    transform:scale(1);
+}
+
+.remember-text{
+    font-size:12px;
+    color:#999;
+    font-weight:600;
+    letter-spacing:.3px;
+}
+
+.forgot-link{
+    font-family:'Orbitron',sans-serif;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:1px;
+    color:#888;
+    text-decoration:none;
+    transition:.2s;
+    padding:6px 4px;
+}
+
+.forgot-link:hover{
+    color:#fff;
+}
+
+/* =========================================================
+   SUBMIT BUTTON
+   ========================================================= */
+
+.login-btn{
+    width:100%;
+    height:60px;
+    border:0;
+    outline:none;
+    border-radius:20px;
+    background:#f2f2f2;
+    color:#080808;
+    font-family:'Orbitron',sans-serif;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:1.5px;
+    cursor:pointer;
+    transition:.2s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    position:relative;
+    z-index:1;
+    box-shadow:0 10px 30px rgba(255,255,255,.1);
+    margin-bottom:14px;
+}
+
+.login-btn:active{
+    transform:scale(.97);
+}
+
+.login-btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+.login-btn svg{
+    width:18px;
+    height:18px;
+}
+
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+.divider-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:16px 0;
+    position:relative;
+    z-index:1;
+}
+
+.divider-row .line{
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent);
+}
+
+.divider-row .text{
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:2px;
+    color:#555;
+}
+
+/* =========================================================
+   REGISTER LINK
+   ========================================================= */
+
+.register-box{
+    text-align:center;
+    margin-top:20px;
+    position:relative;
+    z-index:1;
+}
+
+.register-box p{
+    font-size:12px;
+    color:#777;
+    font-weight:600;
+    margin-bottom:10px;
+}
+
+.register-box a{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    color:#fff;
+    font-family:'Orbitron',sans-serif;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.2px;
+    text-decoration:none;
+    padding:12px 22px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.18);
+    background:#111;
+    transition:.2s;
+}
+
+.register-box a:hover{
+    background:#1c1c1c;
+    border-color:rgba(255,255,255,.35);
+}
+
+.register-box a svg{
+    width:14px;
+    height:14px;
+}
+
+/* =========================================================
+   INFO FOOTER
+   ========================================================= */
+
+.login-footer{
+    text-align:center;
+    margin-top:24px;
+    color:#555;
+    font-family:'Orbitron',sans-serif;
+    font-size:8px;
+    letter-spacing:2px;
+    font-weight:800;
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+.toast{
+    position:fixed;
+    left:50%;
+    bottom:35px;
+    transform:translate(-50%,20px);
+    background:#151515;
+    border:1px solid rgba(255,255,255,.18);
+    color:#fff;
+    padding:14px 22px;
+    border-radius:16px;
+    font-size:11.5px;
+    font-weight:700;
+    opacity:0;
+    visibility:hidden;
+    transition:.3s cubic-bezier(.2,.8,.2,1);
+    z-index:9999;
+    box-shadow:0 15px 45px rgba(0,0,0,.7);
+    max-width:90vw;
+    text-align:center;
+    letter-spacing:.3px;
+}
+
+.toast.show{
+    opacity:1;
+    visibility:visible;
+    transform:translate(-50%,0);
+}
+
+.toast.success{
+    border-color:rgba(74,222,128,.4);
+    box-shadow:0 15px 45px rgba(74,222,128,.15);
+}
+
+.toast.error{
+    border-color:rgba(248,113,113,.4);
+    box-shadow:0 15px 45px rgba(248,113,113,.15);
+}
+
+/* =========================================================
+   SUCCESS OVERLAY
+   ========================================================= */
+
+.success-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.85);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:10000;
+    opacity:0;
+    visibility:hidden;
+    transition:.35s;
+}
+
+.success-overlay.active{
+    opacity:1;
+    visibility:visible;
+}
+
+.success-box{
+    width:100%;
+    max-width:360px;
+    background:linear-gradient(160deg, #181818, #080808);
+    border:1px solid rgba(74,222,128,.35);
+    border-radius:30px;
+    padding:36px 26px;
+    text-align:center;
+    transform:translateY(20px) scale(.95);
+    transition:.4s cubic-bezier(.2,.8,.2,1);
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.85),
+        0 0 60px rgba(74,222,128,.1);
+}
+
+.success-overlay.active .success-box{
+    transform:translateY(0) scale(1);
+}
+
+.success-icon{
+    width:76px;
+    height:76px;
+    border-radius:50%;
+    background:#0d0d0d;
+    border:2px solid rgba(74,222,128,.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 22px;
+    box-shadow:0 0 30px rgba(74,222,128,.25);
+    animation:successPop .5s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes successPop{
+    0%{transform:scale(.4);opacity:0;}
+    60%{transform:scale(1.1);}
+    100%{transform:scale(1);opacity:1;}
+}
+
+.success-icon svg{
+    width:38px;
+    height:38px;
+    color:#4ade80;
+}
+
+.success-title{
+    font-family:'Orbitron',sans-serif;
+    font-size:17px;
+    font-weight:900;
+    letter-spacing:1.5px;
+    margin-bottom:10px;
+    color:#fff;
+}
+
+.success-text{
+    font-size:12.5px;
+    color:#999;
+    line-height:1.6;
+    font-weight:600;
+    margin-bottom:6px;
+}
+
+.success-user{
+    font-family:'Orbitron',sans-serif;
+    font-size:13px;
+    font-weight:900;
+    color:#4ade80;
+    letter-spacing:1px;
+    margin-bottom:24px;
+    text-shadow:0 0 12px rgba(74,222,128,.4);
+}
+
+.success-btn{
+    width:100%;
+    height:54px;
+    border:0;
+    outline:none;
+    border-radius:17px;
+    background:#f2f2f2;
+    color:#080808;
+    font-family:'Orbitron',sans-serif;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.2px;
+    cursor:pointer;
+    transition:.2s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.success-btn:active{transform:scale(.97);}
+
+.success-btn svg{
+    width:16px;
+    height:16px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media(max-width:390px){
+    body{padding:24px 12px 30px;}
+    .login-card{padding:24px 18px;}
+    .login-title{font-size:21px;}
+    .login-logo{width:150px;height:50px;}
+    .login-logo img{max-width:150px;}
+    .form-input{height:52px;font-size:14px;}
+    .login-btn{height:56px;}
+    .success-box{padding:30px 22px;}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="login-wrapper">
+
+    <!-- ================= HEADER ================= -->
+    <div class="login-header">
+
+        <!-- ═══════════════════════════════════════════════════════════
+             GANTI LOGO ANDA DI SINI (header.png)
+             Taruh file logo di folder yang sama dengan file HTML ini
+             ═══════════════════════════════════════════════════════════ -->
+        <div class="login-logo">
+            <img src="header.png" alt="LOGO" onerror="this.style.display='none';">
+        </div>
+
+        <div class="login-title">MASUK AKUN</div>
+        <!-- ═══════════════════════════════════════════════════════════
+             GANTI SUBTITLE DI BAWAH INI DENGAN BRAND ANDA
+             ═══════════════════════════════════════════════════════════ -->
+        <div class="login-subtitle">APPNAME CONTROL SYSTEM</div>
+
+    </div>
+
+    <!-- ================= CARD ================= -->
+    <div class="login-card">
+
+        <!-- ===== USERNAME / EMAIL ===== -->
+        <div class="form-field">
+            <div class="form-label">
+                <span>USERNAME ATAU EMAIL</span>
+                <span class="required">*</span>
+            </div>
+            <div class="input-wrapper">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="7" r="3.5"/>
+                    <path d="M5 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/>
+                </svg>
+                <input class="form-input" id="inputIdentity" type="text"
+                       placeholder="username atau email"
+                       autocomplete="username"
+                       style="text-transform:lowercase;">
+            </div>
+            <div class="field-error" id="errIdentity">Username / email wajib diisi</div>
+        </div>
+
+        <!-- ===== PASSWORD ===== -->
+        <div class="form-field">
+            <div class="form-label">
+                <span>KATA SANDI</span>
+                <span class="required">*</span>
+            </div>
+            <div class="input-wrapper">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="4" y="10" width="16" height="10" rx="2"/>
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+                </svg>
+                <input class="form-input password" id="inputPassword" type="password"
+                       placeholder="Masukkan kata sandi"
+                       autocomplete="current-password">
+                <button class="toggle-pass" onclick="togglePassword('inputPassword', this)" type="button" tabindex="-1">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="field-error" id="errPassword">Kata sandi wajib diisi</div>
+        </div>
+
+        <!-- ===== REMEMBER & FORGOT ===== -->
+        <div class="options-row">
+
+            <label class="remember-box">
+                <input type="checkbox" id="inputRemember" checked>
+                <div class="custom-checkbox">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                </div>
+                <div class="remember-text">Ingat saya</div>
+            </label>
+
+            <!-- ═══════════════════════════════════════════════════════════
+                 GANTI PATH "forgot.html" SESUAI FILE LUPA SANDI ANDA
+                 ═══════════════════════════════════════════════════════════ -->
+            <a href="forgot.html" class="forgot-link">LUPA SANDI?</a>
+
+        </div>
+
+        <!-- ===== SUBMIT ===== -->
+        <button class="login-btn" id="loginBtn" onclick="submitLogin()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                <path d="M10 17l5-5-5-5"/>
+                <path d="M15 12H3"/>
+            </svg>
+            MASUK SEKARANG
+        </button>
+
+        <!-- ===== DIVIDER ===== -->
+        <div class="divider-row">
+            <div class="line"></div>
+            <div class="text">BELUM PUNYA AKUN?</div>
+            <div class="line"></div>
+        </div>
+
+        <!-- ===== REGISTER LINK ===== -->
+        <!-- ═══════════════════════════════════════════════════════════
+             GANTI PATH "register.html" SESUAI FILE REGISTER ANDA
+             ═══════════════════════════════════════════════════════════ -->
+        <div class="register-box">
+            <a href="register.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                DAFTAR AKUN BARU
+            </a>
+        </div>
+
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <!-- ═══════════════════════════════════════════════════════════
+         GANTI "APPNAME" DI BAWAH INI DENGAN BRAND ANDA
+         ═══════════════════════════════════════════════════════════ -->
+    <div class="login-footer">
+        APPNAME • VERSION 1.0 • 2026
+    </div>
+
+</div>
+
+<!-- ================= TOAST ================= -->
+<div class="toast" id="toast"></div>
+
+<!-- ================= SUCCESS OVERLAY ================= -->
+<div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path d="M20 6L9 17l-5-5"/>
+            </svg>
+        </div>
+
+        <div class="success-title">LOGIN BERHASIL</div>
+
+        <div class="success-text">
+            Selamat datang kembali,
+        </div>
+
+        <div class="success-user" id="successUser">USER</div>
+
+        <button class="success-btn" onclick="goToHome()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M3 10.5L12 3l9 7.5"/>
+                <path d="M5 9.5V21h14V9.5"/>
+                <path d="M9 21v-6h6v6"/>
+            </svg>
+            MASUK KE BERANDA
+        </button>
+
+    </div>
+</div>
+
+<script>
+
+/* =========================================================
+   LOGIN — JAVASCRIPT + FIREBASE AUTH
+   ========================================================= */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡⚡⚡ KONFIGURASI FIREBASE ⚡⚡⚡
+   ═══════════════════════════════════════════════════════════════════════════
+   GANTI SEMUA VALUE DI BAWAH INI DENGAN MILIK ANDA:
+
+   1. Buka Firebase Console → Project Settings → General
+   2. Scroll ke "Your apps" → pilih Web App
+   3. Copy config dan paste ke sini
+   4. Pastikan sudah AKTIFKAN "Authentication" → "Sign-in method" → "Email/Password"
+   5. Pastikan Realtime Database sudah dibuat (bukan Firestore)
+   ═══════════════════════════════════════════════════════════════════════════ */
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDLs7Coar_Dy9bE2K4Ha_Q6wG0SmC3m75g",
+    //        ↑ GANTI dengan API Key Anda
+
+    authDomain: "https://radien-95e9d.firebaseapp.com",
+    //            ↑ GANTI dengan Auth Domain Anda
+
+    databaseURL: "https://radien-95e9d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    //             ↑ GANTI dengan Realtime Database URL Anda
+
+    projectId: "radien-95e9d",
+    //           ↑ GANTI dengan Project ID Anda
+
+    storageBucket: "https://radien-95e9d.firebasestorage.app",
+    //               ↑ GANTI dengan Storage Bucket Anda
+
+    messagingSenderId: "208676450122",
+    //                   ↑ GANTI dengan Messaging Sender ID Anda
+
+    appId: "13f1702562e36468a4dbb3"
+    //      ↑ GANTI dengan App ID Anda
+};
+
+let FIREBASE_AUTH = null;
+let FIREBASE_DB = null;
+let FIREBASE_READY = false;
+
+function initFirebase(){
+    try {
+        if (typeof firebase === "undefined") {
+            console.warn("[FIREBASE] SDK belum dimuat");
+            return false;
+        }
+        if (!firebase.apps.length) {
+            firebase.initializeApp(FIREBASE_CONFIG);
+        }
+        FIREBASE_AUTH = firebase.auth();
+        FIREBASE_DB = firebase.database();
+        FIREBASE_READY = true;
+        console.log("[FIREBASE] Initialized ✓", FIREBASE_CONFIG.projectId);
+        return true;
+    } catch (e) {
+        console.error("[FIREBASE] Init error:", e);
+        FIREBASE_READY = false;
+        return false;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ SESSION STORAGE KEYS
+   ⚠️ WAJIB SAMA dengan file forgot.html, home.html, dan file lainnya
+   ═══════════════════════════════════════════════════════════════════════════ */
+const STORAGE_KEY_USERS = "astra_users";
+//                          ↑ GANTI kalau perlu (harus SAMA semua file)
+const STORAGE_KEY_SESSION = "astra_session";
+//                            ↑ GANTI kalau perlu (harus SAMA semua file)
+const STORAGE_KEY_REMEMBER = "astra_remember";
+//                              ↑ GANTI kalau perlu
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ FIREBASE DATABASE PATHS
+   ⚠️ Sesuaikan dengan struktur database Anda
+   ═══════════════════════════════════════════════════════════════════════════ */
+const DB_PATH_USER_BY_USERNAME = "astra_user_by_username";
+//                                  ↑ Path untuk lookup username → email
+const DB_PATH_USERS = "astra_users";
+//                      ↑ Path utama user data
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ DEFAULT VALUES
+   ═══════════════════════════════════════════════════════════════════════════ */
+const DEFAULT_AVATAR = "profile.png";
+//                       ↑ GANTI dengan avatar default Anda
+const DEFAULT_NAME = "USER";
+//                     ↑ GANTI dengan nama default
+const DEFAULT_TIER = "FREE";
+const DEFAULT_USER_ID_PREFIX = "USR-";
+//                                ↑ GANTI prefix ID user Anda
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚡ REDIRECT PATH
+   ═══════════════════════════════════════════════════════════════════════════ */
+const REDIRECT_AFTER_LOGIN = "home.html";
+//                              ↑ GANTI ke halaman utama Anda
+
+/* =========================================================
+   TOGGLE PASSWORD
+   ========================================================= */
+
+function togglePassword(inputId, btn){
+
+    const input = document.getElementById(inputId);
+    if(!input) return;
+
+    const isPassword = input.type === "password";
+    input.type = isPassword ? "text" : "password";
+
+    if(isPassword){
+        btn.innerHTML =
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">' +
+                '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>' +
+                '<path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>' +
+                '<path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>' +
+                '<path d="M1 1l22 22"/>' +
+            '</svg>';
+    }else{
+        btn.innerHTML =
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">' +
+                '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>' +
+                '<circle cx="12" cy="12" r="3"/>' +
+            '</svg>';
+    }
+
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+let toastTimer = null;
+
+function showToast(msg, type){
+
+    const toast = document.getElementById("toast");
+    if(!toast) return;
+
+    toast.textContent = msg;
+    toast.className = "toast show" + (type ? " " + type : "");
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(function(){
+        toast.className = "toast";
+    }, 3200);
+
+}
+
+/* =========================================================
+   FIELD ERROR
+   ========================================================= */
+
+function showError(fieldId, show){
+
+    const el = document.getElementById(fieldId);
+    if(!el) return;
+
+    if(show){
+        el.classList.add("show");
+    }else{
+        el.classList.remove("show");
+    }
+
+}
+
+function setInputState(inputId, state){
+
+    const input = document.getElementById(inputId);
+    if(!input) return;
+
+    input.classList.remove("valid", "invalid");
+
+    if(state === "valid") input.classList.add("valid");
+    if(state === "invalid") input.classList.add("invalid");
+
+}
+
+/* =========================================================
+   STORAGE
+   ========================================================= */
+
+function getUsers(){
+    try{
+        const raw = localStorage.getItem(STORAGE_KEY_USERS);
+        return raw ? JSON.parse(raw) : {};
+    }catch(e){
+        return {};
+    }
+}
+
+function saveUsers(users){
+    localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
+}
+
+function saveSession(data){
+    localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(data));
+}
+
+function getRememberData(){
+    try{
+        const raw = localStorage.getItem(STORAGE_KEY_REMEMBER);
+        return raw ? JSON.parse(raw) : null;
+    }catch(e){
+        return null;
+    }
+}
+
+function saveRememberData(data){
+    if(data){
+        localStorage.setItem(STORAGE_KEY_REMEMBER, JSON.stringify(data));
+    }else{
+        localStorage.removeItem(STORAGE_KEY_REMEMBER);
+    }
+}
+
+/* =========================================================
+   VALIDASI
+   ========================================================= */
+
+function validateIdentity(){
+
+    const input = document.getElementById("inputIdentity");
+    const val = input.value.trim().toLowerCase();
+
+    if(val === ""){
+        setInputState("inputIdentity", "");
+        return false;
+    }
+
+    if(val.length < 3){
+        setInputState("inputIdentity", "invalid");
+        return false;
+    }
+
+    setInputState("inputIdentity", "valid");
+    return true;
+
+}
+
+function validatePassword(){
+
+    const input = document.getElementById("inputPassword");
+    const val = input.value;
+
+    if(val === ""){
+        setInputState("inputPassword", "");
+        return false;
+    }
+
+    if(val.length < 6){
+        setInputState("inputPassword", "invalid");
+        return false;
+    }
+
+    setInputState("inputPassword", "valid");
+    return true;
+
+}
+
+/* =========================================================
+   ⚡ LOOKUP USER BY USERNAME (via Firebase Database)
+   ========================================================= */
+
+function lookupEmailByIdentity(identity){
+    /*
+       Return Promise<String email>
+       - Kalau identity = email → langsung return email
+       - Kalau identity = username → lookup ke Firebase
+    */
+    const id = identity.toLowerCase().trim();
+
+    /* Cek apakah ini email */
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(id);
+
+    if(isEmail){
+        return Promise.resolve(id);
+    }
+
+    /* Ini username — cari di Firebase */
+    if(!FIREBASE_READY || !FIREBASE_DB){
+        /* Fallback ke localStorage */
+        const users = getUsers();
+        if(users[id] && users[id].email){
+            return Promise.resolve(users[id].email);
+        }
+        return Promise.reject({ code: "auth/user-not-found", message: "Akun tidak ditemukan" });
+    }
+
+    return FIREBASE_DB.ref(DB_PATH_USER_BY_USERNAME + "/" + id).once("value")
+        .then(function(snap){
+            if(snap.exists()){
+                const data = snap.val();
+                if(data && data.email){
+                    return data.email;
+                }
+            }
+            throw { code: "auth/user-not-found", message: "Username tidak ditemukan" };
+        });
+
+}
+
+/* =========================================================
+   ⚡ LOAD USER DATA FROM FIREBASE DATABASE
+   ========================================================= */
+
+function loadUserData(uid){
+    if(!FIREBASE_READY || !FIREBASE_DB){
+        return Promise.resolve(null);
+    }
+    return FIREBASE_DB.ref(DB_PATH_USERS + "/" + uid).once("value")
+        .then(function(snap){
+            return snap.exists() ? snap.val() : null;
+        });
+}
+
+/* =========================================================
+   ⚡ SUBMIT LOGIN — FIREBASE AUTH
+   ========================================================= */
+
+function submitLogin(){
+
+    const okIdentity = validateIdentity();
+    const okPassword = validatePassword();
+
+    if(!okIdentity){
+        showError("errIdentity", true);
+        showError("errPassword", false);
+        showToast("Masukkan username / email", "error");
+        document.getElementById("inputIdentity").focus();
+        return;
+    }
+
+    if(!okPassword){
+        showError("errIdentity", false);
+        showError("errPassword", true);
+        showToast("Masukkan kata sandi", "error");
+        document.getElementById("inputPassword").focus();
+        return;
+    }
+
+    showError("errIdentity", false);
+    showError("errPassword", false);
+
+    if(!FIREBASE_READY || !FIREBASE_AUTH){
+        showToast("Firebase belum siap. Refresh halaman.", "error");
+        return;
+    }
+
+    const identity = document.getElementById("inputIdentity").value.trim().toLowerCase();
+    const password = document.getElementById("inputPassword").value;
+    const remember = document.getElementById("inputRemember").checked;
+
+    /* Disable button */
+    const btn = document.getElementById("loginBtn");
+    btn.disabled = true;
+    btn.innerHTML =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" ' +
+            'style="animation:spin 1s linear infinite;">' +
+            '<path d="M21 12a9 9 0 1 1-6.2-8.6"/>' +
+        '</svg>MEMPROSES...';
+
+    /* ⚡ Step 1: Lookup email from identity */
+    lookupEmailByIdentity(identity)
+        .then(function(email){
+            /* ⚡ Step 2: Sign in dengan Firebase Auth */
+            return FIREBASE_AUTH.signInWithEmailAndPassword(email, password);
+        })
+        .then(function(userCredential){
+            const user = userCredential.user;
+            const uid = user.uid;
+
+            /* ⚡ Step 3: Load user data dari Firebase Database */
+            return loadUserData(uid)
+                .then(function(userData){
+                    if(!userData){
+                        /* Kalau data di DB hilang, fallback ke data Auth */
+                        userData = {
+                            uid: uid,
+                            id: DEFAULT_USER_ID_PREFIX + "000000",
+                            name: user.displayName || DEFAULT_NAME,
+                            username: identity,
+                            email: user.email,
+                            tier: DEFAULT_TIER,
+                            avatar: DEFAULT_AVATAR,
+                            wallet: 0,
+                            dailyDay: 1,
+                            dailyLastClaim: null
+                        };
+                    }
+                    return { user: user, userData: userData };
+                });
+        })
+        .then(function(result){
+            const user = result.user;
+            const userData = result.userData;
+
+            /* ⚡ Step 4: Simpan session ke localStorage */
+            const session = {
+                uid: user.uid,
+                userId: userData.id,
+                username: userData.username,
+                email: userData.email,
+                name: userData.name,
+                tier: userData.tier || DEFAULT_TIER,
+                loginAt: Date.now()
+            };
+            saveSession(session);
+
+            /* ⚡ Step 5: Cache user ke localStorage (untuk kompatibilitas) */
+            const users = getUsers();
+            users[userData.username] = {
+                uid: user.uid,
+                id: userData.id,
+                name: userData.name,
+                username: userData.username,
+                email: userData.email,
+                tier: userData.tier || DEFAULT_TIER,
+                avatar: userData.avatar || DEFAULT_AVATAR,
+                wallet: userData.wallet || 0,
+                dailyDay: userData.dailyDay || 1,
+                dailyLastClaim: userData.dailyLastClaim || null,
+                createdAt: userData.createdAt || Date.now()
+            };
+            saveUsers(users);
+
+            /* ⚡ Step 6: Update lastLogin di Firebase */
+            FIREBASE_DB.ref(DB_PATH_USERS + "/" + user.uid + "/lastLogin")
+                .set(firebase.database.ServerValue.TIMESTAMP)
+                .catch(function(){});
+
+            /* ⚡ Step 7: Save remember data */
+            if(remember){
+                saveRememberData({
+                    identity: identity,
+                    remember: true,
+                    lastLogin: Date.now()
+                });
+            }else{
+                saveRememberData(null);
+            }
+
+            console.log("[LOGIN] Success:", userData.name, "| UID:", user.uid);
+
+            /* Tampilkan success overlay */
+            document.getElementById("successUser").textContent =
+                (userData.name || DEFAULT_NAME).toUpperCase();
+
+            document.getElementById("successOverlay").classList.add("active");
+
+            /* Reset button */
+            btn.disabled = false;
+            btn.innerHTML =
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+                    '<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>' +
+                    '<path d="M10 17l5-5-5-5"/>' +
+                    '<path d="M15 12H3"/>' +
+                '</svg>MASUK SEKARANG';
+
+        })
+        .catch(function(error){
+            console.error("[LOGIN] Error:", error);
+
+            /* Reset button */
+            btn.disabled = false;
+            btn.innerHTML =
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+                    '<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>' +
+                    '<path d="M10 17l5-5-5-5"/>' +
+                    '<path d="M15 12H3"/>' +
+                '</svg>MASUK SEKARANG';
+
+            /* Tampilkan error sesuai kode */
+            let msg = "Login gagal. Coba lagi.";
+            const code = error && error.code ? error.code : "";
+
+            if(code === "auth/user-not-found" || code === "auth/wrong-password"){
+                msg = "Username / email atau kata sandi salah";
+                setInputState("inputIdentity", "invalid");
+                setInputState("inputPassword", "invalid");
+            }
+            else if(code === "auth/invalid-email"){
+                msg = "Format email tidak valid";
+                setInputState("inputIdentity", "invalid");
+            }
+            else if(code === "auth/invalid-credential"){
+                msg = "Username / email atau kata sandi salah";
+                setInputState("inputIdentity", "invalid");
+                setInputState("inputPassword", "invalid");
+            }
+            else if(code === "auth/user-disabled"){
+                msg = "Akun kamu dinonaktifkan";
+            }
+            else if(code === "auth/too-many-requests"){
+                msg = "Terlalu banyak percobaan. Coba lagi nanti.";
+            }
+            else if(code === "auth/network-request-failed"){
+                msg = "Koneksi internet bermasalah";
+            }
+            else if(error && error.message){
+                msg = error.message;
+            }
+
+            showToast(msg, "error");
+        });
+
+}
+
+/* =========================================================
+   GO TO HOME
+   ========================================================= */
+
+function goToHome(){
+    window.location.href = REDIRECT_AFTER_LOGIN;
+}
+
+/* =========================================================
+   AUTO FILL — kalau ada remember data
+   ========================================================= */
+
+function autoFillRemember(){
+
+    const rememberData = getRememberData();
+
+    if(rememberData && rememberData.identity){
+
+        const input = document.getElementById("inputIdentity");
+        if(input){
+            input.value = rememberData.identity;
+            setInputState("inputIdentity", "valid");
+        }
+
+        const rememberCheckbox = document.getElementById("inputRemember");
+        if(rememberCheckbox){
+            rememberCheckbox.checked = true;
+        }
+
+        /* Fokus ke password */
+        const passInput = document.getElementById("inputPassword");
+        if(passInput){
+            setTimeout(function(){
+                passInput.focus();
+            }, 300);
+        }
+
+    }else{
+
+        const identityInput = document.getElementById("inputIdentity");
+        if(identityInput){
+            setTimeout(function(){
+                identityInput.focus();
+            }, 300);
+        }
+
+    }
+
+}
+
+/* =========================================================
+   EVENT LISTENERS
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    /* ⚡ Init Firebase */
+    initFirebase();
+
+    /* ⚡ Cek session existing — auto redirect kalau sudah login */
+    if(FIREBASE_READY && FIREBASE_AUTH){
+        FIREBASE_AUTH.onAuthStateChanged(function(user){
+            if(user){
+                /* Cek apakah session local cocok */
+                try{
+                    const raw = localStorage.getItem(STORAGE_KEY_SESSION);
+                    if(raw){
+                        const session = JSON.parse(raw);
+                        if(session && session.uid === user.uid){
+                            console.log("[LOGIN] Already logged in, redirecting...");
+                            window.location.replace(REDIRECT_AFTER_LOGIN);
+                        }
+                    }
+                }catch(e){}
+            }
+        });
+    }
+
+    /* Auto fill remember */
+    autoFillRemember();
+
+    /* Force lowercase input */
+    const inputIdentity = document.getElementById("inputIdentity");
+    if(inputIdentity){
+        inputIdentity.addEventListener("input", function(){
+            this.value = this.value.toLowerCase().replace(/\s/g, "");
+        });
+    }
+
+    const inputPassword = document.getElementById("inputPassword");
+
+    /* Realtime validation */
+    if(inputIdentity){
+        inputIdentity.addEventListener("blur", function(){
+            if(this.value.trim() !== "") validateIdentity();
+        });
+    }
+
+    if(inputPassword){
+        inputPassword.addEventListener("blur", function(){
+            if(this.value !== "") validatePassword();
+        });
+    }
+
+    /* Enter untuk submit */
+    document.addEventListener("keydown", function(e){
+        if(e.key === "Enter"){
+            const overlay = document.getElementById("successOverlay");
+            if(overlay && overlay.classList.contains("active")){
+                goToHome();
+            }else{
+                submitLogin();
+            }
+        }
+    });
+
+});
+
+</script>
+
+<style>
+@keyframes spin{
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
+}
+</style>
+
+</body>
+</html>
